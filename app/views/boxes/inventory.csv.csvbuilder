@@ -4,9 +4,9 @@ csv << [
   "Label ID (QR code)",
   "Batch ID",
   "Virus Lineage",
+  "Replicate",
   "Production Date",
   "Concentration",
-  "Replicate",
   "Inactivation Method",
   "Media",
 ]
@@ -18,9 +18,9 @@ csv << [
     sample.uuid,
     sample.batch_number,
     sample.virus_lineage,
+    sample.replicate,
     sample.date_produced.to_date,
     sample.concentration_formula,
-    sample.replicate,
     sample.inactivation_method,
     sample.media,
   ]

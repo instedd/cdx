@@ -10,7 +10,7 @@
 
     background: $white;
     padding: 5px 7px;
-    margin: 15px 15px;
+    margin: 15px 15px 7px;
 
     .title {
       font-size: 14px;
@@ -63,6 +63,17 @@
       background: none !important;
       color: inherit;
     }
+  }
+}
+
+.barcode-after {
+  margin: 7px 15px 0;
+
+  .btn-icon {
+    margin: -3px 0 0;
+    font-size: 24px;
+    background: none !important;
+    color: inherit;
   }
 }
 
