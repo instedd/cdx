@@ -117,12 +117,13 @@ class SamplesController < ApplicationController
 
   def print
     @sample = Sample.find(params[:id])
+    @sample_form = SamplePresenter.new(@sample, request.format)
     return unless authorize_resource(@sample, READ_SAMPLE)
 
     render pdf: "cdx_sample_#{@sample.uuid}",
       template: "samples/barcode.pdf",
       layout: "layouts/pdf.html",
-      locals: { :sample => @sample },
+      locals: { :sample => @sample_form },
       margin: { top: 0, bottom: 0, left: 0, right: 0 },
       page_width: "1in",
       page_height: "1in",
@@ -131,6 +132,7 @@ class SamplesController < ApplicationController
 
   def bulk_print
     samples = Sample.where(id: params[:sample_ids])
+    sample_forms = samples.each { |s| SamplePresenter.new(@sample, request.format) }
     return unless authorize_resources(samples, READ_SAMPLE)
 
     render pdf: "cdx_samples_#{samples.size}_#{DateTime.now.strftime("%Y%m%d-%H%M")}",
