@@ -189,17 +189,6 @@ RSpec.describe TransferPackagesController, type: :controller do
         expect(data["samples"].map { |s| s["uuid"] }).to eq [qc_sample.uuid]
         expect(data["samples"].map { |s| s["error"] }).to eq ["Sample 01234567-4444-a0c8-ac1b-58bed3633e88 is a QC sample and can't be transferred."]
       end
-      
-      it "blocks transfered boxes" do
-        confirmed_transfer = TransferPackage.make! :receiver_confirmed, sender_institution: @institution, receiver_institution: @other_institution, blinded: true
-        confirmed_box = confirmed_transfer.box_transfers[0].box
-
-        get :find_box, params: { uuid: confirmed_box.uuid }
-        expect(response).to be_success
-
-        data = JSON.parse(response.body)
-        expect(data["boxes"]).to be_empty
-      end
     end
 
     context "partial" do

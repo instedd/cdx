@@ -1,6 +1,5 @@
 class BoxesController < ApplicationController
-  before_action :load_box, only: %i[show destroy]
-  before_action :load_box_print, only: %i[print inventory]
+  before_action :load_box, except: %i[index new create bulk_destroy]
   helper_method :samples_data
 
   def index
@@ -101,17 +100,6 @@ class BoxesController < ApplicationController
     end
   end
 
-  def load_box_print
-    @box = Box.where(institution: @navigation_context.institution, id: params.fetch(:id)).take
-    if @box.nil?
-      @box = Box
-        .joins(box_transfers: :transfer_package)
-        .merge( TransferPackage.within( @navigation_context.institution ) )
-        .where(id: params.fetch(:id))
-        .take
-    end
-  end
-  
   def load_box_samples
     samples = @box.samples.preload(:batch, :sample_identifiers)
     samples = samples.scrambled if @box.blinded?
@@ -151,5 +139,4 @@ class BoxesController < ApplicationController
       }
     end
   end
-  
 end
