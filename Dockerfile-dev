@@ -1,4 +1,4 @@
-FROM ruby:2.2
+FROM ruby:2.3
 
 # ENV POIROT_STDOUT true
 # ENV POIROT_SUPPRESS_RAILS_LOG true
@@ -8,7 +8,6 @@ FROM ruby:2.2
 # RUN \
 #   mkdir -p /app/public/ && \
 #   curl -L https://github.com/instedd/notifiable-diseases/releases/download/$NNDD_VERSION/nndd.tar.gz | tar -xzv -C /app/public/
-
 
 ENV LOCAL_SHARE "/usr/local/share"
 
@@ -36,8 +35,10 @@ RUN \
     mysql-client \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+ARG TARGETARCH
+
 # wkhtmltopdf
-RUN \
-  curl -L https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.jessie_amd64.deb --output wkhtmltopdf.deb && \
-    dpkg -i wkhtmltopdf.deb && \
+RUN set -eux;\
+    curl -L https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.stretch_${TARGETARCH}.deb --output wkhtmltopdf.deb; \
+    dpkg -i wkhtmltopdf.deb; \
     rm -f wkhtmltopdf.deb
