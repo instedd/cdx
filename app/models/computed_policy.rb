@@ -329,8 +329,8 @@ class ComputedPolicy < ApplicationRecord
     end
 
     def compact_policies(computed_policies)
-      computed_policies.delete_if do |policy|
-        computed_policies.any?{|p| !p.equal?(policy) && p.contains(policy) }
+      computed_policies.each_with_object([]) do |policy, uniq_policies|
+        uniq_policies << policy unless uniq_policies.any?{|p| !p.equal?(policy) && p.contains(policy) }
       end
     end
 

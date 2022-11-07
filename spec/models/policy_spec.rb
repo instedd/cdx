@@ -268,7 +268,7 @@ describe Policy do
         assert_can user4, institution, READ_INSTITUTION
       end
 
-      xit "allows checking when there's a loop" do
+      it "allows checking when there's a loop" do
         user2, institution2 = create_user_and_institution
         user3, institution3 = create_user_and_institution
 
