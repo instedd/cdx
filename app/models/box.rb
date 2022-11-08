@@ -43,12 +43,11 @@ class Box < ApplicationRecord
     entity_fields.find { |f| f.name == 'purpose' }.options
   end
 
-  def build_samples(batch, concentration_number: 1, concentration_exponents: [0], replicates:, media:)
-    concentration_exponents.each do |exponent|
+  def build_samples(batch, concentrations: [0], replicates:, media:)
+    concentrations.each do |concentration|
       1.upto(replicates) do |replicate|
         samples << batch.build_sample(
-          concentration_number: concentration_number,
-          concentration_exponent: exponent,
+          concentration_number: concentration,
           replicate: replicate,
           institution: institution,
           site: site,

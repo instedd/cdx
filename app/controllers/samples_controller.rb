@@ -216,7 +216,6 @@ class SamplesController < ApplicationController
       :volume,
       :virus_lineage,
       :concentration_number,
-      :concentration_exponent,
       :replicate,
       :media,
       assay_attachments_attributes: [:id, :loinc_code_id, :result, :assay_file_id, :_destroy],

@@ -17,7 +17,6 @@ class SampleForm
       :volume,
       :virus_lineage,
       :concentration_number,
-      :concentration_exponent,
       :replicate,
       :media,
       :qc_info ]

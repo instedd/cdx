@@ -40,20 +40,20 @@ class BoxForm
   def build_samples
     case @box.purpose
     when "LOD"
-      @box.build_samples(@batches["lod"], concentration_exponents: 1..8, replicates: 3, media: media)
-      @box.build_samples(@batches["lod"], concentration_number: 0, replicates: 4, media: media)
+      @box.build_samples(@batches["lod"], concentrations: (1..8).map{|e| 10**e}, replicates: 3, media: media)
+      @box.build_samples(@batches["lod"], concentrations: [0], replicates: 4, media: media)
 
     when "Variants"
       @batches.each_value do |batch|
-        @box.build_samples(batch, concentration_exponents: [1, 4, 8], replicates: 3, media: media)
+        @box.build_samples(batch, concentrations: [1, 4, 8].map{|e| 10**e}, replicates: 3, media: media)
       end
 
     when "Challenge"
       @batches.each do |key, batch|
         if key == "virus"
-          @box.build_samples(batch, concentration_exponents: [1, 4, 8], replicates: 18, media: media)
+          @box.build_samples(batch, concentrations: [1, 4, 8].map{|e| 10**e}, replicates: 18, media: media)
         else
-          @box.build_samples(batch, concentration_exponents: [1, 4, 8], replicates: 3, media: media)
+          @box.build_samples(batch, concentrations: [1, 4, 8].map{|e| 10**e}, replicates: 3, media: media)
         end
       end
 
