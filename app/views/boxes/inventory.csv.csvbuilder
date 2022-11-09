@@ -20,7 +20,7 @@ csv << [
     sample.virus_lineage,
     sample.replicate,
     sample.date_produced.to_date,
-    sample.concentration_formula,
+    sample.concentration,
     sample.inactivation_method,
     sample.media,
   ]

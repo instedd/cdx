@@ -47,7 +47,7 @@ class Box < ApplicationRecord
     concentrations.each do |concentration|
       1.upto(replicates) do |replicate|
         samples << batch.build_sample(
-          concentration_number: concentration,
+          concentration: concentration,
           replicate: replicate,
           institution: institution,
           site: site,
@@ -83,7 +83,7 @@ class Box < ApplicationRecord
 
   # Returns the full list of sample attributes that can be blinded.
   def self.blind_attribute_names
-    %i[batch_number concentration concentration_formula replicate virus_lineage isolate_name]
+    %i[batch_number concentration replicate virus_lineage isolate_name]
   end
 
   # Returns true if a sample attribute should be blinded for the current box.

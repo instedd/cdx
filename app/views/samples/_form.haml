@@ -63,9 +63,9 @@
           .span.unit (μl)
 
       = f.form_field :concentration do
-        .row.input-unit
-          - @sample_form.blinded_attribute(:concentration) do
-            = f.text_field :concentration_number, readonly: !@can_update, :class=> "input-small"
+        - @sample_form.blinded_attribute(:concentration) do
+          .row.input-unit
+            = f.text_field :concentration, min:0, readonly: !@can_update, :class=> "input-medium", :value => concentration_formatting(@sample_form.concentration)
             .span.unit (copies/ml)
             
       = f.form_field :replicate do
