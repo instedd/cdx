@@ -7,7 +7,6 @@ RSpec.describe TransferPackagesController, type: :controller do
 
     @other_institution = Institution.make!
     @other_user = @other_institution.user
-
     grant @other_user, @user, @other_institution, READ_INSTITUTION
   end
 

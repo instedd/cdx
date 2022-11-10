@@ -11,15 +11,7 @@ RSpec.describe BoxesController, type: :controller do
     @site = Site.make! institution: @institution
     @site_box = Box.make! institution: @institution, site: @site
 
-    @other_institution = Institution.make!
-    @other_user = @other_institution.user
-
-    @floating_transfer = TransferPackage.make! :blinded, sender_institution: @institution, receiver_institution: @other_institution
-    @floating_box = @floating_transfer.box_transfers[0].box
-
-    @confirmed_transfer = TransferPackage.make! :receiver_confirmed, sender_institution: @institution, receiver_institution: @other_institution
-    @confirmed_box = @confirmed_transfer.box_transfers[0].box
-
+    @other_user = Institution.make!.user
     grant @user, @other_user, @institution, READ_INSTITUTION
   end
 
@@ -117,7 +109,7 @@ RSpec.describe BoxesController, type: :controller do
     end
 
     it "should be accessible to institution owner" do
-      get :print, params: { id: @floating_box.id }
+      get :print, params: { id: box.id }
       expect(response).to have_http_status(:ok)
     end
 
@@ -125,40 +117,30 @@ RSpec.describe BoxesController, type: :controller do
       grant user, other_user, box, READ_BOX
       sign_in other_user
 
-      get :print, params: { id: @confirmed_box.id, context: other_institution.uuid }
+      get :print, params: { id: box.id }
       expect(response).to have_http_status(:ok)
     end
 
     it "shouldn't be allowed if can't read" do
       sign_in other_user
-      get :print, params: { id: @floating_box.id, context: other_institution.uuid }
-      expect(response).to have_http_status(:forbidden)
-    end
 
-    it "confirmed box should be accessible to sender" do
-      get :print, params: { id: @confirmed_box.id }
-      expect(response).to have_http_status(:ok)
-    end
-
-    it "floating box shouldn't be accessible receiver" do
-      sign_in other_user
-      get :print, params: { id: @floating_box.id, context: other_institution.uuid }
+      get :print, params: { id: box.id }
       expect(response).to have_http_status(:forbidden)
     end
   end
 
   describe "inventory" do
     it "should be accessible to institution owner" do
-      get :inventory, params: { id: @floating_box.id, format: "csv" }
+      get :inventory, params: { id: box.id, format: "csv" }
       expect(response).to have_http_status(:ok)
       expect(response.content_type).to eq("text/csv")
-      expect(response.body.strip.split("\n").size).to eq(@floating_box.samples.count + 1)
+      expect(response.body.strip.split("\n").size).to eq(box.samples.count + 1)
       expect(response.body).to_not match("Blinded")
-      expect(response.headers["Content-Disposition"]).to match(/cdx_box_inventory_#{floating_box.uuid}\.csv/)
+      expect(response.headers["Content-Disposition"]).to match(/cdx_box_inventory_#{box.uuid}\.csv/)
     end
 
     it "should be ordered by batch_number, concentration, replicate ASC" do
-      get :inventory, params: { id: @confirmed_box.id, format: "csv" }
+      get :inventory, params: { id: box.id, format: "csv" }
       expect(response).to have_http_status(:ok)
       results = CSV.parse(response.body).tap(&:shift).map do |row|
         { :batch_number => row[3], :concentration => row[6], :replicate => row[7] }
@@ -167,51 +149,32 @@ RSpec.describe BoxesController, type: :controller do
     end
 
     it "should be allowed if can read" do
-      grant user, other_user, confirmed_box, READ_BOX
+      grant user, other_user, box, READ_BOX
       sign_in other_user
 
-      get :inventory, params: { id: @confirmed_box.id, context: other_institution.uuid, format: "csv" }
+      get :inventory, params: { id: box.id, format: "csv" }
       expect(response).to have_http_status(:ok)
       expect(response.content_type).to eq("text/csv")
     end
 
     it "shouldn't be allowed if can't read" do
       sign_in other_user
-      get :inventory, params: { id: @floating_box.id, context: other_institution.uuid, format: "csv" }
+      get :inventory, params: { id: box.id, format: "csv" }
       expect(response).to have_http_status(:forbidden)
     end
 
-    it "should be blinded and ordered by uuid for the receiver" do
-      sign_in other_user
+    it "blinds columns for Samples" do
+      box = Box.make! :filled, institution: institution, blinded: true
 
-      get :inventory, params: { id: @confirmed_box.id, context: other_institution.uuid, format: "csv" }
+      get :inventory, params: { id: box.id, format: "csv" }
       expect(response).to have_http_status(:ok)
 
-      sort_verify = []
       CSV.parse(response.body).tap(&:shift).each do |row|
-        sort_verify << row[2]
         expect(row[3]).to eq("Blinded")
         expect(row[4]).to eq("Blinded")
-        expect(row[6]).to eq("Blinded")
+        expect(row[5]).to eq("Blinded")
         expect(row[7]).to eq("Blinded")
       end
-      expect(sort_verify).to eq(sort_verify.sort)
-
-    end
-
-    it "confirmed box should be accessible to sender" do
-      get :inventory, params: { id: @confirmed_box.id, format: "csv" }
-      expect(response).to have_http_status(:ok)
-      expect(response.content_type).to eq("text/csv")
-      expect(response.body.strip.split("\n").size).to eq(@confirmed_box.samples.count + 1)
-      expect(response.body).to_not match("Blinded")
-      expect(response.headers["Content-Disposition"]).to match(/cdx_box_inventory_#{confirmed_box.uuid}\.csv/)
-    end
-
-    it "floating box shouldn't be accessible receiver" do
-      sign_in other_user
-      get :print, params: { id: @floating_box.id, context: other_institution.uuid }
-      expect(response).to have_http_status(:forbidden)
     end
   end
 
