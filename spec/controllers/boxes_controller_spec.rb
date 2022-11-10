@@ -283,6 +283,7 @@ RSpec.describe BoxesController, type: :controller do
 
       box = assigns(:box_form).box.reload
       expect(box.samples.map(&:media).uniq).to eq(["Saliva"])
+      expect(box.blinded).to eq true
     end
 
     it "should create box if allowed" do
