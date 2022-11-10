@@ -41,7 +41,7 @@ class BoxesController < ApplicationController
       layout: "layouts/pdf.html",
       locals: {
         box: @box,
-        samples: @box.samples.preload(:batch, :sample_identifiers),
+        samples: @box.samples.preload(:batch, :sample_identifiers).map { |s| SamplePresenter.new(s, request.format) },
       },
       margin: { top: 0, bottom: 0, left: 0, right: 0 },
       page_width: "1in",
