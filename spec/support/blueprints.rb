@@ -174,6 +174,25 @@ TransferPackage.blueprint(:confirmed) do
   confirmed_at { Faker::Time.backward }
 end
 
+TransferPackage.blueprint(:receiver_confirmed) do
+  confirmed_at { Faker::Time.backward }
+  box_transfers { [
+    BoxTransfer.make(
+      transfer_package: object,
+      box: Box.make(:overfilled_blinded, institution: object.receiver_institution )
+    )
+  ] }
+end
+
+TransferPackage.blueprint(:blinded) do
+  box_transfers { [
+    BoxTransfer.make(
+      transfer_package: object,
+      box: Box.make(:blinded, institution: object.receiver_institution )
+    )
+  ] }
+end
+
 Batch.blueprint do
   institution { Institution.make }
   batch_number { "#{sn}" }
@@ -199,6 +218,49 @@ Box.blueprint(:filled) do
     Sample.make(:filled, box: object, institution: object.institution, site: object.site),
     Sample.make(:filled, box: object, institution: object.institution, site: object.site),
   ] }
+end
+
+Box.blueprint(:overfilled) do
+  @batch_one = Batch.make!
+  @batch_two = Batch.make!
+
+  samples { [
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_one, concentration_exponent: 1, concentration_number: 3, replicate: 1),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_two, concentration_exponent: 2, concentration_number: 2, replicate: 2),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_one, concentration_exponent: 3, concentration_number: 1, replicate: 3),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_two, concentration_exponent: 1, concentration_number: 3, replicate: 4),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_one, concentration_exponent: 2, concentration_number: 2, replicate: 5),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_two, concentration_exponent: 3, concentration_number: 1, replicate: 6),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_one, concentration_exponent: 1, concentration_number: 3, replicate: 7),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_two, concentration_exponent: 2, concentration_number: 2, replicate: 8),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_one, concentration_exponent: 3, concentration_number: 1, replicate: 9),
+  ] }
+end
+
+Box.blueprint(:blinded) do
+  samples { [
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site),
+  ] }
+  blinded { true }
+end
+
+Box.blueprint(:overfilled_blinded) do
+  @batch_one = Batch.make!
+  @batch_two = Batch.make!
+
+  samples { [
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_one, concentration_exponent: 1, concentration_number: 3, replicate: 1),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_two, concentration_exponent: 2, concentration_number: 2, replicate: 2),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_one, concentration_exponent: 3, concentration_number: 1, replicate: 3),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_two, concentration_exponent: 1, concentration_number: 3, replicate: 4),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_one, concentration_exponent: 2, concentration_number: 2, replicate: 5),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_two, concentration_exponent: 3, concentration_number: 1, replicate: 6),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_one, concentration_exponent: 1, concentration_number: 3, replicate: 7),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_two, concentration_exponent: 2, concentration_number: 2, replicate: 8),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_one, concentration_exponent: 3, concentration_number: 1, replicate: 9),
+  ] }
+  blinded { true }
 end
 
 BoxTransfer.blueprint do

@@ -47,6 +47,11 @@
               name: "box[sample_uuids]", placeholder: "Enter sample id", className: "input-block",
               samples: samples_data(@box_form.samples) }
 
+  .row
+    .col
+      = f.check_box :blinded
+      = f.label :blinded, "Blind samples (you'll be able to unblind them later from transfer details)"
+
   = f.form_actions do
     = f.submit 'Save', class: 'btn-primary', id: 'btn-save'
     = link_to 'Cancel', boxes_path, class: 'btn-link'

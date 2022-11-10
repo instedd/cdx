@@ -124,7 +124,6 @@ class TransferPackagesController < ApplicationController
       :receiver_institution_id,
       :recipient,
       :includes_qc_info,
-      :blinded,
       box_transfers_attributes: [:box_id, :_destroy],
     )
   end

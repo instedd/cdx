@@ -10,6 +10,7 @@ class BoxForm
       institution: navigation_context.institution,
       site: navigation_context.site,
       purpose: params[:purpose],
+      blinded: params[:blinded],
     )
     new(box, params)
   end
