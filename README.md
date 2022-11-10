@@ -223,7 +223,7 @@ scale as many as required in a `docker-compose.override.yml` file. You'll may
 also want to scale it down to 1:
 
 ```yaml
-version: "2.2"
+version: "2.4"
 
 services:
   selenium:
@@ -274,7 +274,7 @@ If you want system tests to always run visible on a host browser, you can set
 the environment variables in your `docker-compose.override.yml`. For example:
 
 ```yaml
-version: "2.2"
+version: "2.4"
 
 services:
   web:
