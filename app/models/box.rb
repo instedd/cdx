@@ -91,4 +91,8 @@ class Box < ApplicationRecord
   def blind_attribute?(attr_name)
     Box.blind_attribute_names.include?(attr_name)
   end
+
+  def transferred?
+    box_transfers.exists?
+  end
 end

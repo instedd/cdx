@@ -58,6 +58,7 @@ class TransferPackagesController < ApplicationController
     @transfer_package.box_transfers.each do |box_transfer|
       box = box_transfer.box
       raise "User not authorized for transferring box #{box.uuid}" unless authorize_resource?(box, UPDATE_BOX)
+      raise "Box was already transferred and cannot be transfered a second time" unless !box.transferred?
     end
 
     if @transfer_package.save

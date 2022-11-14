@@ -23,6 +23,7 @@ class BoxesController < ApplicationController
 
   def inventory
     return unless authorize_resource(@box, READ_BOX)
+    return head :forbidden unless !(params[:unblind] && @box.transferred?)
 
     @samples = load_box_samples
 
