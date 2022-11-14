@@ -76,6 +76,8 @@ class TransferPackagesController < ApplicationController
     full_uuid = uuid.size == 36
     @boxes = Box
       .within(@navigation_context.entity, @navigation_context.exclude_subsites)
+      .left_joins(:box_transfers)
+      .where(box_transfers: {id: nil})
       .autocomplete(uuid)
       .order("created_at DESC")
       .count_samples

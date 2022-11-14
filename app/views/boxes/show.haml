@@ -30,17 +30,29 @@
       .col
         = render "barcode_card"
 
-        .barcode-after
-          = link_to inventory_box_path(@box, format: "csv"), target: "_blank", class: 'btn-link' do
-            .icon-download.btn-icon
-            %span Download inventory
-
 .row
+  .col.pe-3
+    %label Contents
   .col
     .row
       .col.pe-3
-        %label Contents
-      .col.pe-9
+        .samples-count
+          .title
+            = @box.samples.count.to_s + ' ' + "samples" + (@box.blinded ? ' (blinded)' : '' )
+      .col.pe-3
+        .inventory-button
+          = link_to inventory_box_path(@box, format: "csv"), target: "_blank", class: 'btn-link' do
+            .icon-download.btn-icon
+            %span Download inventory
+      - if @box.blinded && @box.box_transfers.count == 0
+        .col.pe-3
+          .inventory-button
+            = link_to inventory_box_path(@box, format: "csv", unblind: true), target: "_blank", class: 'btn-link' do
+              .icon-download.btn-icon
+              %span Download unblinded inventory
+
+    .row
+      .col
         - @samples.each do |sample|
           .col.pe-7.batches-samples
             .samples-row

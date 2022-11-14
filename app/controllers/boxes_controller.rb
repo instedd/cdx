@@ -103,7 +103,7 @@ class BoxesController < ApplicationController
   def load_box_samples
     samples = @box.samples.preload(:batch, :sample_identifiers)
     samples = samples.scrambled if @box.blinded?
-    SamplePresenter.map(samples, request.format)
+    SamplePresenter.map(samples, request.format, params[:unblind])
   end
 
   def load_batches
