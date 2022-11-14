@@ -61,11 +61,6 @@ describe Sample do
     expect(sample.old_batch_number).to eq batch.batch_number
   end
 
-  it "concentration" do
-    expect(Sample.new(concentration: 100000000).concentration).to eq(1 * (10 ** 8))
-    expect(Sample.new(concentration: 20000).concentration).to eq(2 * (10 ** 4))
-  end
-
   it "validates box context" do
     institution = Institution.make!
     site = Site.make!(institution: institution)

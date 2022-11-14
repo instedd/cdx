@@ -7,9 +7,9 @@ module SampleHelper
     end
   end
 
-  def concentration_formatting(concentration)
+  def humanize_concentration(concentration)
     if concentration.to_s.length > 8
-      ("%g" % concentration.to_s).to_s
+      "%g" % concentration.to_s
     else
       concentration
     end

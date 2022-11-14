@@ -270,10 +270,9 @@ RSpec.describe BoxesController, type: :controller do
     def expect_samples(batch, concentrations: [1], replicates:)
       # NOTE: can't where/order in SQL because entity fields...
       concentrations.each do |c|
-        samples = batch.samples.to_a.reject { |s| s.concentration != c }.sort! do |a, b|
-          cmp = a.replicate <=> b.replicate
-          cmp
-        end
+        samples = batch.samples.to_a
+          .reject { |s| s.concentration != c }
+          .sort_by(&:replicate)
 
         1.upto(replicates) do |r|
           expect(sample = samples.shift).to_not be_nil
