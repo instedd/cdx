@@ -56,7 +56,3 @@ Capybara.javascript_driver = :selenium
 # WARNING: this also affects matchers that want to verify that an element
 # doesn't exist, in which case you should override the wait time!
 Capybara.default_max_wait_time = 5
-
-SitePrism.configure do |config|
-  config.use_implicit_waits = true
-end

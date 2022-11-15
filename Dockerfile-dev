@@ -1,4 +1,4 @@
-FROM ruby:2.3
+FROM ruby:2.4
 
 # ENV POIROT_STDOUT true
 # ENV POIROT_SUPPRESS_RAILS_LOG true
@@ -32,12 +32,12 @@ RUN \
     imagemagick \
     ghostscript \
     libgs-dev \
-    mysql-client \
+    default-mysql-client \
   && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ARG TARGETARCH
 
 # wkhtmltopdf
-RUN curl -L https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.stretch_${TARGETARCH}.deb --output wkhtmltopdf.deb && \
+RUN curl -L https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.buster_${TARGETARCH}.deb --output wkhtmltopdf.deb && \
     dpkg -i wkhtmltopdf.deb && \
     rm -f wkhtmltopdf.deb

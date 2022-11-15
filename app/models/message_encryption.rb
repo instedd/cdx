@@ -1,16 +1,17 @@
 module MessageEncryption
   require 'securerandom'
 
+  ALGORITHM = "aes-256-cbc" # TODO: migrate to aes-256-gcm (default in encryptor 2.x)
   DEFAULT_IV = "\xD7\xCA\xD5\x9D\x1D\xC0I\x01Sf\xC8\xFBa\x88\xE1\x03"
   DEFAULT_SALT = "1403203711"
 
   def self.encrypt string
-    Encryptor.encrypt string, :key => secret_key, :iv => iv, :salt => salt unless string.blank?
+    Encryptor.encrypt string, :algorithm => ALGORITHM, :key => secret_key, :iv => iv, :salt => salt unless string.blank?
   end
 
   def self.decrypt string
     unless string.blank?
-      Encryptor.decrypt(string, :key => secret_key, :iv => iv, :salt => salt)
+      Encryptor.decrypt(string, :algorithm => ALGORITHM, :key => secret_key, :iv => iv, :salt => salt)
     else
       ''
     end
@@ -26,8 +27,8 @@ module MessageEncryption
 
   def self.reencrypt(string, old_key:, old_iv: DEFAULT_IV, old_salt: DEFAULT_SALT, new_key:, new_iv: DEFAULT_IV, new_salt: DEFAULT_SALT)
     return '' if string.blank?
-    plain = Encryptor.decrypt(string, :key => old_key, :iv => old_iv, :salt => old_salt)
-    Encryptor.encrypt(plain, :key => new_key, :iv => new_iv, :salt => new_salt) unless plain.blank?
+    plain = Encryptor.decrypt(string, :algorithm => ALGORITHM, :key => old_key, :iv => old_iv, :salt => old_salt)
+    Encryptor.encrypt(plain, :algorithm => ALGORITHM, :key => new_key, :iv => new_iv, :salt => new_salt) unless plain.blank?
   end
 
   private
