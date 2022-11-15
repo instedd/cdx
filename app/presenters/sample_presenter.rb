@@ -1,13 +1,14 @@
 class SamplePresenter
   delegate_missing_to :@sample
 
-  def self.map(samples, format)
-    samples.map { |sample| new(sample, format) }
+  def self.map(samples, format, unblind: false)
+    samples.map { |sample| new(sample, format, unblind: unblind) }
   end
 
-  def initialize(sample, format)
+  def initialize(sample, format, unblind: false)
     @sample = sample
     @format = format
+    @unblind = unblind
   end
 
   def to_param
@@ -18,7 +19,7 @@ class SamplePresenter
 
   Box.blind_attribute_names.each do |attr_name|
     define_method attr_name do
-      if blinded_attribute?(attr_name)
+      if blinded_attribute?(attr_name) && !@unblind
         blinded_value
       else
         @sample.__send__(attr_name)

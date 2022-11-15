@@ -58,6 +58,7 @@ class TransferPackagesController < ApplicationController
     @transfer_package.box_transfers.each do |box_transfer|
       box = box_transfer.box
       raise "User not authorized for transferring box #{box.uuid}" unless authorize_resource?(box, UPDATE_BOX)
+      raise "Box was already transferred and cannot be transfered a second time" if box.transferred?
     end
 
     if @transfer_package.save
@@ -76,6 +77,8 @@ class TransferPackagesController < ApplicationController
     full_uuid = uuid.size == 36
     @boxes = Box
       .within(@navigation_context.entity, @navigation_context.exclude_subsites)
+      .left_joins(:box_transfers)
+      .where(box_transfers: {id: nil})
       .autocomplete(uuid)
       .order("created_at DESC")
       .count_samples

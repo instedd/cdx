@@ -66,17 +66,6 @@
   }
 }
 
-.barcode-after {
-  margin: 7px 15px 0;
-
-  .btn-icon {
-    margin: -3px 0 0;
-    font-size: 24px;
-    background: none !important;
-    color: inherit;
-  }
-}
-
 // Print Barcode style
 
 .barcode-card-print {
@@ -128,5 +117,18 @@
       width: 15px;
       height: auto;
     }
+  }
+}
+
+// INVENTORY
+
+.inventory-button {
+  margin: 6px 15px 0;
+
+  .btn-icon {
+    margin: -3px 0 0;
+    font-size: 24px;
+    background: none !important;
+    color: inherit;
   }
 }
