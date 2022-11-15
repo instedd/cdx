@@ -3,7 +3,7 @@
     = check_box_tag 'select_all_samples'
     %label.row{for: "select_all_samples"}
     #count
-      = @batch_form.batch.samples.count.to_s + ' ' + "Samples"
+      = "#{@batch_form.batch.samples.count} Samples"
   .actions
     = button_tag id: 'bulk_print', class: 'btn-link', name: 'bulk_action', value: 'print' do
       .icon-print.btn-icon

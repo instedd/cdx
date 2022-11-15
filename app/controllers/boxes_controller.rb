@@ -23,7 +23,7 @@ class BoxesController < ApplicationController
 
   def inventory
     return unless authorize_resource(@box, READ_BOX)
-    return head :forbidden unless !(params[:unblind] && @box.transferred?)
+    return head :forbidden if params[:unblind] && @box.transferred?
 
     @samples = load_box_samples
 
@@ -104,7 +104,7 @@ class BoxesController < ApplicationController
   def load_box_samples
     samples = @box.samples.preload(:batch, :sample_identifiers)
     samples = samples.scrambled if @box.blinded?
-    SamplePresenter.map(samples, request.format, params[:unblind])
+    SamplePresenter.map(samples, request.format, unblind: params[:unblind])
   end
 
   def load_batches

@@ -1,11 +1,11 @@
 class SamplePresenter
   delegate_missing_to :@sample
 
-  def self.map(samples, format, unblind= false)
-    samples.map { |sample| new(sample, format, unblind) }
+  def self.map(samples, format, unblind: false)
+    samples.map { |sample| new(sample, format, unblind: unblind) }
   end
 
-  def initialize(sample, format, unblind= false)
+  def initialize(sample, format, unblind: false)
     @sample = sample
     @format = format
     @unblind = unblind
