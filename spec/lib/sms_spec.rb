@@ -3,13 +3,15 @@ include Alerts
 
 describe "SMS" do
   before(:each) do
-    stub_request(:get, "https://CDx%2FCDx-Dev:cdx123cdx@nuntium.instedd.org/CDx/CDx-Dev/send_ao?body=welcome%20mr%20smith&from=sms://442393162302&to=sms://123444").
-    with(:headers => {'Accept'=>'*/*; q=0.5, application/xml', 'Accept-Encoding'=>'gzip, deflate', 'Content-Type'=>'application/json', 'User-Agent'=>'Ruby'}).
-    to_return(:status => 200, :body => "{'id'=>'2051719', 'guid'=>'69abea50-840e-50a0-77f9-547b38b2943e', 'token'=>'76beefab-9686-cd17-a3bc-d79dec6e0544'}", :headers => {})
+    authorization = Base64.urlsafe_encode64("CDx/CDx-Dev:cdx123cdx")
 
-    stub_request(:get, "https://CDx%2FCDx-Dev:cdx123cdx@nuntium.instedd.org/CDx/CDx-Dev/send_ao?body=welcome%20mr%20smith&from=sms://442393162302&to=sms://456777").
-    with(:headers => {'Accept'=>'*/*; q=0.5, application/xml', 'Accept-Encoding'=>'gzip, deflate', 'Content-Type'=>'application/json', 'User-Agent'=>'Ruby'}).
-    to_return(:status => 200, :body => "{'id'=>'2051719', 'guid'=>'69abea50-840e-50a0-77f9-547b38b2943e', 'token'=>'76beefab-9686-cd17-a3bc-d79dec6e0544'}", :headers => {})
+    stub_request(:get, "https://nuntium.instedd.org/CDx/CDx-Dev/send_ao?body=welcome%20mr%20smith&from=sms://442393162302&to=sms://123444")
+      .with(:headers => {'Authorization' => "Basic #{authorization}", 'Content-Type'=>'application/json'})
+      .to_return(:status => 200, :body => "{'id'=>'2051719', 'guid'=>'69abea50-840e-50a0-77f9-547b38b2943e', 'token'=>'76beefab-9686-cd17-a3bc-d79dec6e0544'}", :headers => {})
+
+    stub_request(:get, "https://nuntium.instedd.org/CDx/CDx-Dev/send_ao?body=welcome%20mr%20smith&from=sms://442393162302&to=sms://456777")
+      .with(:headers => {'Authorization' => "Basic #{authorization}", 'Content-Type'=>'application/json'})
+      .to_return(:status => 200, :body => "{'id'=>'2051719', 'guid'=>'69abea50-840e-50a0-77f9-547b38b2943e', 'token'=>'76beefab-9686-cd17-a3bc-d79dec6e0544'}", :headers => {})
   end
 
   context "sms operation" do

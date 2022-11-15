@@ -42,7 +42,7 @@ describe Subscriber, elasticsearch: true do
     fields = ["test.assays", "patient.gender"]
     url = "http://subscriber/cdp_trigger"
     subscriber = Subscriber.make! fields: fields, url: url, filter: filter, verb: 'GET'
-    callback_query = "http://subscriber/cdp_trigger?patient%5Bgender%5D=male&test%5Bassays%5D%5B0%5D%5Bcondition%5D=mtb&test%5Bassays%5D%5B1%5D%5Bname%5D=mtb&test%5Bassays%5D%5B2%5D%5Bresult%5D=positive"
+    callback_query = "http://subscriber/cdp_trigger?patient%5Bgender%5D=male&test%5Bassays%5D%5B0%5D%5Bcondition%5D=mtb&test%5Bassays%5D%5B0%5D%5Bname%5D=mtb&test%5Bassays%5D%5B0%5D%5Bresult%5D=positive"
     callback_request = stub_request(:get, callback_query).to_return(status: 200, body: "", headers: {})
 
     perform_enqueued_jobs { submit_test }

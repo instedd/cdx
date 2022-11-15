@@ -8,6 +8,44 @@ SampleSshKey = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4'+
           'bCAzqtIUUJOMKz4lHn5Os/d8temlYskaKQ1n+FuX5qJXNr1SW8euH72fjQndu78DCwVNwnnrG+nEe3a9m2QwL5xn'+
           'X8f1ohAZ9IG41hwIOvB5UcrFenqYIpMPBCCOnizUcyIFJhegJDWh2oWlBo041emGOX3VCRjtGug3 fbulgarelli@Manass-MacBook-2.local'
 
+# NOTE: fixes compatibility with Ruby 2.4 (Fixnum is deprecated, use Integer)
+module Machinist
+  class Lathe
+    protected
+
+    def make_attribute(attribute, args, &block) #:nodoc:
+      count = args.shift if args.first.is_a?(Integer)
+      if count
+        Array.new(count) { make_one_value(attribute, args, &block) }
+      else
+        make_one_value(attribute, args, &block)
+      end
+    end
+  end
+
+  module Machinable
+    private
+
+    def decode_args_to_make(*args) #:nodoc:
+      shift_arg = lambda {|klass| args.shift if args.first.is_a?(klass) }
+      count      = shift_arg[Integer]
+      name       = shift_arg[Symbol] || :master
+      attributes = shift_arg[Hash]   || {}
+      raise ArgumentError.new("Couldn't understand arguments") unless args.empty?
+
+      @blueprints ||= {}
+      blueprint = @blueprints[name]
+      raise NoBlueprintError.new(self, name) unless blueprint
+
+      if count.nil?
+        yield(blueprint, attributes)
+      else
+        Array.new(count) { yield(blueprint, attributes) }
+      end
+    end
+  end
+end
+
 User.blueprint do
   email { FFaker::Internet.email }
   password { FFaker::Internet.password }

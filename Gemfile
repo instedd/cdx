@@ -22,10 +22,10 @@ gem 'mysql2', '~> 0.3'
 gem 'elasticsearch', '~> 1.0'
 
 # Models
-gem 'encryptor', '~> 1.3'
+gem 'encryptor', '~> 2.0'
 gem 'kaminari', '~> 0.16'
 gem 'paperclip', git: 'https://github.com/instedd/paperclip', branch: 'fix/v4.3.6-no-mimemagic'
-gem 'paranoia', '<= 2.4.2' # last version to support ruby 2.2
+gem 'paranoia', '< 2.5.0' # last version to support ruby 2.4 / rails 5.0
 gem 'premailer-rails', '< 1.10' # 1.10 requires Rails.application.assets_manifest
 
 # Views
@@ -38,7 +38,7 @@ gem 'wicked_pdf', '~> 2.1'
 # Authentication
 # gem 'bcrypt-ruby', '~> 3.1.2'
 gem 'devise', '~> 4.0.0'
-gem 'devise-security', '<= 0.12.0' # last version to support ruby 2.2
+gem 'devise-security', '< 0.15.0' # last version to support ruby 2.4
 gem 'devise_invitable', '~> 1.5'
 gem 'doorkeeper', '~> 4.2.0'
 gem 'omniauth', '~> 1.2'
@@ -46,7 +46,7 @@ gem 'omniauth-google-oauth2', '~> 0.2'
 gem 'recaptcha'
 
 # Libraries
-gem 'aws-sdk', '~> 1.6'
+# gem 'aws-sdk', '~> 1.6'
 gem 'base58', '~> 0.1'
 gem 'barby', '~> 0.6'
 gem 'config', '~> 1.2'
@@ -54,12 +54,12 @@ gem 'dotiw', '~> 3.0'
 gem 'faker', '< 1.9.2' # NOTE: kept until we upgrade to ruby 2.5+ then we can upgrade to ffaker 2.20 to replace Faker::Number
 gem 'ffaker', '< 2.12.0'
 gem 'guid', '~> 0.1'
-gem 'nokogiri', '~> 1.6', '< 1.10.0' # last version to support ruby 2.2
+gem 'nokogiri', '~> 1.6', '< 1.11.0' # last version to support ruby 2.4
 gem 'oj', '~> 2.12', '< 2.17.3' # NOTE: 2.17.3 will stringify Time as a Float then load a BigDecimal...
-gem 'poirot_rails', git: 'https://github.com/instedd/poirot_rails.git', branch: 'master'
+# gem 'poirot_rails', git: 'https://github.com/instedd/poirot_rails.git', branch: 'master'
 gem 'rails-i18n', '~> 5.0'
 gem 'rchardet', '~> 1.6'
-gem 'rest-client', '~> 1.8' # NOTE: only used for a single HTTP call
+gem 'rest-client', '~> 2.1' # NOTE: only used for a single HTTP call + Nuntium (SMS) + LocationService
 gem 'rubyzip', '>= 1.0.0'
 gem 'rqrcode', '~> 0.10' # required by Barby::QRCode
 
@@ -80,7 +80,7 @@ gem 'sidekiq-cron', '~> 0.3' # TODO: not maintained, consider sidekiq-scheduler 
 gem 'whenever', '~> 1.0' # TODO: replace with a sidekiq-cron job
 
 # External services
-gem 'location_service', git: 'https://github.com/instedd/ruby-location_service.git', branch: 'master'
+gem 'location_service', path: "tmp/ruby-location_service" # git: 'https://github.com/instedd/ruby-location_service.git', branch: 'master'
 gem 'nuntium_api', '~> 0.21'
 gem 'sentry-raven', '~> 2.13'
 
@@ -111,16 +111,16 @@ group :development do
   gem 'spring-commands-parallel-tests'
   gem 'spring-commands-rspec'
   gem 'spring-watcher-listen', '~> 2.0.0'
-  gem 'web-console', '< 4.0' # last version to support ruby 2.2
+  gem 'web-console', '< 4.0' # last version to support ruby 2.4 / rails 5
 end
 
 group :development, :test do
-  gem 'pry-byebug', '< 2.7.0' # last version to support ruby 2.2
+  gem 'pry-byebug', '< 3.10.0' # last version to support ruby 2.4
   gem 'pry-rescue'
   gem 'pry-stack_explorer'
 
-  gem 'parallel_tests', '~> 2.32.0' # last version to support ruby 2.2
-  gem 'parallel', '~> 1.19.2'       # TODO: remove after upgrading ruby and parallel_tests
+  gem 'parallel_tests', '~> 3.5.1' # last version to support ruby 2.4
+  gem 'parallel', '~> 1.20.0'      # TODO: remove after upgrading ruby and parallel_tests
 end
 
 group :test do
@@ -133,12 +133,12 @@ group :test do
   gem 'rails-controller-testing'
   gem 'simplecov', require: false
   gem 'timecop', '~> 0.8'
-  gem 'webmock', '~> 1.23.0', require: false # a spec fails with 1.24.x
+  gem 'webmock', '~> 2.3.1', require: false
 
   # integration tests
-  gem 'capybara', '~> 2.4'
+  gem 'capybara', '~> 3.17.0'
   gem 'capybara-screenshot', '~> 1.0'
   gem 'cucumber-rails', '~> 1.5', require: false
   gem 'selenium-webdriver', '< 4.0'
-  gem 'site_prism', '~> 2.17'
+  gem 'site_prism', '~> 3.0'
 end
