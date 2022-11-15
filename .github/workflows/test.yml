@@ -94,7 +94,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: integration_tests_coverage
-      - run: docker-compose run --no-deps --rm web rake coverage:report
+      - run: docker-compose run --no-deps --rm web bundle exec rails coverage:report
 
       - uses: actions/upload-artifact@v3
         with:
