@@ -269,18 +269,16 @@ RSpec.describe BoxesController, type: :controller do
       end.to change(institution.boxes, :count).by(0)
     end
 
-    def expect_samples(batch, concentration_number: 1, concentration_exponents: [0], replicates:)
+    def expect_samples(batch, concentrations: [1], replicates:)
       # NOTE: can't where/order in SQL because entity fields...
-      samples = batch.samples.to_a.reject { |s| s.concentration_number != concentration_number }.sort! do |a, b|
-        cmp = a.concentration_exponent <=> b.concentration_exponent
-        cmp = a.replicate <=> b.replicate if cmp == 0
-        cmp
-      end
+      concentrations.each do |c|
+        samples = batch.samples.to_a
+          .reject { |s| s.concentration != c }
+          .sort_by(&:replicate)
 
-      concentration_exponents.each do |e|
         1.upto(replicates) do |r|
           expect(sample = samples.shift).to_not be_nil
-          expect(sample.concentration).to eq(concentration_number * (10 ** -e))
+          expect(sample.concentration).to eq(c)
           expect(sample.replicate).to eq(r)
         end
       end
@@ -298,8 +296,8 @@ RSpec.describe BoxesController, type: :controller do
         end.to change(institution.samples, :count).by(28)
 
         expect(Box.last.samples.count).to eq(28)
-        expect_samples(batch, concentration_exponents: 1..8, replicates: 3)
-        expect_samples(batch, concentration_number: 0, replicates: 4)
+        expect_samples(batch, concentrations: (1..8).map{|e| 10**e}, replicates: 3)
+        expect_samples(batch, concentrations: [0], replicates: 4)
       end
 
       it "requires one batch" do
@@ -329,7 +327,7 @@ RSpec.describe BoxesController, type: :controller do
 
         expect(Box.last.samples.count).to eq(54)
         batches.each do |b|
-          expect_samples(b, concentration_exponents: [1, 4, 8], replicates: 3)
+          expect_samples(b, concentrations: [1, 4, 8].map{|e| 10**e}, replicates: 3)
         end
       end
 
@@ -378,11 +376,11 @@ RSpec.describe BoxesController, type: :controller do
         expect(Box.last.samples.count).to eq(108)
 
         # virus batch
-        expect_samples(batch, concentration_exponents: [1, 4, 8], replicates: 18)
+        expect_samples(batch, concentrations: [1, 4, 8].map{|e| 10**e}, replicates: 18)
 
         # distractor batches
         batches.each do |b|
-          expect_samples(b, concentration_exponents: [1, 4, 8], replicates: 3)
+          expect_samples(b, concentrations: [1, 4, 8].map{|e| 10**e}, replicates: 3)
         end
       end
 

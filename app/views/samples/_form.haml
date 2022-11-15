@@ -64,13 +64,10 @@
 
       = f.form_field :concentration do
         - @sample_form.blinded_attribute(:concentration) do
-          = f.number_field :concentration_number, min: 1, step: 1, readonly: !@can_update, class: "input-small"
-          × 10^-(
-          = f.number_field :concentration_exponent, min: 1, step: 1, readonly: !@can_update, class: "input-small"
-          )
-          = f.field_errors :concentration_number
-          = f.field_errors :concentration_exponent
-
+          .row.input-unit
+            = f.text_field :concentration, min:0, readonly: !@can_update, :class=> "input-medium", :value => humanize_concentration(@sample_form.concentration)
+            .span.unit (copies/ml)
+            
       = f.form_field :replicate do
         - @sample_form.blinded_attribute(:replicate) do
           = f.number_field :replicate, min: 0, step: 1, class: "input-small", readonly: !@can_update

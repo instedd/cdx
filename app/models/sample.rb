@@ -30,8 +30,7 @@ class Sample < ApplicationRecord
   validate :validate_encounter
   validate :validate_patient
 
-  validates_numericality_of :concentration_number, only_integer: true, greater_than_or_equal: 0, allow_blank: true
-  validates_numericality_of :concentration_exponent, only_integer: true, greater_than_or_equal: 0, allow_blank: true
+  validates_numericality_of :concentration, only_integer: true, greater_than_or_equal: 0, allow_blank: true
   validates_numericality_of :replicate, only_integer: true, greater_than_or_equal_to: 0, allow_blank: true
   validates_inclusion_of :media, in: ->(_) { Sample.media }, allow_blank: true
   validate :validate_box_context, if: -> { box.present? }
@@ -53,8 +52,7 @@ class Sample < ApplicationRecord
                   :inactivation_method,
                   :volume,
                   :virus_lineage,
-                  :concentration_number,
-                  :concentration_exponent,
+                  :concentration,
                   :replicate,
                   :media
 
@@ -154,25 +152,16 @@ class Sample < ApplicationRecord
   end
 
   # Attribute fields don't convert numerical types.
-  %w[concentration_number concentration_exponent replicate].each do |name|
+  %w[replicate].each do |name|
     define_method name do
       core_fields[name].presence.try(&:to_i)
     end
   end
 
-  def concentration
-    if (n = concentration_number) && (e = concentration_exponent)
-      n * (10 ** -e)
-    end
-  end
-
-  def concentration_formula
-    if (n = concentration_number) && (e = concentration_exponent)
-      if n == 1
-        "10E-#{e}"
-      else
-        "#{n} × 10E-#{e}"
-      end
+  # Fields accepting exponenciation (e.g. 1e8) first are converted to float then to integer.
+  %w[concentration].each do |name|
+    define_method name do
+      core_fields[name].presence.try(&:to_f).try(&:to_i)
     end
   end
 

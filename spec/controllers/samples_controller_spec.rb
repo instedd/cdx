@@ -174,8 +174,7 @@ RSpec.describe SamplesController, type: :controller do
           institution: institution,
           batch: batch,
           virus_lineage: "CV.19.B.1.1.XYZ",
-          concentration_number: 5,
-          concentration_exponent: 8,
+          concentration: 500000000,
           replicate: 2,
           date_produced: Date.today.to_s,
           sample_identifiers: [SampleIdentifier.make],
@@ -190,8 +189,7 @@ RSpec.describe SamplesController, type: :controller do
 
         expect(response.body).to include("Blinded value")
         expect(response.body).to_not include(batch.batch_number)
-        assert_select "input[name='sample[concentration_number]']", count: 0
-        assert_select "input[name='sample[concentration_exponent]']", count: 0
+        assert_select "input[name='sample[concentration]']", count: 0
         assert_select "input[name='sample[replicate]']", count: 0
         assert_select "input[name='sample[virus_lineage]']", count: 0
         assert_select "input[name='sample[isolate_name]']", count: 0
@@ -351,8 +349,7 @@ RSpec.describe SamplesController, type: :controller do
         get :new
         post :create, params: { sample: build_sample_form_plan(
           virus_lineage: "B.1.1.529",
-          concentration_number: 2,
-          concentration_exponent: 8,
+          concentration: 200000000,
           replicate: 12,
           media: "Other",
         ) }
@@ -360,8 +357,7 @@ RSpec.describe SamplesController, type: :controller do
 
       sample = institution.samples.first
       expect(sample.virus_lineage).to eq("B.1.1.529")
-      expect(sample.concentration_number).to eq(2)
-      expect(sample.concentration_exponent).to eq(8)
+      expect(sample.concentration).to eq(200000000)
       expect(sample.replicate).to eq(12)
       expect(sample.media).to eq("Other")
     end
