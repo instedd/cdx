@@ -46,7 +46,7 @@ gem 'omniauth-google-oauth2', '~> 0.2'
 gem 'recaptcha'
 
 # Libraries
-# gem 'aws-sdk', '~> 1.6'
+gem 'aws-sdk', '~> 1.6'
 gem 'base58', '~> 0.1'
 gem 'barby', '~> 0.6'
 gem 'config', '~> 1.2'
@@ -56,7 +56,7 @@ gem 'ffaker', '< 2.12.0'
 gem 'guid', '~> 0.1'
 gem 'nokogiri', '~> 1.6', '< 1.11.0' # last version to support ruby 2.4
 gem 'oj', '~> 2.12', '< 2.17.3' # NOTE: 2.17.3 will stringify Time as a Float then load a BigDecimal...
-# gem 'poirot_rails', git: 'https://github.com/instedd/poirot_rails.git', branch: 'master'
+gem 'poirot_rails', git: 'https://github.com/instedd/poirot_rails.git', branch: 'master'
 gem 'rails-i18n', '~> 5.0'
 gem 'rchardet', '~> 1.6'
 gem 'rest-client', '~> 2.1' # NOTE: only used for a single HTTP call + Nuntium (SMS) + LocationService
@@ -80,7 +80,7 @@ gem 'sidekiq-cron', '~> 0.3' # TODO: not maintained, consider sidekiq-scheduler 
 gem 'whenever', '~> 1.0' # TODO: replace with a sidekiq-cron job
 
 # External services
-gem 'location_service', path: "tmp/ruby-location_service" # git: 'https://github.com/instedd/ruby-location_service.git', branch: 'master'
+gem 'location_service', git: 'https://github.com/instedd/ruby-location_service.git', ref: '99c97016c240af0d8e942add2e5ddc3e994a4d62'
 gem 'nuntium_api', '~> 0.21'
 gem 'sentry-raven', '~> 2.13'
 
@@ -98,7 +98,7 @@ gem 'jquery-rails', '~> 4.0'
 gem 'jquery-turbolinks', '~> 2.1.0'
 gem 'leaflet-rails', '~> 0.7.4'
 gem 'lodash-rails', '~> 3.10.1'
-gem 'react-rails', '~> 1.3.2'
+gem 'react-rails', '~> 1.3.2' # NOTE: required for JSX templates
 
 source 'https://rails-assets.org' do
   gem 'rails-assets-urijs', '~> 1.17.0'
