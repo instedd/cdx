@@ -26,6 +26,8 @@
       = f.password_field :password_confirmation, autocomplete: "off", placeholder: 'Password Confirmation', class: "input-block"
       = f.field_errors :password_confirmation
   %br
+  = recaptcha_tags
+  = f.field_errors :recaptcha
   .row
     .col
       = f.submit "Sign up", class: "btn-secondary input-block"

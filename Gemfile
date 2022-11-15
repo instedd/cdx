@@ -43,6 +43,7 @@ gem 'devise_invitable', '~> 1.5'
 gem 'doorkeeper', '~> 4.2.0'
 gem 'omniauth', '~> 1.2'
 gem 'omniauth-google-oauth2', '~> 0.2'
+gem 'recaptcha'
 
 # Libraries
 gem 'aws-sdk', '~> 1.6'

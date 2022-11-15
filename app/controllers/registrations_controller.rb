@@ -1,5 +1,5 @@
 class RegistrationsController < Devise::RegistrationsController
-
+  prepend_before_action :check_captcha, only: [:create]
   before_action :load_locales
   skip_before_action :ensure_context, except: :edit
 
@@ -38,5 +38,16 @@ class RegistrationsController < Devise::RegistrationsController
 
   def account_update_params
     params.require(:user).permit(:first_name, :last_name, :password, :password_confirmation, :locale, :time_zone, :timestamps_in_device_time_zone)
+  end
+
+  def check_captcha
+    unless verify_recaptcha
+      self.resource = resource_class.new sign_up_params
+      resource.validate # Look for any other validation errors besides reCAPTCHA
+      respond_with_navigational(resource) do
+        resource.errors.add(:recaptcha, "unsolved")
+        render :new
+      end
+    end
   end
 end
