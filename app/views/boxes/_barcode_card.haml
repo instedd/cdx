@@ -1,14 +1,18 @@
 .barcode-card.is-box
   .barcode-content
-    .barcode(style="float:right")
+    .barcode
       = image_tag barcode_svg_data_url(@box.uuid)
-
-    .title
+    .code
+      .uuid
+        #{@box.uuid}
+    .code
+      %strong
+        Box:
       = @box.institution.name
     .code
-      Box ID #{@box.uuid}
-    .code
-      Purpose: #{@box.purpose}
+      %strong
+        Purpose:
+      #{@box.purpose}
     .logo
       = image_tag 'cdx-logo-bw.png'
       .label https://cdx.io
