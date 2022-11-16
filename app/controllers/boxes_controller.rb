@@ -116,6 +116,7 @@ class BoxesController < ApplicationController
   def load_samples
     Sample
       .within(@navigation_context.entity, @navigation_context.exclude_subsites)
+      .where(box_id: nil)
       .find_all_by_any_uuid(@box_form.sample_uuids.values.reject(&:blank?))
   end
 
