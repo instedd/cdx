@@ -5,8 +5,8 @@ csv << [
   "Batch ID",
   "Virus Lineage",
   "Replicate",
-  "Production Date",
   "Concentration",
+  "Production Date",
   "Inactivation Method",
   "Media",
 ]
@@ -19,8 +19,8 @@ csv << [
     sample.batch_number,
     sample.virus_lineage,
     sample.replicate,
-    sample.date_produced.to_date,
     sample.concentration,
+    sample.date_produced.to_date,
     sample.inactivation_method,
     sample.media,
   ]

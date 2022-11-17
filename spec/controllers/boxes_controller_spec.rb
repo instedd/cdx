@@ -173,7 +173,7 @@ RSpec.describe BoxesController, type: :controller do
         expect(row[3]).to eq("Blinded")
         expect(row[4]).to eq("Blinded")
         expect(row[5]).to eq("Blinded")
-        expect(row[7]).to eq("Blinded")
+        expect(row[6]).to eq("Blinded")
       end
     end
 
@@ -187,7 +187,7 @@ RSpec.describe BoxesController, type: :controller do
         expect(row[3]).not_to eq("Blinded")
         expect(row[4]).not_to eq("Blinded")
         expect(row[5]).not_to eq("Blinded")
-        expect(row[7]).not_to eq("Blinded")
+        expect(row[6]).not_to eq("Blinded")
       end
     end
 
