@@ -145,7 +145,7 @@ RSpec.describe BoxesController, type: :controller do
       results = CSV.parse(response.body).tap(&:shift).map do |row|
         { :batch_number => row[3], :concentration => row[6], :replicate => row[7] }
       end
-      expect( results ).to eq( results.sort_by{ |sample|  [ sample[:batch_number], sample[:concentration], sample[:replicate] ] } )
+      expect( results ).to eq( results.sort_by{ |sample|  [ sample.batch_number , sample.concentration, sample.replicate ] } )
     end
 
     it "should be allowed if can read" do
