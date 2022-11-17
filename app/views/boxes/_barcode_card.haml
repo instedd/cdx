@@ -7,6 +7,11 @@
         #{@box.uuid}
     .code
       %strong
+        Box:
+      = @box.samples.count
+      samples
+    .code
+      %strong
         Institution:
       = @box.institution.name
     .code

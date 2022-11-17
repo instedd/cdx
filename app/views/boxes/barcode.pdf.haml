@@ -6,11 +6,11 @@
       .uuid
         #{box.uuid}
     .code
-      &nbsp;
+      Box: #{box.samples.count} samples
+    .code
+      Institution: #{box.institution.name}
     .code
       Purpose: #{box.purpose}
-    .code
-      &nbsp;
     .logo
       = image_tag wicked_pdf_asset_base64('cdx-logo-bw.png')
       .label https://cdx.io
