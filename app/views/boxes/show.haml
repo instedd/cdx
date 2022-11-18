@@ -60,7 +60,17 @@
               - unless sample.blinded_attribute?(:batch_number)
                 .sample-row-action= sample.batch_number
 
-- if @can_delete
-  .row.button-actions
+.row.button-actions
+  - if @can_blind
+    - if @box.blinded
+      = link_to unblind_box_path(@box), class: "btn btn-icon", method: "post" do
+        %i.icon-eye.icon-blue
+        UNBLIND SAMPLES
+    -else
+      = link_to blind_box_path(@box), class: "btn btn-icon", method: "post" do
+        %i.icon-eye.icon-blue
+        BLIND SAMPLES
+
+  - if @can_delete
     .col
       = confirm_deletion_button @box, 'box'

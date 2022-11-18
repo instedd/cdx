@@ -146,6 +146,8 @@ Rails.application.routes.draw do
   end
   resources :boxes, except: [:edit, :update] do
     member do
+      post :unblind
+      post :blind
       get 'print'
       get 'inventory', constraints: { format: 'csv' }
     end
