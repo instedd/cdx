@@ -65,7 +65,7 @@
       = f.form_field :concentration do
         - @sample_form.blinded_attribute(:concentration) do
           .row.input-unit
-            = f.text_field :concentration, min:0, readonly: !@can_update, :class=> "input-medium", :value => humanize_concentration(@sample_form.concentration)
+            = f.text_field :concentration, min:0, readonly: !@can_update, :class=> "input-medium", :value => humanize_concentration(@sample_form.concentration), :pattern => "[\\d.]+(?:[eE]\\+?\\d+)?", :title => "(examples: 120, 12e1, 1.2e2, 1.2e+2, 1.2E2, 1.2E+2, 1.2E+02)"
             .span.unit (copies/ml)
             
       = f.form_field :replicate do
