@@ -25,7 +25,12 @@
     .table-actions {
       display: inline-block;
       vertical-align: middle;
+      width: 100%;
 
+      .align-right{
+        margin-left: auto;
+      }
+      
       .btn-link {
         margin-left: 0px;
       }

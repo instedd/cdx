@@ -89,6 +89,10 @@ entities:
           - Saliva
           - Transport media
           - Other
+      measured_signal:
+        type: integer
+      measurement_result:
+        type: boolean
       lab_technician:
       old_batch_number:
         searchable: true

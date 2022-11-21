@@ -47,6 +47,7 @@ Rails.application.routes.draw do
   end
 
   get 'settings' => 'home#settings'
+  get 'samples/upload_results'
 
   resources :sites, except: [:show] do
     member do
@@ -121,6 +122,8 @@ Rails.application.routes.draw do
     end
     collection do
       get 'autocomplete'
+      get 'existing_uuids'
+      post 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'process_csv' }, action: :bulk_process_csv
       post 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'print' }, action: :bulk_print
       post 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
     end

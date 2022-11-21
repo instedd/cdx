@@ -511,7 +511,6 @@ ul.samples {
   }
 
   .ttext::after {
-    content: " ";
     position: absolute;
     bottom: -9px;
     left: 10px;
@@ -531,7 +530,6 @@ ul.samples {
     width: 50%;
     background: #8c1;
     height: 2px;
-    animation: timerbar 2s;
 }
 
 @keyframes timerbar {

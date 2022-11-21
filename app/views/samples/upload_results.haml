@@ -1,0 +1,31 @@
+- content_for(:subheader) do
+  .row.center.add-new
+    .col.pe-10
+      .row
+        .col
+          %h2
+            = link_to samples_path, class: 'side-link', title: 'Back' do
+              = image_tag "arrow-left-white.png"
+            Upload Results
+
+=form_tag bulk_action_samples_path, :id => 'samples_form' , :method => :post, multipart: true do
+  .row
+    .col.pe-3
+      %label Results
+    .col
+      #uploaded-files
+
+      .row
+        .col.pe-3
+        .col.pe-10
+          = button_tag id: 'add-results-file', class: 'btn-link', type: "button" do
+            .icon-circle-plus.icon-blue.icon-margin
+            Add file
+
+  .row
+    .col
+      = button_tag id: 'bulk_process_csv', class: 'btn-primary', name: 'bulk_action', value: 'process_csv', data: { method: "process_csv", confirm: "This action will unblind samples and cannot be undone." } do
+        Upload Results
+      = link_to 'Cancel', samples_path, class: 'btn-link'
+
+= render 'upload_results_js'
