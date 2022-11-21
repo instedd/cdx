@@ -145,7 +145,7 @@ RSpec.describe BoxesController, type: :controller do
       results = CSV.parse(response.body).tap(&:shift).map do |row|
         { :batch_number => row[3], :concentration => row[6], :replicate => row[7] }
       end
-      expect( results ).to eq( results.sort_by{ |sample|  [ sample[:batch_number], sample[:concentration], sample[:replicate] ] } )
+      expect( results ).to eq( results.sort_by{ |sample|  [ sample.batch_number , sample.concentration, sample.replicate ] } )
     end
 
     it "should be allowed if can read" do
@@ -173,7 +173,7 @@ RSpec.describe BoxesController, type: :controller do
         expect(row[3]).to eq("Blinded")
         expect(row[4]).to eq("Blinded")
         expect(row[5]).to eq("Blinded")
-        expect(row[7]).to eq("Blinded")
+        expect(row[6]).to eq("Blinded")
       end
     end
 
@@ -187,7 +187,7 @@ RSpec.describe BoxesController, type: :controller do
         expect(row[3]).not_to eq("Blinded")
         expect(row[4]).not_to eq("Blinded")
         expect(row[5]).not_to eq("Blinded")
-        expect(row[7]).not_to eq("Blinded")
+        expect(row[6]).not_to eq("Blinded")
       end
     end
 
