@@ -104,7 +104,7 @@ class BoxesController < ApplicationController
   def load_box_samples
     samples = @box.samples.preload(:batch, :sample_identifiers)
     samples = if @box.blinded? && !params[:unblind] 
-      samples.sort_by{ |sample|  [ sample.uuid ] }
+      samples.scrambled
     else
       samples.sort_by{ |sample|  [ sample.batch_number , sample.concentration , sample.replicate ] }
     end 
