@@ -24,10 +24,11 @@
 
       = f.password_field :password_confirmation, autocomplete: "off", placeholder: 'Password Confirmation', class: "input-block"
       = f.field_errors :password_confirmation
-  .row
-    .col
-      = recaptcha_tags
-      = f.field_errors :recaptcha
+  - if Settings.recaptcha.enabled
+    .row
+      .col
+        = recaptcha_tags
+        = f.field_errors :recaptcha
   %br
   .row
     .col
