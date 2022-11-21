@@ -17,20 +17,19 @@
             return false;
         };
 
-        let files = evt.target.files; // FileList object
-        
-        // use the 1st file from the list
-        let f = files[0];
-
+        // We use the 1st file from the FileList list
+        let f = evt.target.files[0];
         let reader = new FileReader();
 
         // Closure to capture the file information.
         reader.onload = (function(f) {
             return async(e) => {
+                // Parse the input file
                 var text =  e.target.result
                 var lines = text.split(/\r\n|\r|\n/); // tolerate both Windows and Unix linebreaks
-                var samples_param = []
-                var samples = []
+                var samples_param = [] // params for GET call
+                var samples = [] // samples uuids
+
                 lines.forEach(function(line) { 
                     if (line != ''){
                         samples_param.push( 'uuids[]=' + line.split(',')[0] );
@@ -38,62 +37,73 @@
                     } 
                 });
                 
+                // Retrieve found uuids
                 var context = getUrlParameter('context');
-
                 var url = '/samples/existing_uuids?context='+context+"&"+samples_param.join("&")
                 var found = await fetch(url)
                     .then((response) => response.json())
                     .then((r) => {
                         return r.message;
                 })
+                // Compute not found ones
                 var not_found = samples.filter(function(x) {
                     return found.indexOf(x) < 0;
                 });
-                var upload_info = "<div class='batches-samples'>";
-                upload_info += "<div class='samples-row'>"
-                upload_info += `<div class='samples-item'>${f.name}</div>`;
-                upload_info += (found.length == samples.length) ? 
-                    `<div class="samples-row-action">(${samples.length} Samples)</div>` :
-                    `<div class="samples-row-action ttip input-required" 
-                          id="not_found_mess_${evt.target.nowParam}" 
-                          title="${not_found.join('\n')}"
-                          >
-                        (${samples.length} Samples, ${(samples.length-found.length)} not found) 
-                        <div class="icon-alert icon-red"></div>
-                    </div>` 
-                upload_info += "</div>";
-                upload_info += "</div>";
+                
+                // Create row with filename and upload info
+                var upload_info = $('<div>', { class: `batches-samples` })
+                    .append( $('<div>', { class: `samples-row` }) 
+                    .append( $('<div>', { class: `samples-item` }).append( f.name ) )
+                    .append( (found.length == samples.length) ? 
+                        $('<div>', { class: `samples-row-action` })
+                        .append( `(${samples.length} Samples) ` )
+                        .append( $('<div>', { class: `icon-checkmark  bigger` }) )  :
+                        $('<div>', { class: `samples-row-action ttip input-required`,
+                                     id: `not_found_mess_${evt.target.nowParam}`, 
+                                     title: `${not_found.join('\n')}` 
+                                    })
+                            .append( `${samples.length} Samples, (${(samples.length-found.length)} sample UUID(s) not found) ` ) 
+                            .append( $('<div>', { class: `icon-alert icon-red bigger` }) )
+                        )
+                    );
+                
+                // if samples were not found add mouse behaviour to display tooltip
+                if (found.length != samples.length) {
+                    $(document).on("mouseover", `#not_found_mess_${evt.target.nowParam}`, function(e) {
+                        $(`#not_found_mess_${evt.target.nowParam}`)
+                            .append(`<span class="ttext" style='color:red; width: 300px;' >${not_found.join("<br>")}</span>`);
+                    })
 
-                $(document).on("mouseover", `#not_found_mess_${evt.target.nowParam}`, function(e) {
-                    $(`#not_found_mess_${evt.target.nowParam}`)
-                        .append(`<span class="ttext" style='color:red; width: 200px;' >${not_found.join("<br>")}</span>`);
-                })
-
-                $(document).on("mouseleave", `#not_found_mess_${evt.target.nowParam}`, function(e) {
-                    $(`#not_found_mess_${evt.target.nowParam}`)
-                        .find(".ttext").remove();
-                })
-
-                $('#uploaded-files').append(upload_info);
+                    $(document).on("mouseleave", `#not_found_mess_${evt.target.nowParam}`, function(e) {
+                        $(`#not_found_mess_${evt.target.nowParam}`)
+                            .find(".ttext").remove();
+                    })
+                }
+                
+                // Append the information row to the corresponding section
+                $(`#upload_info_${evt.target.nowParam}`).append(upload_info);
             }
         })(f);
 
         reader.readAsText(f);
     }
 
+    // Upon pressing the "Add file" button we will create a file input and click it
     $("#add-results-file").on('click', function (e) {
+        // Use identifier = now for all the elements of the row of files that will be created
         var now = Date.now()
         var new_file = $('<div>', { id: `upload_info_${now}` })
-          .append($('<input>', {
+            .append ( $('<input>', {
             type: 'file',
             name: `csv_file_${now}`,
             id: `csv_file_${now}`,
             accept: `text/csv`,
             hidden: `true`
-          }));
+          }) );
 
+        // Append the hidden input to the corresponding section
         $('#uploaded-files').append(new_file);
-
+        
         document.getElementById(`csv_file_${now}`).nowParam = now;
         document.getElementById(`csv_file_${now}`).addEventListener('change', handleFileSelect, false);
         document.getElementById(`csv_file_${now}`).click();

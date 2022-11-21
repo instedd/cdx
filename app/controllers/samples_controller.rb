@@ -223,8 +223,12 @@ class SamplesController < ApplicationController
 
         s = Sample.find_by_uuid(sample_id)
         unless s.nil?
-          s.core_fields["measured_signal"] = measured_signal.try(&:to_i)
-          s.core_fields["measurement_result"] = measurement_result
+          if s.core_fields["measured_signal"].nil? && measured_signal.strip != "" && !!Float(measured_signal)
+            s.core_fields["measured_signal"] = measured_signal.try(&:to_f)
+          end
+          if s.core_fields["measurement_result"].nil? && (measurement_result.downcase == "positive" || measurement_result.downcase == "negative")
+            s.core_fields["measurement_result"] = measurement_result
+          end
           s.save!
         end
       end
