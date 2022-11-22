@@ -1,22 +1,29 @@
 :javascript
+    var getUrlParameter = function getUrlParameter(sParam) {
+        var sPageURL = window.location.search.substring(1),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+            }
+        }
+        return false;
+    };
+
+    var checkUploadEnabling = function checkUploadEnabling() {
+        // Enable upload button if there are uploaded files
+        if (document.getElementById('uploaded-files').innerHTML != "") 
+            document.getElementById(`bulk_process_csv`).disabled = false;
+        else 
+            document.getElementById(`bulk_process_csv`).disabled = true;
+    }
 
     function handleFileSelect(evt) {
-        var getUrlParameter = function getUrlParameter(sParam) {
-            var sPageURL = window.location.search.substring(1),
-                sURLVariables = sPageURL.split('&'),
-                sParameterName,
-                i;
-
-            for (i = 0; i < sURLVariables.length; i++) {
-                sParameterName = sURLVariables[i].split('=');
-
-                if (sParameterName[0] === sParam) {
-                    return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
-                }
-            }
-            return false;
-        };
-
         // We use the 1st file from the FileList list
         let f = evt.target.files[0];
         let reader = new FileReader();
@@ -53,7 +60,13 @@
                 // Create row with filename and upload info
                 var upload_info = $('<div>', { class: `batches-samples` })
                     .append( $('<div>', { class: `samples-row` }) 
-                    .append( $('<div>', { class: `samples-item` }).append( f.name ) )
+                    .append( $('<div>', { class: `samples-item` })
+                        .append( $('<div>', { 
+                            class: `icon-circle-minus icon-gray `,
+                            id: `remove_file_${evt.target.nowParam}`
+                        }) )
+                        .append( "&nbsp;" + f.name ) 
+                    )
                     .append( (found.length == samples.length) ? 
                         $('<div>', { class: `samples-row-action` })
                         .append( `(${samples.length} Samples) ` )
@@ -82,6 +95,16 @@
                 
                 // Append the information row to the corresponding section
                 $(`#upload_info_${evt.target.nowParam}`).append(upload_info);
+                
+                // Bind click event to remove button
+                $(`#remove_file_${evt.target.nowParam}`).bind({
+                    click: function() {
+                        document.getElementById(`upload_info_${evt.target.nowParam}`).remove();
+                        checkUploadEnabling();
+                    },
+                });
+
+                checkUploadEnabling();
             }
         })(f);
 
@@ -107,6 +130,7 @@
         document.getElementById(`csv_file_${now}`).nowParam = now;
         document.getElementById(`csv_file_${now}`).addEventListener('change', handleFileSelect, false);
         document.getElementById(`csv_file_${now}`).click();
+
 
     })
 

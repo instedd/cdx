@@ -24,7 +24,7 @@
 
   .row
     .col
-      = button_tag id: 'bulk_process_csv', class: 'btn-primary', name: 'bulk_action', value: 'process_csv', data: { method: "process_csv", confirm: "This action will unblind samples and cannot be undone. <br> Samples with uploaded measurements won't be overwritten. " } do
+      = button_tag id: 'bulk_process_csv', class: 'btn-primary', name: 'bulk_action', value: 'process_csv', disabled: true, data: { method: "process_csv", confirm: "This action will unblind samples and cannot be undone. <br> Samples with uploaded measurements won't be overwritten. " } do
         Upload Results
       = link_to 'Cancel', samples_path, class: 'btn-link'
 
