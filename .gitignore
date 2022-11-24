@@ -41,5 +41,3 @@ Procfile.local
 
 # Artefacts
 /coverage
-
-spec/fixtures/csvs/samples.csv

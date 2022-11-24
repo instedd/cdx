@@ -211,25 +211,21 @@ class SamplesController < ApplicationController
   end
 
   def bulk_process_csv
-    files_data = params.keys.grep(/csv_file/)
-    files_data.each do |file_data_key|
-      file_data = params[file_data_key]
-      table = CSV.parse(File.read(file_data.path))
+    params[:csv_files].each do |csv_file|
+      CSV.open(csv_file.path) do |csv_stream|
+        csv_stream.each do |row|
+          sample_id, measured_signal, measurement_result = row[0], row[1], row[2]
 
-      table.each do |row| 
-        sample_id = row[0]
-        measured_signal = row[1]
-        measurement_result = row[2]
-
-        s = Sample.find_by_uuid(sample_id)
-        unless s.nil?
-          if s.core_fields["measured_signal"].nil? && measured_signal.strip != "" && !!Float(measured_signal)
-            s.core_fields["measured_signal"] = measured_signal.try(&:to_f)
+          sample = Sample.find_by_uuid(sample_id)
+          unless sample.nil?
+            if sample.measured_signal.nil? && measured_signal.strip != "" && !!Float(measured_signal)
+              sample.measured_signal = measured_signal.try(&:to_f)
+            end
+            if sample.measurement_result.nil? && (measurement_result.downcase == "positive" || measurement_result.downcase == "negative")
+              sample.measurement_result = measurement_result.downcase
+            end
+            sample.save!
           end
-          if s.core_fields["measurement_result"].nil? && (measurement_result.downcase == "positive" || measurement_result.downcase == "negative")
-            s.core_fields["measurement_result"] = measurement_result
-          end
-          s.save!
         end
       end
     end

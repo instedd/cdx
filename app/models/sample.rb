@@ -65,7 +65,7 @@ class Sample < ApplicationRecord
   end
 
   def self.find_by_uuid(uuid)
-    joins(:sample_identifiers).where(sample_identifiers: {uuid: uuid}).first
+    joins(:sample_identifiers).where(sample_identifiers: {uuid: uuid}).take
   end
 
   def self.find_all_by_any_uuid(uuids)

@@ -90,9 +90,12 @@ entities:
           - Transport media
           - Other
       measured_signal:
-        type: integer
+        type: float
       measurement_result:
-        type: boolean
+        type: enum
+        options:
+          - positive
+          - negative
       lab_technician:
       old_batch_number:
         searchable: true

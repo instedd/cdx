@@ -31,6 +31,7 @@
         // Closure to capture the file information.
         reader.onload = (function(f) {
             return async(e) => {
+                var now = evt.target.nowParam
                 // Parse the input file
                 var text =  e.target.result
                 var lines = text.split(/\r\n|\r|\n/); // tolerate both Windows and Unix linebreaks
@@ -57,52 +58,53 @@
                     return found.indexOf(x) < 0;
                 });
                 
-                // Create row with filename and upload info
-                var upload_info = $('<div>', { class: `batches-samples` })
-                    .append( $('<div>', { class: `samples-row` }) 
-                    .append( $('<div>', { class: `samples-item` })
-                        .append( $('<div>', { 
-                            class: `icon-circle-minus icon-gray `,
-                            id: `remove_file_${evt.target.nowParam}`
-                        }) )
-                        .append( "&nbsp;" + f.name ) 
-                    )
-                    .append( (found.length == samples.length) ? 
-                        $('<div>', { class: `samples-row-action` })
-                        .append( `(${samples.length} Samples) ` )
-                        .append( $('<div>', { class: `icon-checkmark  bigger` }) )  :
-                        $('<div>', { class: `samples-row-action ttip input-required`,
-                                     id: `not_found_mess_${evt.target.nowParam}`, 
-                                     title: `${not_found.join('\n')}` 
-                                    })
-                            .append( `${samples.length} Samples, (${(samples.length-found.length)} sample UUID(s) not found) ` ) 
-                            .append( $('<div>', { class: `icon-alert icon-red bigger` }) )
-                        )
-                    );
+                // Create row from template with filename and upload info
+                var template = document.getElementById(`csvFileRow`).content;
+                var fragment = template.cloneNode(true);
+                fragment.querySelector(`.upload_info`).id = `upload_info_${now}`
+                fragment.querySelector(`.uploaded-samples-count`).textContent = `${samples.length} Samples ` ;
+                if (found.length != samples.length){
+                    fragment.querySelector(`.uploaded-samples-count`).innerHTML += `(<span class="dashed-underline">${(not_found.length)} sample UUID${(not_found.length>1?'s':'')}</span> not found) `
+                    fragment.querySelector(`.upload-icon`).className += ` icon-alert icon-red`
+                    fragment.querySelector(`.samples-row-action`).className += ` ttip input-required`
+                    fragment.querySelector(`.not_found_message`).id = `not_found_message_${now}`;
+                }
+                else {
+                    fragment.querySelector(`.upload-icon`).className += ` icon-checkmark`
+                }
+                fragment.querySelector(`.remove_file`).id = `remove_file_${now}`;
+                fragment.querySelector(`.file-name`).textContent = `${f.name}`;
+                
+                document.getElementById(`uploaded-files`).append(fragment)
                 
                 // if samples were not found add mouse behaviour to display tooltip
                 if (found.length != samples.length) {
-                    $(document).on("mouseover", `#not_found_mess_${evt.target.nowParam}`, function(e) {
-                        $(`#not_found_mess_${evt.target.nowParam}`)
-                            .append(`<span class="ttext" style='color:red; width: 300px;' >${not_found.join("<br>")}</span>`);
-                    })
-
-                    $(document).on("mouseleave", `#not_found_mess_${evt.target.nowParam}`, function(e) {
-                        $(`#not_found_mess_${evt.target.nowParam}`)
-                            .find(".ttext").remove();
-                    })
+                    document.getElementById(`not_found_message_${now}`).addEventListener('click', 
+                        function() {
+                            if (!document.getElementById(`ttext_${now}`)){
+                                var tooltip = document.createElement("span")
+                                tooltip.className = `ttext`
+                                tooltip.id = `ttext_${now}`
+                                tooltip.style = `color:red; width: 300px;`
+                                tooltip.innerHTML = `${not_found.slice(0,5).join("<br>")}`
+                                document.getElementById(`not_found_message_${now}`).append(tooltip)
+                                setTimeout( () => tooltip.remove() , 5000 );
+                            }
+                            else {
+                                document.getElementById(`ttext_${now}`).remove()
+                            }
+                        }
+                    )
                 }
                 
-                // Append the information row to the corresponding section
-                $(`#upload_info_${evt.target.nowParam}`).append(upload_info);
-                
                 // Bind click event to remove button
-                $(`#remove_file_${evt.target.nowParam}`).bind({
-                    click: function() {
-                        document.getElementById(`upload_info_${evt.target.nowParam}`).remove();
+                document.getElementById(`remove_file_${now}`).addEventListener('click', 
+                    function() {
+                        document.getElementById(`upload_info_${now}`).remove();
+                        document.getElementById(`csv_file_${now}`).remove();
                         checkUploadEnabling();
-                    },
-                });
+                    }
+                );
 
                 checkUploadEnabling();
             }
@@ -115,17 +117,11 @@
     $("#add-results-file").on('click', function (e) {
         // Use identifier = now for all the elements of the row of files that will be created
         var now = Date.now()
-        var new_file = $('<div>', { id: `upload_info_${now}` })
-            .append ( $('<input>', {
-            type: 'file',
-            name: `csv_file_${now}`,
-            id: `csv_file_${now}`,
-            accept: `text/csv`,
-            hidden: `true`
-          }) );
 
-        // Append the hidden input to the corresponding section
-        $('#uploaded-files').append(new_file);
+        var template = document.getElementById(`csvInputFile`).content;
+        var fragment = template.cloneNode(true);
+        fragment.querySelector(`.csv_file`).id = `csv_file_${now}`;
+        document.getElementById(`uploaded-files`).append(fragment)
         
         document.getElementById(`csv_file_${now}`).nowParam = now;
         document.getElementById(`csv_file_${now}`).addEventListener('change', handleFileSelect, false);
