@@ -46,6 +46,11 @@
   padding: 0px 10px;
   width: 100%;
 }
+.samples-left {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
 
 .samples-row.mark-destroy {
   text-decoration: line-through;
@@ -72,7 +77,6 @@
 .samples-row-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
 }
 
 .transfer-data {
