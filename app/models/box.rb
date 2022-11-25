@@ -96,10 +96,10 @@ class Box < ApplicationRecord
   end
 
   def unblind!
-    self.update(blinded: false)
+    update_columns(blinded: false)
   end
 
   def blind!
-    self.update(blinded: true)
+    update_columns(blinded: true)
   end
 end
