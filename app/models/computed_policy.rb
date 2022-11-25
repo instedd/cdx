@@ -182,7 +182,7 @@ class ComputedPolicy < ApplicationRecord
 
     def update_user(user)
       computed_policies = policies_for(user).map{|p| compute_for(p)}.flatten
-      computed_policies = compact_policies(computed_policies)
+      compact_policies!(computed_policies)
       existing_policies = user.computed_policies.to_a
 
       to_create = substract(computed_policies, existing_policies)
@@ -328,9 +328,21 @@ class ComputedPolicy < ApplicationRecord
       throw(:empty_intersection)
     end
 
-    def compact_policies(computed_policies)
-      computed_policies.delete_if do |policy|
-        computed_policies.any?{|p| !p.equal?(policy) && p.contains(policy) }
+    def compact_policies!(computed_policies)
+      # NOTE: inlined ruby 2.2 compatible version of Array#delete_if because a
+      # performance improvement in ruby 2.3 broke the behavior: we expect the
+      # array to be immediately mutated!
+      #
+      # See https://bugs.ruby-lang.org/issues/10714
+      i = 0
+      while i < computed_policies.size
+        policy = computed_policies[i]
+
+        if computed_policies.any? { |p| !p.equal?(policy) && p.contains(policy) }
+          computed_policies.delete_at(i)
+        else
+          i += 1
+        end
       end
     end
 
