@@ -39,14 +39,17 @@ var SamplesSelector = React.createClass({
       }
       return (<div className="batches-samples" key={"samples-selector-" + index}>
         <div className="samples-row">
-          <div className="samples-item">{sample.uuid}</div>
-          <div className="samples-row-actions">
-            <input type="hidden" name={this.props.name + "[" + index + "]"} value={sample.uuid}/>
-            <span>{sample.batch_number}</span>
-            <a href="#" onClick={removeSample.bind(this)} title="Remove this sample">
-              <i className="icon-close icon-gray bigger"></i>
-            </a>
+          <div className="samples-left">
+            <div className="samples-row-actions">
+              <input type="hidden" name={this.props.name + "[" + index + "]"} value={sample.uuid}/>
+              <span>{sample.batch_number}</span>
+              <a href="#" onClick={removeSample.bind(this)} title="Remove this sample">
+                <i className="icon-delete hex-gray bigger"></i>
+              </a>
+            </div>
+            <div className="samples-item">{sample.uuid}</div>
           </div>
+          <div className="samples-concentration">{sample.concentration} copies/ml</div>
         </div>
       </div>);
     } else {
