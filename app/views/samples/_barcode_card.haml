@@ -19,7 +19,7 @@
     .code
       %strong
         Production Date:
-      #{@sample_form.date_produced.try(:strftime, ("%m/%d/%Y"))}
+      #{@sample_form.date_produced.try{ strftime("%m/%d/%Y")}}
     .logo
       = image_tag 'cdx-logo-bw.png'
       .label https://cdx.io
