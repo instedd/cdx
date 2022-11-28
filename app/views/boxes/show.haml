@@ -18,7 +18,7 @@
           %span.copy-content
             = @box.uuid
           %button.btn-copy.ttip
-            = icon "copy", class: "btn-icon"
+            = icon_tag "copy", class: "btn-icon"
 
     .row
       .col.pe-5
@@ -43,13 +43,13 @@
       .col.pe-3
         .inventory-button
           = link_to inventory_box_path(@box, format: "csv"), target: "_blank", class: 'btn-link' do
-            = icon "download", class: "btn-icon"
+            = icon_tag "download", class: "btn-icon"
             %span Download inventory
       - if @box.blinded && !@box.transferred?
         .col.pe-3
           .inventory-button
             = link_to inventory_box_path(@box, format: "csv", unblind: true), target: "_blank", class: 'btn-link' do
-              = icon "download", class: "btn-icon"
+              = icon_tag "download", class: "btn-icon"
               %span Download unblinded inventory
 
     .row

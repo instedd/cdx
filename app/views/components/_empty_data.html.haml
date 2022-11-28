@@ -8,5 +8,5 @@
     %tr
       %td.empty
         .empty-icon
-          = icon empty_data[:icon], class: "xx-large" if empty_data[:icon].present?
+          = icon_tag empty_data[:icon], class: "xx-large" if empty_data[:icon].present?
         = empty_data[:body]

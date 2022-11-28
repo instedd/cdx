@@ -45,7 +45,7 @@
               %td= @localization_helper.format_datetime_time_zone(message.created_at, message.device.time_zone)
               %td
                 = link_to raw_device_message_path(message) do
-                  = icon "download", class: "icon-gray"
+                  = icon_tag "download", class: "icon-gray"
 
       .pagination
         = render 'shared/pagination'

@@ -13,7 +13,7 @@
           %col{:width => "50%"}
         - t.actions do
           = link_to sites_path(filters_params.merge(format: :csv)), title: 'Download CSV' do
-            = icon "download", class: "icon-gray"
+            = icon_tag "download", class: "icon-gray"
         - t.thead do
           %tr
             %th Name

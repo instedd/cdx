@@ -6,9 +6,9 @@
       = "#{@batch_form.batch.samples.count} Samples"
   .actions
     = button_tag id: 'bulk_print', class: 'btn-link', name: 'bulk_action', value: 'print' do
-      = icon "print", class: "btn-icon"
+      = icon_tag "print", class: "btn-icon"
     = button_tag id: 'bulk_destroy', class: 'btn-link' do
-      = icon "trash", class: "btn-icon"
+      = icon_tag "trash", class: "btn-icon"
     = button_tag id: 'bulk_destroy_undo', class: 'btn-link hidden' do
       Undo
 
@@ -22,13 +22,13 @@
         = sample.uuid
       .samples-row-actions
         - if sample.is_quality_control?
-          = icon "test", class: "icon-gray", title: "Q - Control specimen"
+          = icon_tag "test", class: "icon-gray", title: "Q - Control specimen"
         = link_to edit_sample_path(sample.id) do
-          = icon "keyboard-arrow-right", class: "icon-gray"
+          = icon_tag "keyboard-arrow-right", class: "icon-gray"
 
 = link_to add_sample_batch_path, method: :post, class: 'add-samples' do
   .col.pe-7.add-samples
-    = icon "circle-plus", class: "icon-blue icon-margin"
+    = icon_tag "circle-plus", class: "icon-blue icon-margin"
     .add-sample-link
       = "ADD SAMPLE"
 

@@ -39,12 +39,12 @@
                   Received
                   = time_tag confirmed_at, I18n.l(confirmed_at, format: I18n.t("date.formats.long"))
                 %td{style: "padding-left: 0;"}
-                  = icon "tick", class: "icon-text-color", style: "vertical-align:bottom"
+                  = icon_tag "tick", class: "icon-text-color", style: "vertical-align:bottom"
               - else
                 %td.col-state.text-right
                   In transit
                 %td{style: "padding-left: 0;"}
-                  = icon "local_shipping", class: "icon-text-color", style: "vertical-align:bottom"
+                  = icon_tag "local_shipping", class: "icon-text-color", style: "vertical-align:bottom"
 
       .pagination
         = render 'shared/pagination'

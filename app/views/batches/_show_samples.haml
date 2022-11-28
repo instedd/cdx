@@ -10,6 +10,6 @@
         = sample.uuid
       .samples-row-actions
         - if sample.is_quality_control?
-          = icon "test", class: "icon-gray", title: "Q - Control specimen"
+          = icon_tag "test", class: "icon-gray", title: "Q - Control specimen"
         = link_to sample_path(sample.id) do
-          = icon "keyboard-arrow-right", class: "icon-gray"
+          = icon_tag "keyboard-arrow-right", class: "icon-gray"

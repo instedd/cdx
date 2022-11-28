@@ -4,7 +4,7 @@
       = f.form_field :batch_number do
         = f.text_field :batch_number, readonly: !@can_update
         %button.btn-copy.ttip
-          = icon "copy", class: "btn-icon"
+          = icon_tag "copy", class: "btn-icon"
 
       = f.form_field :date_produced do
         = f.date_field :date_produced, readonly: !@can_update

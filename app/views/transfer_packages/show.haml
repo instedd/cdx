@@ -21,12 +21,12 @@
     .value
       %ol.dispatch-log
         %li.log-entry.log-entry--created
-          = icon "local_shipping", class: "icon-text-color"
+          = icon_tag "local_shipping", class: "icon-text-color"
           Sent on
           = time_tag @transfer_package.created_at, I18n.l(@transfer_package.created_at, format: I18n.t("date.formats.long"))
         - if @transfer_package.confirmed?
           %li.log-entry.log-entry--confirmed
-            = icon "tick", class: "icon-text-color"
+            = icon_tag "tick", class: "icon-text-color"
             Confirmed on
             = time_tag @transfer_package.confirmed_at, I18n.l(@transfer_package.confirmed_at, format: I18n.t("date.formats.long"))
 
@@ -47,5 +47,5 @@
 
       - if @transfer_package.blinded?
         = link_to unblind_transfer_package_path(@transfer_package), class: "btn btn-icon", method: "post" do
-          = icon "eye", class: "icon-blue"
+          = icon_tag "eye", class: "icon-blue"
           UNBLIND SAMPLES

@@ -4,14 +4,14 @@
       - unless f.object.qc_info.nil?
         = f.form_field :quality_control do
           = link_to edit_qc_info_path(f.object.qc_info.id, sample_id: f.object.id), class: 'centered' do
-            = icon "text", class: "icon-blue"
+            = icon_tag "text", class: "icon-blue"
             = "VIEW QC INFO"
 
       = f.form_field :uuid do
         %span.copy-content
           = f.object.uuid
         %button.btn-copy.ttip
-          = icon "copy", class: "btn-icon"
+          = icon_tag "copy", class: "btn-icon"
 
       - if f.object.batch_number
         = f.form_field :batch_id, value: @sample_form.batch_number
@@ -22,7 +22,7 @@
             %span.copy-content
               = g.object.uuid
             %button.btn-copy.ttip
-              = icon "copy", class: "btn-icon"
+              = icon_tag "copy", class: "btn-icon"
           = g.form_field :purpose, value: box.purpose, label: { text: "Box Purpose" }
 
     .col.pe-5

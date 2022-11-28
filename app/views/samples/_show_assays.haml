@@ -24,7 +24,7 @@
                 .file.is-hidden
                   .picture-container.assay-file
                     .any-filetype
-                      = icon "document"
+                      = icon_tag "document"
               - else
                 .file
                   .picture-container.assay-file
@@ -32,6 +32,6 @@
                       = image_tag ay.object.assay_file.picture.url(:card)
                     - else
                       .any-filetype
-                        = icon "document"
+                        = icon_tag "document"
                     .picture-title{ title: ay.object.assay_file.picture_file_name }
                       = link_to ay.object.assay_file.picture_file_name, ay.object.assay_file.picture.url, target: "_blank", download: ay.object.assay_file.picture_file_name

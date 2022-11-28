@@ -1,7 +1,7 @@
 module IconHelper
   ICON_PATH = Rails.root.join("app/assets/images/icons")
 
-  def icon(name, **attributes)
+  def icon_tag(name, **attributes)
     if attributes[:class].is_a?(Enumerable)
       attributes[:class] << "icon-svg"
     else
