@@ -56,7 +56,7 @@
 
   .user{:tabindex => "0"}
     - if current_user
-      %span.icon-user.medium.icon-gray-light{title: current_user.email}
+      = icon_tag "user", class: "icon-user medium icon-gray-light", title: current_user.email
       %ul
         - unless @hide_my_account
           %li= link_to "My Account", edit_user_registration_path

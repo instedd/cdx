@@ -60,8 +60,8 @@
     .btn-icon {
       margin: -3px 0 0;
       font-size: 24px;
-      background: none !important;
       color: inherit;
+      svg { fill: currentcolor; }
     }
   }
 }
@@ -130,5 +130,6 @@
     font-size: 24px;
     background: none !important;
     color: inherit;
+    svg { fill: currentcolor; }
   }
 }

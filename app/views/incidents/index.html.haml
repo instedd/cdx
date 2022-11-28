@@ -3,7 +3,7 @@
 .row
   .col
     - if @incidents.empty?
-      = empty_data title: "No incidents", icon: 'icon-outline-alert xx-large' do |c|
+      = empty_data title: "No incidents", icon: 'outline-alert' do |c|
         - c.body do
           %h1 There are no incidents on this site
           %p Create alert groups in order to keep your team notified on current events

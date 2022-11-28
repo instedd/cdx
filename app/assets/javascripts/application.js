@@ -216,12 +216,11 @@ $(document).on("click", ".btn-copy", function(e) {
 
   // tooltip
   if( copyBtn.find(".ttext").length == 0 ) {
-    copyBtn.append('<span class="ttext ttimer2"><i class="icon-tick"></i> Copied</span>');
+    copyBtn.append('<span class="ttext ttimer2"><span class="ttext-icon"><i class="icon-tick icon-white"></i></span> Copied</span>');
     var timer = setTimeout( function() {
       copyBtn.find(".ttext").remove();
     }, 2000 );
   }
-
 });
 $(document).on("click", ".copy-content", function() {
   $(this).next(".btn-copy").click();

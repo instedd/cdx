@@ -9,9 +9,9 @@
     margin: 0 15px 15px;
 
     .btn-icon {
-      background: none !important;
       color: inherit;
       margin: -3px 0 0;
+      svg { fill: currentcolor; }
     }
   }
 }

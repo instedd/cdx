@@ -19,7 +19,7 @@
             .row.custom-fields-line
               .col.px-2
                 = m.label field.target_field
-                %span.icon-arrow-right.absolute-right
+                = icon_tag "arrow-right", class: "absolute-right"
               .col.px-2
                 = cdx_select form: m, name: field.target_field, value: (@device.custom_mappings || {})[field.target_field], class: 'input-medium' do |select|
                   - select.item "", "None"

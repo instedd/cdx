@@ -3,7 +3,7 @@
 .row
   .col
     - if @batches.empty?
-      = empty_data icon: 'icon-outline-test xx-large' do |c|
+      = empty_data icon: 'outline-test' do |c|
         - c.body do
           %h1 There are no batches
           %p Every batch will hold multiple samples
@@ -12,7 +12,7 @@
         = cdx_table title: pluralize(@total, "batch") do |t|
           - t.actions do
             =button_tag id: 'bulk_destroy', class: 'btn-link', name: 'bulk_action', value: 'destroy', data: { method: "delete", confirm: "You're about to permanently delete the selected batches. This action CANNOT be undone. Are you sure you want to proceed?" } do
-              .icon-trash.btn-icon
+              = icon_tag "trash", class: "btn-icon"
           - t.columns do
             %col{:width => "5%"}
             %col{:width => "20%"}
