@@ -10,7 +10,8 @@
       = f.form_field :uuid do
         %span.copy-content
           = f.object.uuid
-        %button.icon-copy.btn-copy.ttip
+        %button.btn-copy.ttip
+          = icon "copy", class: "btn-icon"
 
       - if f.object.batch_number
         = f.form_field :batch_id, value: @sample_form.batch_number
@@ -20,7 +21,8 @@
           = g.form_field :uuid, label: { text: "Box ID" } do
             %span.copy-content
               = g.object.uuid
-            %button.icon-copy.btn-copy.ttip
+            %button.btn-copy.ttip
+              = icon "copy", class: "btn-icon"
           = g.form_field :purpose, value: box.purpose, label: { text: "Box Purpose" }
 
     .col.pe-5
@@ -67,7 +69,7 @@
           .row.input-unit
             = f.text_field :concentration, min:0, readonly: !@can_update, :class=> "input-medium", :value => humanize_concentration(@sample_form.concentration), :pattern => "[\\d.]+(?:[eE]\\+?\\d+)?", :title => "(examples: 120, 12e1, 1.2e2, 1.2e+2, 1.2E2, 1.2E+2, 1.2E+02)"
             .span.unit (copies/ml)
-            
+
       = f.form_field :replicate do
         - @sample_form.blinded_attribute(:replicate) do
           = f.number_field :replicate, min: 0, step: 1, class: "input-small", readonly: !@can_update
