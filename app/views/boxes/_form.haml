@@ -26,10 +26,9 @@
           %label Contents
         .col
           %fieldset#add_batch{ :disabled => "true", :style => "display: none" }
-            = f.form_field "lod", label: { text: "Batch", class: "is-normal-case" }, full_message: false do
-              = react_component "CdxSelectAutocomplete", { url: autocomplete_batches_path(format: "json", context: params[:context]),
-                name: "box[batch_uuids][lod]", value: @box_form.batch_uuids["lod"],
-                placeholder: "Enter batch id", className: "input-block" }
+            = react_component "BatchesSelector", { url: autocomplete_batches_path(format: "json", context: params[:context]),
+              name: "box[batch_uuids]", placeholder: "Enter batch id", className: "input-block",
+              batches: [] }
 
           %fieldset#add_samples{ :disabled => "true", :style => "display: none" }
             = react_component "SamplesSelector", { url: autocomplete_samples_path(format: "json", context: params[:context], qc: 0),

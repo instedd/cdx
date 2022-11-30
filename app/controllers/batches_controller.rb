@@ -26,6 +26,10 @@ class BatchesController < ApplicationController
       .limit(10)
 
     @batches = check_access(batches, READ_BATCH).pluck(:uuid, :batch_number)
+
+    @batches.each do |batch|
+      batch[2] = Sample.joins(:batch).where( batches: { uuid: batch[0] }).pluck(:uuid, :core_fields)
+    end
   end
 
   def edit_or_show
