@@ -10,10 +10,10 @@ var SamplesSelector = React.createClass({
       {this.renderTitle()}
       {this.state.samples.map(this.renderSample)}
 
-      <a className="add-samples" href="#" onClick={this.addSample}>
-        <div className="add-samples">
+      <a className="add-items" href="#" onClick={this.addSample}>
+        <div className="add-items">
           <div className="icon-circle-plus icon-blue icon-margin"></div>
-          <div className="add-sample-link">ADD SAMPLE</div>
+          <div className="add-link">ADD SAMPLE</div>
         </div>
       </a>
     </div>);
@@ -37,27 +37,26 @@ var SamplesSelector = React.createClass({
       function removeSample(event) {
         this.removeSample(event, index);
       }
-      return (<div className="batches-samples" key={"samples-selector-" + index}>
-        <div className="samples-row">
-          <div className="samples-left">
-            <div className="samples-row-actions">
+      return (<div className="list-items" key={"samples-selector-" + index}>
+        <div className="items-row">
+          <div className="items-left">
+            <div className="items-row-actions">
               <input type="hidden" name={this.props.name + "[" + index + "]"} value={sample.uuid}/>
-              <span>{sample.batch_number}</span>
               <a href="#" onClick={removeSample.bind(this)} title="Remove this sample">
                 <i className="icon-delete hex-gray bigger"></i>
               </a>
             </div>
-            <div className="samples-item">{sample.uuid}</div>
+            <div className="items-item">{sample.uuid} <span>{sample.batch_number}</span></div>
           </div>
-          <div className="samples-concentration">{sample.concentration} copies/ml</div>
+          <div className="items-concentration">{sample.concentration} copies/ml</div>
         </div>
       </div>);
     } else {
       function selectSample(_, options) {
         this.selectSample(index, options && options[0]);
       }
-      return (<div className="batches-samples" key={"samples-selector-" + index}>
-        <div className="samples-row">
+      return (<div className="list-items" key={"samples-selector-" + index}>
+        <div className="items-row">
           <CdxSelectAutocomplete
             className={this.props.className}
             url={this.props.url}
