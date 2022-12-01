@@ -122,10 +122,26 @@ describe Manifest, validate_manifest: false do
       {"sample" => {"custom" => {"fields" => "#{loc.name},#{loc.lat.to_i},#{loc.lng.to_i}"}, "pii" => {}, "core" => {}}}, device
     end
 
-    it "loads xml in javascript" do
+    it "loads xml in javascript (serialized hash)" do
       assert_manifest_application %(
         {
-          "patient.name": {"script": "message.xpath('Patient/@name').first().value"}
+          "patient.name": {"script": "message.children.find(function (node) { return node.name === 'Patient' }).attributes.name"}
+        }
+      ), %(
+        {
+        }
+      ), {xml: %(
+        <Message>
+          <Patient name="Socrates" age="27"/>
+        </Message>
+      )},
+      "patient" => {"custom" => {}, "pii" => {"name" => "Socrates"}, "core" => {}}
+    end
+
+    it "loads xml in javascript (xpath)" do
+      assert_manifest_application %(
+        {
+          "patient.name": {"script": "message.xpath('Patient/@name')[0].value"}
         }
       ), %(
         {

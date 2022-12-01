@@ -1,3 +1,5 @@
+require_relative "./xml_message_serializer"
+
 class ManifestFieldMapping
   include DateDistanceHelper
 
@@ -122,7 +124,13 @@ class ManifestFieldMapping
 
   def run_script(script, data)
     ctx = MiniRacer::Context.new
-    ctx.eval "var message = #{data.to_json};"
+
+    if data.is_a?(Nokogiri::XML::Node)
+      ctx.eval "var message = #{data.cdx_serializable_hash.to_json};"
+      ctx.attach "message.xpath", ->(query) { data.xpath(query).cdx_serializable_hash }
+    else
+      ctx.eval "var message = #{data.to_json};"
+    end
 
     if @device
       ctx.eval "var device = #{script_device(@device).to_json};"
