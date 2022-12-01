@@ -100,8 +100,7 @@ class BoxesController < ApplicationController
   end
 
   def blind
-    return unless authorize_resource(@box, UPDATE_BOX)
-
+    return head :forbidden if @box.transferred?
     @box.blind!
 
     redirect_to box_path(@box), notice: "Samples were successfully blinded."
