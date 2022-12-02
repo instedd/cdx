@@ -17,6 +17,7 @@ class BoxesController < ApplicationController
   def show
     return unless authorize_resource(@box, READ_BOX)
     @can_delete = has_access?(@box, DELETE_BOX)
+    @can_blind = !@box.transferred?
 
     @samples = load_box_samples
   end
@@ -89,6 +90,20 @@ class BoxesController < ApplicationController
     boxes.destroy_all
 
     redirect_to boxes_path, notice: "Boxes were successfully deleted."
+  end
+
+  def unblind
+    return head :forbidden if @box.transferred?
+    @box.unblind!
+
+    redirect_to box_path(@box), notice: "Samples were successfully unblinded."
+  end
+
+  def blind
+    return head :forbidden if @box.transferred?
+    @box.blind!
+
+    redirect_to box_path(@box), notice: "Samples were successfully blinded."
   end
 
   private

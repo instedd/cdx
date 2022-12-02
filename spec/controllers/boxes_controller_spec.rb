@@ -11,7 +11,12 @@ RSpec.describe BoxesController, type: :controller do
     @site = Site.make! institution: @institution
     @site_box = Box.make! institution: @institution, site: @site
 
-    @other_user = Institution.make!.user
+    @other_institution = Institution.make!
+    @other_user = @other_institution.user
+
+    @confirmed_transfer = TransferPackage.make! :receiver_confirmed, sender_institution: @institution, receiver_institution: @other_institution
+    @confirmed_box = @confirmed_transfer.box_transfers[0].box
+
     grant @user, @other_user, @institution, READ_INSTITUTION
   end
 
@@ -99,6 +104,32 @@ RSpec.describe BoxesController, type: :controller do
       sign_in other_user
 
       get :show, params: { id: box.id }
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
+
+  describe "blind" do
+    it "before transfer: owner institution can blind box" do
+      post :blind, params: { id: box.id }
+      expect(response).to have_http_status(:found)
+    end
+
+    it "after transfer: owner institution can't blind box" do
+      sign_in other_user
+      post :blind, params: { id: confirmed_box.id, context: other_institution.uuid }
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
+
+  describe "unblind" do
+    it "before transfer: owner institution can unblind box" do
+      post :unblind, params: { id: box.id }
+      expect(response).to have_http_status(:found)
+    end
+
+    it "after tranfer: owner institution can't unblind box" do
+      sign_in other_user
+      post :blind, params: { id: confirmed_box.id, context: other_institution.uuid }
       expect(response).to have_http_status(:forbidden)
     end
   end
