@@ -524,6 +524,7 @@ form {
 .field-errors {
 
 }
+
 .form-errors {
   margin: 10px;
   border-bottom: 1px solid $red;
@@ -536,4 +537,8 @@ form {
   &:hover {
     border-bottom: 1px dashed #999;
   }
+}
+
+.dashed-underline{
+  border-bottom: 1px dashed;
 }

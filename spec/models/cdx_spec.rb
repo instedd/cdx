@@ -39,6 +39,7 @@ describe Cdx do
       "sample.concentration",
       "sample.replicate",
       "sample.media",
+      "sample.measured_signal",
       "test.assays.result",
       "test.assays.name",
       "test.assays.condition",

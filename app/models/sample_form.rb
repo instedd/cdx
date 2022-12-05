@@ -19,6 +19,7 @@ class SampleForm
       :concentration,
       :replicate,
       :media,
+      :measured_signal,
       :qc_info ]
   end
 

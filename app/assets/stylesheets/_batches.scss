@@ -70,10 +70,16 @@
   align-items: center;
   min-height: 40px;
 }
+
 .samples-row-actions {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.gap-5 {
+  display: flex;
+  gap: 5px;
 }
 
 .transfer-data {

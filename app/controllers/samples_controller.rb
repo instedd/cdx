@@ -47,6 +47,11 @@ class SamplesController < ApplicationController
       .preload(:batch)
   end
 
+  def existing_uuids
+    uuids = Sample.find_all_by_any_uuid(params[:uuids]).pluck(:uuid)
+    render json: { status: :ok, message: uuids }
+  end
+
   def edit_or_show
     sample = Sample.find(params[:id])
 
@@ -204,6 +209,24 @@ class SamplesController < ApplicationController
     redirect_to samples_path, notice: "Samples were successfully deleted."
   end
 
+  def bulk_process_csv
+    params[:csv_files].each do |csv_file|
+      CSV.open(csv_file.path) do |csv_stream|
+        csv_stream.each do |row|
+          sample_id, measured_signal = row[0], row[1]
+
+          sample = Sample.find_by_uuid(sample_id)
+          unless sample.nil?
+            sample.measured_signal ||= Float(measured_signal) if measured_signal.present?
+            sample.save!
+          end
+        end
+      end
+    end
+
+    redirect_to samples_path
+  end
+
   private
 
   def sample_params
@@ -218,6 +241,7 @@ class SamplesController < ApplicationController
       :concentration,
       :replicate,
       :media,
+      :measured_signal,
       assay_attachments_attributes: [:id, :loinc_code_id, :result, :assay_file_id, :_destroy],
       notes_attributes: [:id, :description, :updated_at, :user_id, :_destroy],
     )

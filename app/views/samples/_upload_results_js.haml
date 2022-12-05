@@ -1,0 +1,121 @@
+:javascript
+    var getUrlParameter = function getUrlParameter(sParam) {
+        var sPageURL = window.location.search.substring(1),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+            }
+        }
+        return false;
+    };
+
+    var checkUploadEnabling = function checkUploadEnabling() {
+        // Enable upload button if there are uploaded files
+        var hasFilesToUpload = document.getElementById('uploaded-files').innerHTML.trim() != "";
+        document.getElementById(`bulk_process_csv`).disabled = !hasFilesToUpload;
+    }
+
+    var showToolTip = function(evt) {
+        var tooltip = evt.currentTarget.tooltip
+        if (tooltip.classList.contains("hidden")) {
+            tooltip.classList.remove("hidden")
+            setTimeout(() => tooltip.classList.add("hidden"), 5000)
+        }
+        else {
+            tooltip.classList.toggle("hidden")
+        }
+    }
+
+    function handleFileSelect(change_event) {
+        // We use the 1st file from the FileList list
+        let f = change_event.target.files[0];
+        let reader = new FileReader();
+
+        // Closure to capture the file information.
+        reader.onload = (function(f) {
+            return async(load_event) => {
+                // Parse the input file
+                var text =  load_event.target.result
+                var lines = text.split(/\r\n|\r|\n/); // tolerate both Windows and Unix linebreaks
+                var samples_param = [] // params for GET call
+                var samples = [] // samples uuids
+
+                lines.forEach(function(line) { 
+                    if (line != ''){
+                        samples_param.push( 'uuids[]=' + line.split(',')[0] );
+                        samples.push( line.split(',')[0] );
+                    } 
+                });
+                
+                // Retrieve found uuids
+                var context = getUrlParameter('context');
+                var url = '/samples/existing_uuids?context='+context+"&"+samples_param.join("&")
+                var found = await fetch(url)
+                    .then((response) => response.json())
+                    .then((r) => {
+                        return r.message;
+                })
+                // Compute not found ones
+                var not_found = samples.filter(function(x) {
+                    return found.indexOf(x) < 0;
+                });
+                
+                // Create row from template with filename and upload info
+                var template = document.getElementById(`csvFileRow`).content;
+                var fragment = template.cloneNode(true);
+                fragment.querySelector(`.uploaded-samples-count`).textContent = `${samples.length} Samples ` ;
+                if (found.length != samples.length){
+                    fragment.querySelector(`.uploaded-samples-count`).innerHTML += `(<span class="dashed-underline">${(not_found.length)} sample UUID${(not_found.length>1?'s':'')}</span> not found) `
+                    fragment.querySelector(`.upload-icon`).classList.add(`icon-alert`,`icon-red`)
+                    fragment.querySelector(`.samples-row-action`).classList.add(`ttip`,`input-required`)
+                }
+                else {
+                    fragment.querySelector(`.upload-icon`).classList.add(`icon-checkmark`)
+                }
+                fragment.querySelector(`.file-name`).textContent = `${f.name}`;
+                // if samples were not found add mouse behaviour to display tooltip
+                if (found.length != samples.length) {
+                    var ttext = fragment.querySelector(".ttext")
+                    ttext.innerHTML = not_found.slice(0,5).join("<br>")
+                    // Modify classList here won't work because of class order
+                    ttext.style = `color: #EB2122; width: 300px;`
+                    fragment.querySelector(".not_found_message").tooltip = ttext
+                    fragment.querySelector(".not_found_message").addEventListener('click', showToolTip, false )
+                }
+                
+                // Bind click event to remove button
+                var removeFileRow = function(evt) {
+                    evt.currentTarget.upload_info.remove();
+                    change_event.target.remove();
+                    checkUploadEnabling();
+                }                
+                fragment.querySelector(".remove_file").upload_info = fragment.querySelector(`.upload_info`)
+                fragment.querySelector(".remove_file").addEventListener('click', removeFileRow, false)
+
+                document.getElementById(`uploaded-files`).append(fragment)
+                
+                checkUploadEnabling();
+            }
+        })(f);
+
+        reader.readAsText(f);
+    }
+
+    // Upon pressing the "Add file" button we will create a file input and click it
+    document.getElementById(`add-results-file`).addEventListener('click', function (e) {
+        var template = document.getElementById(`csvInputFile`).content;
+        var fragment = template.cloneNode(true);
+        var fileInput = fragment.querySelector('.csv_file');
+        document.getElementById(`uploaded-files`).append(fragment)
+        
+        fileInput.addEventListener('change', handleFileSelect, false);
+        fileInput.click();
+    })
+
+    

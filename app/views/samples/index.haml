@@ -19,7 +19,12 @@
               #table-notification.table-info.hidden.icon-red
                 = icon_tag "notification"
                 .notification-text= "QC Samples can't be transferred"
-
+              %div.align-right
+                =link_to 'samples/upload_results' do
+                  .icon-upload.icon-blue
+                  %span.btn-upload
+                    UPLOAD RESULTS
+            
           - t.columns do
             %col{:width => "4%"}
             %col{:width => "12%"}

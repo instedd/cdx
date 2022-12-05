@@ -644,4 +644,32 @@ RSpec.describe SamplesController, type: :controller do
       expect(response).to be_forbidden
     end
   end
+
+  context "upload_results" do
+    let!(:sample1) { Sample.make!(institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced: Time.zone.local(2018, 1, 1)) }
+
+    it "should write measurement results for samples" do
+      file_path = File.join(Rails.root, 'spec', 'fixtures', 'csvs', 'samples_results_1.csv')
+      file = fixture_file_upload(file_path, 'text/csv')
+      post :bulk_process_csv, params: { "csv_files": [file] }
+      sample1.reload
+
+      expect(sample1.measured_signal).to eq(10.0)
+    end
+
+    it "shouldn't overwrite measurement results for samples with measurements" do
+      file_path = File.join(Rails.root, 'spec', 'fixtures', 'csvs', 'samples_results_1.csv')
+      file = fixture_file_upload(file_path, 'text/csv')
+      post :bulk_process_csv, params: { "csv_files": [file] }
+      sample1.reload
+
+      file_path = File.join(Rails.root, 'spec', 'fixtures', 'csvs', 'samples_results_2.csv')
+      file = fixture_file_upload(file_path, 'text/csv')
+      post :bulk_process_csv, params: { "csv_files": [file] }
+      sample1.reload
+
+      expect(sample1.measured_signal).to eq(10.0)
+    end
+
+  end
 end
