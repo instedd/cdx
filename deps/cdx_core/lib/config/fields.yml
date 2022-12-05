@@ -99,6 +99,12 @@ entities:
       lab_technician:
       old_batch_number:
         searchable: true
+  samples_report: &SAMPLES_REPORT
+    fields:
+      name:
+        type: string
+      threshold:
+        type: float
   batch: &BATCH
     fields:
       batch_number:

@@ -19,6 +19,8 @@ class Sample < ApplicationRecord
   has_many :sample_identifiers, inverse_of: :sample, dependent: :destroy
   has_many :test_results, through: :sample_identifiers
 
+  has_many :samples_reports, through: :samples_report_sample
+
   has_many :assay_attachments, dependent: :destroy
   accepts_nested_attributes_for :assay_attachments, allow_destroy: true
   validates_associated :assay_attachments, message: "are invalid"

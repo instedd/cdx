@@ -2,6 +2,7 @@ var BoxSelector = React.createClass({
   getInitialState: function() {
     return {
       includeQcInfo: this.props.includeQcInfo,
+      displayQcInfo: this.props.displayQcInfo,
       boxes: this.props.boxes,
       search: "",
       error: null,
@@ -14,8 +15,8 @@ var BoxSelector = React.createClass({
     const missingQuantity = selectedBoxes.length - haveQc
     return (
       <div>
-        {haveQc > 0 && this.includeQcInfoCheckbox()}
-        {missingQuantity > 0 && this.qcInfoMessage(missingQuantity, selectedBoxes)}
+        {haveQc > 0 && this.state.displayQcInfo && this.includeQcInfoCheckbox()}
+        {missingQuantity > 0 && this.state.displayQcInfo && this.qcInfoMessage(missingQuantity, selectedBoxes)}
       </div>
     )
   },

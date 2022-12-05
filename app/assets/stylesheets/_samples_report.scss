@@ -1,0 +1,57 @@
+.samples-report {
+  @include flexbox();
+  @include flex-direction(column);
+  
+  .report-summary-content {
+    background: $gray1;
+    border-radius: 3px;
+
+    padding: 18px 20px 23px 18px;
+  }
+  .report-content {
+    padding: 18px 30px;
+  }
+  
+  .title {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0 0 15px 0;
+  }
+  
+  .subtitle{
+    font-size: 14px;
+    color: $gray3;
+    text-transform: uppercase;
+  }
+
+  .text{
+    font-size: 14px;
+    margin: 0 0 15px 0;
+  }
+
+  .separation{
+    margin-top: 35px;
+  }
+  
+}
+
+.report-summary-after {
+  padding: 25px 18px;
+
+  .subtitle{
+    font-size: 14px;
+    color: $gray3;
+    text-transform: uppercase;
+  }
+}
+
+.action {
+  padding: 12px 0;
+}
+
+.btn-icon {
+  margin: -3px 0 0;
+  font-size: 24px;
+  background: none !important;
+  color: $gray3;
+}

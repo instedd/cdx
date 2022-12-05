@@ -15,7 +15,8 @@
   = f.form_field :box_transfers do
     = react_component("BoxSelector",
       context: @navigation_context.uuid,
-      includeQcInfo: @transfer_package.includes_qc_info, boxes: boxes_data(@transfer_package.boxes))
+      includeQcInfo: @transfer_package.includes_qc_info, 
+      boxes: boxes_data(@transfer_package.boxes))
     = f.field_errors :"box_transfers.box.sample"
 
   - if @can_update
