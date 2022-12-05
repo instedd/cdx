@@ -1,14 +1,23 @@
 .barcode-card.is-box
   .barcode-content
-    .barcode(style="float:right")
+    .barcode
       = image_tag barcode_svg_data_url(@box.uuid)
-
-    .title
+    .code
+      .uuid
+        #{@box.uuid}
+    .code
+      %strong
+        Box:
+      = @box.samples.count
+      samples
+    .code
+      %strong
+        Institution:
       = @box.institution.name
     .code
-      Box ID #{@box.uuid}
-    .code
-      Purpose: #{@box.purpose}
+      %strong
+        Purpose:
+      #{@box.purpose}
     .logo
       = image_tag 'cdx-logo-bw.png'
       .label https://cdx.io
@@ -16,5 +25,5 @@
 
   .row.actions
     = link_to print_box_path(@box), target: "_blank", class: 'btn-link' do
-      .icon-print.btn-icon
+      = icon_tag "print", class: "btn-icon"
       %span Print box and sample labels

@@ -11,7 +11,12 @@ RSpec.describe BoxesController, type: :controller do
     @site = Site.make! institution: @institution
     @site_box = Box.make! institution: @institution, site: @site
 
-    @other_user = Institution.make!.user
+    @other_institution = Institution.make!
+    @other_user = @other_institution.user
+
+    @confirmed_transfer = TransferPackage.make! :receiver_confirmed, sender_institution: @institution, receiver_institution: @other_institution
+    @confirmed_box = @confirmed_transfer.box_transfers[0].box
+
     grant @user, @other_user, @institution, READ_INSTITUTION
   end
 
@@ -103,6 +108,32 @@ RSpec.describe BoxesController, type: :controller do
     end
   end
 
+  describe "blind" do
+    it "before transfer: owner institution can blind box" do
+      post :blind, params: { id: box.id }
+      expect(response).to have_http_status(:found)
+    end
+
+    it "after transfer: owner institution can't blind box" do
+      sign_in other_user
+      post :blind, params: { id: confirmed_box.id, context: other_institution.uuid }
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
+
+  describe "unblind" do
+    it "before transfer: owner institution can unblind box" do
+      post :unblind, params: { id: box.id }
+      expect(response).to have_http_status(:found)
+    end
+
+    it "after tranfer: owner institution can't unblind box" do
+      sign_in other_user
+      post :blind, params: { id: confirmed_box.id, context: other_institution.uuid }
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
+
   describe "print" do
     before do
       stub_request(:get, %r{https://fonts\.googleapis\.com/.*}).to_return(body: "")
@@ -145,7 +176,7 @@ RSpec.describe BoxesController, type: :controller do
       results = CSV.parse(response.body).tap(&:shift).map do |row|
         { :batch_number => row[3], :concentration => row[6], :replicate => row[7] }
       end
-      expect( results ).to eq( results.sort_by{ |sample|  [ sample[:batch_number], sample[:concentration], sample[:replicate] ] } )
+      expect( results ).to eq( results.sort_by{ |sample|  [ sample.batch_number , sample.concentration, sample.replicate ] } )
     end
 
     it "should be allowed if can read" do
@@ -173,7 +204,7 @@ RSpec.describe BoxesController, type: :controller do
         expect(row[3]).to eq("Blinded")
         expect(row[4]).to eq("Blinded")
         expect(row[5]).to eq("Blinded")
-        expect(row[7]).to eq("Blinded")
+        expect(row[6]).to eq("Blinded")
       end
     end
 
@@ -187,7 +218,7 @@ RSpec.describe BoxesController, type: :controller do
         expect(row[3]).not_to eq("Blinded")
         expect(row[4]).not_to eq("Blinded")
         expect(row[5]).not_to eq("Blinded")
-        expect(row[7]).not_to eq("Blinded")
+        expect(row[6]).not_to eq("Blinded")
       end
     end
 

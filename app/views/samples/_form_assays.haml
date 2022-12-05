@@ -11,7 +11,7 @@
             .text
               or
             .action
-              .icon-upload.icon-blue
+              = icon_tag "upload", class: "icon-blue"
               Choose a file to upload
 
         #dropzonePreview.upload-picture.dz-default.dz-message
@@ -39,7 +39,7 @@
               - if ay.object.errors.include?(:assay_file)
                 .file
                   .picture-container.picture-required
-                    .icon-alert.icon-red
+                    = icon_tag "alert", class: "icon-red"
                     = ay.object.errors[:assay_file].join(" - ")
                 - ay.field_errors :assay_file
               - else
@@ -47,7 +47,7 @@
                   .file.is-hidden
                     .picture-container.assay-file
                       .any-filetype
-                        .icon-document
+                        = icon_tag "document"
                   .remove
                     = ay.check_box '_destroy', { id: "destroy_assay_attachments_#{ay.object.id}" }
                     %label.cross{:for => "destroy_assay_attachments_#{ay.object.id}" }
@@ -59,7 +59,7 @@
                         = image_tag ay.object.assay_file.picture.url(:card)
                       - else
                         .any-filetype
-                          .icon-document
+                          = icon_tag "document"
                       .picture-title{ title: ay.object.assay_file.picture_file_name }
                         = link_to ay.object.assay_file.picture_file_name, ay.object.assay_file.picture.url, target: "_blank", download: ay.object.assay_file.picture_file_name
 
@@ -72,7 +72,7 @@
 
     .actions
       = button_tag id: 'add-assays', class: "btn-link" do
-        .icon-circle-plus.btn-icon.icon-blue-important.icon-margin
+        = icon_tag "circle-plus", class: "btn-icon icon-blue-important icon-margin"
         New Assay
 
 = render 'form_assays_js'

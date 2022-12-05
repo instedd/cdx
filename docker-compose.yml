@@ -1,4 +1,4 @@
-version: '2.2'
+version: '2.4'
 
 services:
   base: &base
@@ -38,6 +38,7 @@ services:
     scale: 2
 
   db:
+    platform: linux/amd64
     image: mysql:5.7
     command: --innodb-flush-method=nosync --innodb-flush-log-at-trx-commit=0 --innodb-flush-log-at-timeout=2700 --sync-binlog=0
     environment:
@@ -55,6 +56,7 @@ services:
     image: redis:6.2-alpine
 
   sshd:
+    platform: linux/amd64
     image: instedd/cdx-sync-sshd
     environment:
       SYNC_UID: 9999

@@ -10,7 +10,7 @@ var AddUserLink = React.createClass({
 
   render: function() {
     return (<div>
-      <a className="btn-add icon side-link" href='#' title="Invite users" onClick={this.openInviteModal} ><span className="icon-mail icon-white"></span></a>
+      <a className="btn-add icon side-link" href='#' title="Invite users" onClick={this.openInviteModal} ><span className="icon-mail icon-white icon-baseline"></span></a>
 
       <Modal ref="inviteModal">
         <h1>Invite users</h1>

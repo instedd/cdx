@@ -10,7 +10,7 @@
 .row
   .col
     - if @policies.empty?
-      = empty_data title: "No policies", icon: 'icon-outline-user xx-large' do |c|
+      = empty_data title: "No policies", icon: 'outline-user' do |c|
         - c.body do
           %h1 There are no users with access to #{truncated_navigation_context_entity_name}
           %p Invite other users to join this site's team

@@ -2,7 +2,7 @@
 .row
   .col
     - if @sites.empty?
-      = empty_data icon: 'icon-outline-site xx-large' do |c|
+      = empty_data icon: 'outline-site' do |c|
         - c.body do
           %h1 This #{navigation_context_entity_name} has no dependencies
           %p Create sites here to keep your institution's hierachy organized
@@ -13,7 +13,7 @@
           %col{:width => "50%"}
         - t.actions do
           = link_to sites_path(filters_params.merge(format: :csv)), title: 'Download CSV' do
-            .icon-download.icon-gray
+            = icon_tag "download", class: "icon-gray"
         - t.thead do
           %tr
             %th Name
