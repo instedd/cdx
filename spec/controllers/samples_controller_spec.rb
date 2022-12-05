@@ -655,7 +655,6 @@ RSpec.describe SamplesController, type: :controller do
       sample1.reload
 
       expect(sample1.measured_signal).to eq(10.0)
-      expect(sample1.measurement_result).to eq("positive")
     end
 
     it "shouldn't overwrite measurement results for samples with measurements" do
@@ -670,7 +669,6 @@ RSpec.describe SamplesController, type: :controller do
       sample1.reload
 
       expect(sample1.measured_signal).to eq(10.0)
-      expect(sample1.measurement_result).to eq("positive")
     end
 
   end

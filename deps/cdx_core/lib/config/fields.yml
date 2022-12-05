@@ -91,11 +91,6 @@ entities:
           - Other
       measured_signal:
         type: float
-      measurement_result:
-        type: enum
-        options:
-          - positive
-          - negative
       lab_technician:
       old_batch_number:
         searchable: true

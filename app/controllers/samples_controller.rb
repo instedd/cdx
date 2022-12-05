@@ -48,8 +48,7 @@ class SamplesController < ApplicationController
   end
 
   def existing_uuids
-    response =  Sample.find_all_by_any_uuid(params[:uuids])
-    uuids = response.map{ |s| s.uuid }
+    uuids = Sample.find_all_by_any_uuid(params[:uuids]).pluck(:uuid)
     render json: { status: :ok, message: uuids }
   end
 
@@ -214,16 +213,11 @@ class SamplesController < ApplicationController
     params[:csv_files].each do |csv_file|
       CSV.open(csv_file.path) do |csv_stream|
         csv_stream.each do |row|
-          sample_id, measured_signal, measurement_result = row[0], row[1], row[2]
+          sample_id, measured_signal = row[0], row[1]
 
           sample = Sample.find_by_uuid(sample_id)
           unless sample.nil?
-            if sample.measured_signal.nil? && measured_signal.strip != "" && !!Float(measured_signal)
-              sample.measured_signal = measured_signal.try(&:to_f)
-            end
-            if sample.measurement_result.nil? && (measurement_result.downcase == "positive" || measurement_result.downcase == "negative")
-              sample.measurement_result = measurement_result.downcase
-            end
+            sample.measured_signal ||= Float(measured_signal) if measured_signal.present?
             sample.save!
           end
         end
@@ -248,7 +242,6 @@ class SamplesController < ApplicationController
       :replicate,
       :media,
       :measured_signal,
-      :measurement_result,
       assay_attachments_attributes: [:id, :loinc_code_id, :result, :assay_file_id, :_destroy],
       notes_attributes: [:id, :description, :updated_at, :user_id, :_destroy],
     )
