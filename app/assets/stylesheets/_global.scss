@@ -76,6 +76,7 @@ th.text-right {
 }
 .muted {
   color: $gray3;
+  padding: 10px;
 }
 .align-top {
   @include align-self(flex-start);
