@@ -17,17 +17,8 @@
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   // "forwardPorts": [],
 
-  "onCreateCommand": [
-    "docker compose build",
-    "docker compose pull",
-    "docker compose run --rm --no-deps web bundle install"
-  ],
-
-  "postCreateCommand": [
-    "docker compose run --rm web bin/rails db:setup",
-    "docker compose run --rm web bin/rails db:test:prepare",
-    "docker compose run --rm web bin/rails elasticsearch:setup"
-  ]
+  "onCreateCommand": "docker compose build && docker compose pull && docker compose run --rm --no-deps web bundle install",
+  "postCreateCommand": "docker compose run --rm web bin/rails db:setup elasticsearch:setup"
 
   // Configure tool-specific properties.
   // "customizations": {},
