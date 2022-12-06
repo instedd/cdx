@@ -104,6 +104,27 @@ class SamplesReportsController < ApplicationController
     redirect_to samples_reports_path, notice: 'Box reports were successfully deleted.'
   end
 
+  def find_box
+    @navigation_context = NavigationContext.new(nil, params[:context])
+
+    uuid = params[:uuid]
+    full_uuid = uuid.size == 36
+    @boxes = Box
+      .within(@navigation_context.entity, @navigation_context.exclude_subsites)
+      .left_joins(:box_transfers)
+      .where(box_transfers: {id: nil})
+      .autocomplete(uuid)
+      .order("created_at DESC")
+      .count_samples
+      .count_samples_without_results
+      .limit(5)
+
+    @boxes = check_access(@boxes, READ_BOX)
+
+    render json: { boxes: boxes_data(@boxes) }
+  end
+
+
   private
 
   def boxes_data(boxes)
@@ -112,7 +133,8 @@ class SamplesReportsController < ApplicationController
         id: box.id,
         uuid: box.uuid,
         hasQcReference: box.samples.any?(&:has_qc_reference?),
-        preview: render_to_string(partial: "boxes/preview", locals: { box: box }),
+        preview: render_to_string(partial: "boxes/preview_for_report", locals: { box: box }),
+        samplesWithoutResults: box.samples_without_results_count>0 ? true : false 
       }
     }
   end

@@ -39,6 +39,13 @@ class Box < ApplicationRecord
       .group("samples.box_id")
   }
 
+  scope :count_samples_without_results, -> {
+    select("boxes.*, COUNT(samples.id) AS samples_without_results_count")
+      .joins(:samples)
+      .where("samples.core_fields NOT LIKE '%measured_signal%'")
+      .group("samples.box_id")
+  }
+
   def self.purposes
     entity_fields.find { |f| f.name == 'purpose' }.options
   end

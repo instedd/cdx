@@ -16,6 +16,8 @@
     = react_component("BoxSelector",
       context: @navigation_context.uuid,
       includeQcInfo: @transfer_package.includes_qc_info, 
+      maxBoxes: -1,
+      caller: "transfer_packages",
       boxes: boxes_data(@transfer_package.boxes))
     = f.field_errors :"box_transfers.box.sample"
 

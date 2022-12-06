@@ -3,6 +3,8 @@ var BoxSelector = React.createClass({
     return {
       includeQcInfo: this.props.includeQcInfo,
       displayQcInfo: this.props.displayQcInfo,
+      maxBoxes: this.props.maxBoxes,
+      caller: this.props.caller,
       boxes: this.props.boxes,
       search: "",
       error: null,
@@ -23,7 +25,7 @@ var BoxSelector = React.createClass({
 
   renderBoxes: function() {
     const selector = this;
-
+    
     function renderBox(box, i) {
       function handleClick(e) {
         e.preventDefault();
@@ -32,6 +34,22 @@ var BoxSelector = React.createClass({
 
       let id = Math.floor(Math.random() * 1000000000);
       let name = `transfer_package[box_transfers_attributes][${id}][box_id]`;
+      if (selector.state.caller == 'samples_reports')
+        return <div>
+          <div className="batches-samples">
+            <div className="samples-row-with-remove">
+              <a href="#" className="selector-list-item__remove" title="Remove box" onClick={handleClick}>
+                <i className="icon-circle-minus icon-gray" />
+              </a>
+              <div className="samples-row" dangerouslySetInnerHTML={{ __html: box.preview }}></div>
+            </div>
+            <input type="hidden" name={name} value={box.id} />
+          </div>
+            { box.samplesWithoutResults ? 
+              (<div className="muted"><div className="icon-info-outline muted"/>Samples without results will be ignored</div>) :
+              ("") }
+        </div>
+      else
       return <div className="selector-list-item">
         <div dangerouslySetInnerHTML={{ __html: box.preview }}></div>
         <input type="hidden" name={name} value={box.id} />
@@ -94,7 +112,7 @@ var BoxSelector = React.createClass({
   },
 
   loadBox: function(uuid) {
-    url = "/transfer_packages/find_box"
+    url = "/"+this.state.caller+"/find_box"
     this.setState({
       error: null,
       status: "loading",
@@ -194,11 +212,12 @@ var BoxSelector = React.createClass({
             <div className="selector-list">
               {this.renderBoxes()}
             </div>
+            {(this.state.maxBoxes ==-1 || this.state.boxes.length < this.state.maxBoxes) &&
             <input type="text" size="36" maxlength="36" placeholder="Enter, paste or scan box ID"
               value={this.state.search}
               onChange={this.handleChange} onKeyDown={this.onKeyDown}
               className={this.state.error ? "input-required" : ""} />
-
+            }
             <div className="error">
               {this.renderError()}
             </div>

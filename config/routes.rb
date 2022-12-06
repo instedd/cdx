@@ -135,6 +135,7 @@ Rails.application.routes.draw do
       delete 'delete'
     end
     collection do
+      get "find_box"
       get 'autocomplete'
       post 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
     end

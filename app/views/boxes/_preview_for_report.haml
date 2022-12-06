@@ -1,0 +1,8 @@
+.samples-item
+  .box__uuid{title: "UUID"}
+    = box.uuid
+.actions
+  #{box.purpose} with #{box.samples_count} samples
+  - if box.samples_without_results_count > 0
+    %span.input-required
+      (#{box.samples_without_results_count} without results)
