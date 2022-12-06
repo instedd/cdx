@@ -1,6 +1,7 @@
 {
   "dockerComposeFile": "../docker-compose.yml",
   "service": "web",
+  "runServices": ["web", "db", "elasticsearch", "redis", "sidekiq", "selenium"],
 
   "settings": {
     "terminal.integrated.shell.linux": "/bin/bash"
