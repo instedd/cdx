@@ -49,6 +49,10 @@
   &.hex-gray {
     filter: invert(62%) sepia(14%) saturate(8%) hue-rotate(12deg) brightness(97%) contrast(85%);
   }
+  &.hex-blue {
+    filter: invert(56%) sepia(29%) saturate(6765%) hue-rotate(185deg) brightness(95%) contrast(100%);
+    border: 0;
+  }
   &.icon-gray-light {
     color: $gray-light;
   }
@@ -396,6 +400,21 @@
   width: 24px;
   height: 24px;
   background-size: 24px 24px;
+}
+.icon-check {
+  background-image: asset-url('/assets/icons/check.svg');
+  /* todo: cut this when merging Julien's commit */
+  display: inline-block;
+  content: " ";
+  vertical-align: middle;
+  line-height: 1;
+  background-repeat: no-repeat;
+  width: 24px;
+  height: 24px;
+  background-size: 24px 24px;
+  cursor: pointer;
+  border: 0;
+  background-color: transparent;
 }
 
 

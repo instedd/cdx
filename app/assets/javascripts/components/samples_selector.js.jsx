@@ -27,7 +27,7 @@ var SamplesSelector = React.createClass({
       return e.uuid ? a + 1 : a;
     }, 0);
 
-    return (<div className="samples-count">
+    return (<div className="items-count">
       <div className="title">{count}&nbsp;{count == 1 ? "sample" : "samples"}</div>
     </div>);
   },
