@@ -17,7 +17,7 @@
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   // "forwardPorts": [],
 
-  "onCreateCommand": "docker compose build && docker compose pull && docker compose run --rm --no-deps web bundle install",
+  "onCreateCommand": "docker compose build web sidekiq selenium && docker compose pull db elasticsearch redis && docker compose run --rm --no-deps web bundle install",
   "postCreateCommand": "docker compose run --rm web bin/rails db:setup elasticsearch:setup"
 
   // Configure tool-specific properties.
