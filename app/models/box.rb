@@ -101,4 +101,12 @@ class Box < ApplicationRecord
   def transferred?
     box_transfers.exists?
   end
+
+  def unblind!
+    update_columns(blinded: false)
+  end
+
+  def blind!
+    update_columns(blinded: true)
+  end
 end

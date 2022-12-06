@@ -17,10 +17,19 @@
 
     var checkUploadEnabling = function checkUploadEnabling() {
         // Enable upload button if there are uploaded files
-        if (document.getElementById('uploaded-files').innerHTML.trim() != "") 
-            document.getElementById(`bulk_process_csv`).disabled = false;
-        else 
-            document.getElementById(`bulk_process_csv`).disabled = true;
+        var hasFilesToUpload = document.getElementById('uploaded-files').innerHTML.trim() != "";
+        document.getElementById(`bulk_process_csv`).disabled = !hasFilesToUpload;
+    }
+
+    var showToolTip = function(evt) {
+        var tooltip = evt.currentTarget.tooltip
+        if (tooltip.classList.contains("hidden")) {
+            tooltip.classList.remove("hidden")
+            setTimeout(() => tooltip.classList.add("hidden"), 5000)
+        }
+        else {
+            tooltip.classList.toggle("hidden")
+        }
     }
 
     function handleFileSelect(change_event) {
@@ -72,16 +81,6 @@
                 fragment.querySelector(`.file-name`).textContent = `${f.name}`;
                 // if samples were not found add mouse behaviour to display tooltip
                 if (found.length != samples.length) {
-                    var showToolTip = function(evt) {
-                            var tooltip = evt.currentTarget.tooltip
-                            if (tooltip.classList.contains("hidden")) {
-                                tooltip.classList.remove("hidden")
-                                setTimeout(() => tooltip.classList.add("hidden"), 5000)
-                            }
-                            else {
-                                tooltip.classList.toggle("hidden")
-                            }
-                        }
                     var ttext = fragment.querySelector(".ttext")
                     ttext.innerHTML = not_found.slice(0,5).join("<br>")
                     // Modify classList here won't work because of class order
@@ -110,16 +109,13 @@
 
     // Upon pressing the "Add file" button we will create a file input and click it
     document.getElementById(`add-results-file`).addEventListener('click', function (e) {
-        // Use identifier = now for all the elements of the row of files that will be created
-        var now = Date.now()
-
         var template = document.getElementById(`csvInputFile`).content;
         var fragment = template.cloneNode(true);
-        fragment.querySelector(`.csv_file`).id = `csv_file_${now}`;
+        var fileInput = fragment.querySelector('.csv_file');
         document.getElementById(`uploaded-files`).append(fragment)
         
-        document.getElementById(`csv_file_${now}`).addEventListener('change', handleFileSelect, false);
-        document.getElementById(`csv_file_${now}`).click();
+        fileInput.addEventListener('change', handleFileSelect, false);
+        fileInput.click();
     })
 
     

@@ -20,7 +20,6 @@ class SampleForm
       :replicate,
       :media,
       :measured_signal,
-      :measurement_result,
       :qc_info ]
   end
 

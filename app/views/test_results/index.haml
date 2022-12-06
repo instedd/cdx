@@ -3,7 +3,7 @@
 .row
   .col
     - if @tests.empty?
-      = empty_data icon: 'icon-outline-test xx-large' do |c|
+      = empty_data icon: 'outline-test' do |c|
         - c.body do
           %h1 No #{@display_as == "test" ? "tests" : "test results"} have been reported
           %p Setup your devices first in order to start reporting

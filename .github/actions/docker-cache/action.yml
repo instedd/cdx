@@ -15,7 +15,7 @@ runs:
   using: composite
 
   steps:
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       id: docker-cache
       with:
         path: tmp/docker
@@ -32,6 +32,6 @@ runs:
     - name: Build Docker image
       if: steps.docker-cache.outputs.cache-hit != 'true'
       run: |
-        docker-compose build
+        docker-compose build --build-arg TARGETARCH=amd64
         docker save ${{ inputs.docker-images }} > tmp/docker/docker_images.tar
       shell: bash

@@ -18,7 +18,7 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/docker-cache
         with:
           docker-images: cdx_web cdx_selenium
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: setup
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/docker-cache
       - uses: ./.github/actions/gems-cache
 
@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: setup
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/docker-cache
       - uses: ./.github/actions/gems-cache
 
@@ -84,7 +84,7 @@ jobs:
       - unit
       - integration
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/docker-cache
       - uses: ./.github/actions/gems-cache
 

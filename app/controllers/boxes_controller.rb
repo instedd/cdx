@@ -17,6 +17,7 @@ class BoxesController < ApplicationController
   def show
     return unless authorize_resource(@box, READ_BOX)
     @can_delete = has_access?(@box, DELETE_BOX)
+    @can_blind = !@box.transferred?
 
     @samples = load_box_samples
   end
@@ -91,6 +92,20 @@ class BoxesController < ApplicationController
     redirect_to boxes_path, notice: "Boxes were successfully deleted."
   end
 
+  def unblind
+    return head :forbidden if @box.transferred?
+    @box.unblind!
+
+    redirect_to box_path(@box), notice: "Samples were successfully unblinded."
+  end
+
+  def blind
+    return head :forbidden if @box.transferred?
+    @box.blind!
+
+    redirect_to box_path(@box), notice: "Samples were successfully blinded."
+  end
+
   private
 
   def load_box
@@ -103,7 +118,11 @@ class BoxesController < ApplicationController
 
   def load_box_samples
     samples = @box.samples.preload(:batch, :sample_identifiers)
-    samples = samples.scrambled if @box.blinded?
+    samples = if @box.blinded? && !params[:unblind] 
+      samples.scrambled
+    else
+      samples.sort_by{ |sample|  [ sample.batch_number , sample.concentration , sample.replicate ] }
+    end 
     SamplePresenter.map(samples, request.format, unblind: params[:unblind])
   end
 
