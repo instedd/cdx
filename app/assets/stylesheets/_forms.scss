@@ -38,7 +38,7 @@ textarea {
   }
 }
 
-
+.subtitle,
 label {
   color: $gray3;
   line-height: 40px;
@@ -50,6 +50,9 @@ label {
   &.is-normal-case {
     text-transform: inherit;
   }
+}
+.subtitle {
+  vertical-align: top;
 }
 
 .value {
@@ -122,6 +125,7 @@ input[type="checkbox"] {
     margin-left: 32px;
     margin-bottom: 10px;
     cursor: pointer;
+    line-height: 40px;
 
     &:before {
       content: '';

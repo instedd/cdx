@@ -40,11 +40,27 @@
   }
 }
 
+.items-cols {
+  display: grid;
+  grid-template-columns: 40px 1fr 1fr;
+
+  .items-row-actions {
+    align-items: flex-start;
+  }
+}
+
 .items-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0px 10px;
+  width: 100%;
+
+  input {
+    width: 60px;
+  }
+}
+.full-input {
   width: 100%;
 }
 .items-left {
@@ -128,4 +144,9 @@
   [class^="icon-"], [class*=" icon-"] {
     font-size: 30px;
   }
+}
+
+.distractor-description {
+  padding-left: 40px;
+  color: $gray3;
 }
