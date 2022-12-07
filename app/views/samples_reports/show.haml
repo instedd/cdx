@@ -11,7 +11,7 @@
 .row
   .col
     .row
-      .col.pe-5
+      .col.pe-4
         .samples-report
           .report-summary-content 
             .title
@@ -20,35 +20,19 @@
               Samples
             .text 
               = @samples_report.samples_report_samples.length
-            .subtitle 
-              Threshold
-            .text 
-              = @samples_report.threshold.to_f
-            .subtitle 
-              Computed AUC
-            .text 
-              xx
-            .subtitle 
-              Computed LOD
-            .text 
-              xx
-            .subtitle 
-              Computed AUC
-            .text 
-              xx
             .separation 
             .action
               .subtitle 
-                .icon-print.btn-icon
+                = icon_tag "barchart", class: "btn-icon icon-text-color"
                 Download charts as svg
             .action
               .subtitle
-                .icon-print.btn-icon
+                = icon_tag "as-pdf", class: "btn-icon icon-text-color"
                 Download PDF
         .report-summary-after
           =link_to delete_samples_report_path, id: @samples_report.id, data: { method: "delete", confirm: "You're about to permanently this box report. This action CANNOT be undone. Are you sure you want to proceed?" } do
             .subtitle
-              .icon-trash.btn-icon
+              = icon_tag "trash", class: "btn-icon icon-text-color"
               Delete Report
               
             

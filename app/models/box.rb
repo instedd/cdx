@@ -40,10 +40,10 @@ class Box < ApplicationRecord
   }
 
   scope :count_samples_without_results, -> {
-    select("boxes.*, COUNT(samples.id) AS samples_without_results_count")
-      .joins(:samples)
-      .where("samples.core_fields NOT LIKE '%measured_signal%'")
-      .group("samples.box_id")
+    select("COUNT(samples_without_results.id) AS samples_without_results_count")
+      .joins("LEFT OUTER JOIN samples samples_without_results ON samples_without_results.box_id = boxes.id
+              AND samples_without_results.core_fields NOT LIKE '%measured_signal%'")
+      .group("samples_without_results.box_id")
   }
 
   def self.purposes

@@ -15,15 +15,13 @@
               .icon-trash.btn-icon
           - t.columns do
             %col{:width => "5%"}
+            %col{:width => "40%"}
             %col{:width => "30%"}
-            %col{:width => "20%"}
-            %col{:width => "30%"}
-            %col{:width => "15%"}
+            %col{:width => "25%"}
           - t.thead do
             %tr
               %th
               %th REPORT NAME
-              %th THRESHOLD
               %th SAMPLES
               %th CREATION DATE
           - t.tbody do
@@ -33,7 +31,6 @@
                   =check_box_tag 'samples_report_ids[]', samples_report.id, false, { id: "samples_report_ids.#{samples_report.id}" }
                   %label.row{for: "samples_report_ids.#{samples_report.id}"}
                 %td= samples_report.name
-                %td= samples_report.threshold
                 %td= samples_report.samples_report_samples.length
                 %td= samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))
 
