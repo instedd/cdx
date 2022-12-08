@@ -5,10 +5,10 @@ class SamplesReportsController < ApplicationController
   helper_method :available_institutions
 
   def index
-    @can_create = true # has_access?(@navigation_context.institution, CREATE_INSTITUTION_BATCH)
+    @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_SAMPLES_REPORT)
   
     @samples_reports = SamplesReport.where(institution: @navigation_context.institution)
-    #@batches = check_access(@batches, READ_BATCH).order('created_at DESC')
+    @samples_reports = check_access(@samples_reports, READ_SAMPLES_REPORT).order('created_at DESC')
   
     # Filter by search params
     @samples_reports = @samples_reports.where("name LIKE concat('%', ?, '%')", params[:name]) unless params[:name].blank?
@@ -24,7 +24,7 @@ class SamplesReportsController < ApplicationController
                                  .where("batches.batch_number LIKE concat('%', ?, '%')", params[:batch_number])
                                  .group(:samples_report_id) unless params[:batch_number].blank?
 
-    #paginate batches
+    #paginate samples report
     @samples_reports = perform_pagination(@samples_reports)
   end
   
@@ -36,52 +36,49 @@ class SamplesReportsController < ApplicationController
 
     @boxes = []
     
-    #@batch_form = BatchForm.for(batch)
-    #prepare_for_institution_and_authorize(@batch_form, CREATE_INSTITUTION_BATCH)
+    prepare_for_institution_and_authorize(@samples_report, CREATE_INSTITUTION_SAMPLES_REPORT)
   end
 
   def create
     @institution = @navigation_context.institution
-    #return unless authorize_resource(institution, CREATE_INSTITUTION_BATCH)
+    return unless authorize_resource(@institution, CREATE_INSTITUTION_SAMPLES_REPORT)
 
     @samples_report = SamplesReport.new()
     @samples_report.institution = @institution
     @samples_report.site = @navigation_context.site
     @samples_report.name = params[:samples_report][:name]
-    @samples_report.threshold = params[:samples_report][:threshold]
-    @boxes_p = params[:transfer_package][:box_transfers_attributes]
-    @boxes_p.each do |box_param|
-      box_id = @boxes_p[box_param][:box_id]
-      box = Box.find_by_id(box_id)
-      box.samples.each do |sample|
-        @samples_report.samples_report_samples << SamplesReportSample.new(samples_report: @samples_report, sample: sample)
+    
+    samples_report_samples = []
+    @boxes = [] # For form reloading in case of validation error
+    if params[:samples_report][:boxes_attributes]
+      @boxes_p = params[:samples_report][:boxes_attributes]
+      @boxes_p.each do |box_param|
+        box_id = @boxes_p[box_param][:box_id]
+        box = Box.find_by_id(box_id)
+        box.samples.each do |sample|
+          samples_report_samples  << SamplesReportSample.new(samples_report: @samples_report, sample: sample)
+        end
       end
     end
 
+    @samples_report.samples_report_samples = samples_report_samples
+    
     if @samples_report.save
       redirect_to samples_reports_path, notice: 'Box report was successfully created.'
     else
       render action: 'new'
     end
-
-    #batch = Batch.new(batch_params.merge({
-    #  institution: institution,
-    #  site: @navigation_context.site
-    #}))
-    #@batch_form = BatchForm.for(batch)
-    #@batch_form.samples_quantity = batch_samples_quantity_params
-
   end
 
   def show
     @samples_report = SamplesReport.find_by_id(params[:id])
-    #return unless authorize_resource(@samples_report, READ_BOX)
-    #@can_delete = has_access?(@box, DELETE_BOX)
-
+    return unless authorize_resource(@samples_report, READ_SAMPLES_REPORT)
+    @can_delete = has_access?(@samples_report, DELETE_SAMPLES_REPORT)
   end
 
   def delete
-    #return unless authorize_resource(@batch, DELETE_BATCH)
+    @samples_report = SamplesReport.find_by_id(params[:id])
+    return unless authorize_resource(@samples_report, DELETE_SAMPLES_REPORT)
   
     SamplesReport.destroy(params[:id])
     
@@ -97,7 +94,7 @@ class SamplesReportsController < ApplicationController
     end
   
     samples_reports = SamplesReport.where(id: samples_reports_ids)
-    #return unless authorize_resources(batches, DELETE_BATCH)
+    return unless authorize_resources(samples_reports, DELETE_SAMPLES_REPORT)
   
     samples_reports.destroy_all
   

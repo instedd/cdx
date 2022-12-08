@@ -31,6 +31,7 @@ class Policy < ApplicationRecord
     CREATE_INSTITUTION_SAMPLE =         "institution:createSample"
     CREATE_INSTITUTION_BATCH =          "institution:createBatch"
     CREATE_INSTITUTION_BOX =            "institution:createBox"
+    CREATE_INSTITUTION_SAMPLES_REPORT = "institution:createSamplesReport"
 
     READ_INSTITUTION_USERS = "institution:readUsers"
 
@@ -46,6 +47,11 @@ class Policy < ApplicationRecord
     READ_SAMPLE =   "sample:read"
     UPDATE_SAMPLE = "sample:update"
     DELETE_SAMPLE = "sample:delete"
+
+    READ_SAMPLES_REPORT =   "samplesReport:read"
+    UPDATE_SAMPLES_REPORT = "samplesReport:update"
+    DELETE_SAMPLES_REPORT = "samplesReport:delete"
+
 
     READ_BATCH =   "batch:read"
     UPDATE_BATCH = "batch:update"

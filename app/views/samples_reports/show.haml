@@ -29,11 +29,12 @@
               .subtitle
                 = icon_tag "as-pdf", class: "btn-icon icon-text-color"
                 Download PDF
-        .report-summary-after
-          =link_to delete_samples_report_path, id: @samples_report.id, data: { method: "delete", confirm: "You're about to permanently this box report. This action CANNOT be undone. Are you sure you want to proceed?" } do
-            .subtitle
-              = icon_tag "trash", class: "btn-icon icon-text-color"
-              Delete Report
+        - if @can_delete
+          .report-summary-after
+            =link_to delete_samples_report_path, id: @samples_report.id, data: { method: "delete", confirm: "You're about to permanently this box report. This action CANNOT be undone. Are you sure you want to proceed?" } do
+              .subtitle
+                = icon_tag "trash", class: "btn-icon icon-text-color"
+                Delete Report
               
             
       .col

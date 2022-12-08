@@ -33,8 +33,8 @@ var BoxSelector = React.createClass({
       }
 
       let id = Math.floor(Math.random() * 1000000000);
-      let name = `transfer_package[box_transfers_attributes][${id}][box_id]`;
-      if (selector.state.caller == 'samples_reports')
+      if (selector.state.caller == 'samples_reports'){
+        let name = `samples_report[boxes_attributes][${id}][box_id]`;
         return <div>
           <div className="batches-samples">
             <div className="samples-row-with-remove">
@@ -49,14 +49,19 @@ var BoxSelector = React.createClass({
               (<div className="muted"><div className="icon-info-outline muted"/>Samples without results will be ignored</div>) :
               ("") }
         </div>
-      else
-      return <div className="selector-list-item">
-        <div dangerouslySetInnerHTML={{ __html: box.preview }}></div>
-        <input type="hidden" name={name} value={box.id} />
-        <a href="#" className="selector-list-item__remove" title="Remove box" onClick={handleClick}>
-          <i className="icon-close" />
-        </a>
-      </div>
+      }
+      else {
+        let name = `transfer_package[box_transfers_attributes][${id}][box_id]`;
+      
+        return <div className="selector-list-item">
+          <div dangerouslySetInnerHTML={{ __html: box.preview }}></div>
+          <input type="hidden" name={name} value={box.id} />
+          <a href="#" className="selector-list-item__remove" title="Remove box" onClick={handleClick}>
+            <i className="icon-close" />
+          </a>
+        </div>
+      }
+      
     }
 
     const listItems = this.state.boxes.map(renderBox)
