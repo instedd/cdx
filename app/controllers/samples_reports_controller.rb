@@ -6,7 +6,8 @@ class SamplesReportsController < ApplicationController
 
   def index
     @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_SAMPLES_REPORT)
-  
+    @can_delete = has_access?(SamplesReport, DELETE_SAMPLES_REPORT)
+
     @samples_reports = SamplesReport.where(institution: @navigation_context.institution)
     @samples_reports = check_access(@samples_reports, READ_SAMPLES_REPORT).order('created_at DESC')
   

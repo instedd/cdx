@@ -46,7 +46,7 @@ var BoxSelector = React.createClass({
             <input type="hidden" name={name} value={box.id} />
           </div>
             { box.samplesWithoutResults ? 
-              (<div className="muted"><div className="icon-info-outline muted"/>Samples without results will be ignored</div>) :
+              (<div className="muted"><div className="icon-info-outline icon-gray"/>Samples without results will be ignored</div>) :
               ("") }
         </div>
       }
