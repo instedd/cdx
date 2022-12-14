@@ -9,7 +9,7 @@
     padding: 18px 20px 23px 18px;
   }
   .report-content {
-    padding: 18px 30px;
+    padding: 18px 10px 18px 30px;
   }
   
   .title {
@@ -54,4 +54,50 @@
   font-size: 24px;
   background: none !important;
   color: $gray3;
+}
+
+
+.confusion-matrix{
+  text-align: center;
+  width: 100%;
+
+  .confusion-matrix-row{
+    display: grid;
+    grid-template-columns: 20% 25% 25% 25%;
+    grid-column-gap: 5px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1em;
+  }
+
+  .confusion-matrix-subtitle{
+    font-size: 14px;
+    text-transform: uppercase;
+    color: $gray3;
+
+    &.rotated{
+      transform: rotate(-90deg);
+      word-wrap:break-word;
+      margin-right: 1em;
+    }
+  }
+
+  .confusion-matrix-cell{
+    border-radius: 3px;
+    padding: 10px;
+
+    .number{
+      font-size: 36px;
+    }
+    .legend{
+      font-size: 10px;
+    }
+    &.gray{
+      background-color: $gray1;
+    }
+    &.muted{
+      border: 1px solid;
+    }
+  }
+
 }

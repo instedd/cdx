@@ -20,6 +20,12 @@
               Samples
             .text 
               = @samples_report.samples_report_samples.length
+              -if @samples_without_results_count > 0
+                (#{@samples_without_results_count} without results)
+            .subtitle 
+              Box Purpose
+            .text 
+              = @samples_report.samples[0].box.purpose
             .separation 
             .action
               .subtitle 
@@ -36,22 +42,37 @@
                 = icon_tag "trash", class: "btn-icon icon-text-color"
                 Delete Report
               
-            
       .col
         .samples-report
           .report-content 
             .title
               Confusion Matrix
-            = image_tag confusion_matrix_svg(@samples_report.id)
+            .separation 
+            = render 'confusion_matrix'
             .separation 
             .title
               Measured signal
-            = image_tag measured_signal_svg(@samples_report.id)
-            .separation 
-            .title
-              Limit of detection
-            = image_tag limit_of_detection_svg(@samples_report.id)
-            .separation 
-            .title
-              ROC Curve
-            = image_tag roc_curve_svg(@samples_report.id)
+            = react_component('BoxReportsBarChart', 
+                        data: @reports_data, 
+                        height: 300, 
+                        barVariable: "average",
+                        errorBarsVariable: "errors",
+                        y_label: 'Measured Signal', 
+                        x_labels: ["Virus"])
+
+            - if @samples_report.samples[0].box.purpose == "LOD"
+              .separation 
+              .title
+                Limit of detection
+              = react_component('BoxReportsLineChart', 
+                          data: @reports_data, 
+                          height: 300, 
+                          dotsVariable: "measurements",
+                          y_label: 'Measured Signal', 
+                          x_labels: [])
+
+          // - if @samples_report.samples[0].box.purpose == "Challenge"
+            //.separation 
+            //.title
+            //  ROC Curve
+            //  = react_component('BoxReportsLineChart' <- TO DO

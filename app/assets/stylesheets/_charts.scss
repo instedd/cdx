@@ -1,13 +1,23 @@
 .chart {
   .bar {
-    &.b0 { fill: #03A9F4; }
-    &.b1 { fill: #EC1561; }
-    &.b2 { fill: #3E4EB8; }
+    &.b0 { fill: $red; }
+    &.b1 { fill: $blue }
+    &.b2 { fill: $gray3; }
+  }
+
+  .circle{
+    fill: $red;
+    opacity: 0.9;
+  }
+
+  .errorbar{
+    fill: $gray2;
+    opacity: 1;
   }
 
   .axis {
     color: #555555;
-    font-size: 10px;
+    font-size: 12px;
     font-family: 'Open Sans', sans-serif;
     text-transform: uppercase;
   }

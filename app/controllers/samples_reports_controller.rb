@@ -131,4 +131,20 @@ class SamplesReportsController < ApplicationController
     end
   end
 
+  def measured_signal_data(samples_report)
+    measurements = Hash.new { |hash, key| hash[key] = [] }
+    samples_report.samples.map do |s| 
+      if s.measured_signal
+        measurements[s.concentration] << s.measured_signal
+      end
+    end 
+    
+    ret = measurements.sort_by { |k, v| k }.map do | label, signals | 
+      avg = signals.inject(:+) / signals.size
+      errors = signals.map { |s| (s - avg).abs}
+      {label: label, average: [avg], measurements: signals, errors: errors}
+    end
+    ret.map { |h| h.symbolize_keys }
+  end
+
 end
