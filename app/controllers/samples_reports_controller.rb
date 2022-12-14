@@ -73,6 +73,8 @@ class SamplesReportsController < ApplicationController
 
   def show
     @samples_report = SamplesReport.find_by_id(params[:id])
+    @reports_data = measured_signal_data(@samples_report)
+    @samples_without_results_count = @samples_report.samples.where("core_fields NOT LIKE '%measured_signal%'").count
     return unless authorize_resource(@samples_report, READ_SAMPLES_REPORT)
     @can_delete = has_access?(@samples_report, DELETE_SAMPLES_REPORT)
   end
@@ -135,6 +137,22 @@ class SamplesReportsController < ApplicationController
         samplesWithoutResults: box.samples_without_results_count>0 ? true : false 
       }
     }
+  end
+
+  def measured_signal_data(samples_report)
+    measurements = Hash.new { |hash, key| hash[key] = [] }
+    samples_report.samples.map do |s| 
+      if s.measured_signal
+        measurements[s.concentration] << s.measured_signal
+      end
+    end 
+    
+    ret = measurements.sort_by { |k, v| k }.map do | label, signals | 
+      avg = signals.inject(:+) / signals.size
+      errors = signals.map { |s| (s - avg).abs}
+      {label: label, average: [avg], measurements: signals, errors: errors}
+    end
+    ret.map { |h| h.symbolize_keys }
   end
 
 end
