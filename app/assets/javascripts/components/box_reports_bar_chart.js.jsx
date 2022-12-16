@@ -9,8 +9,8 @@ var BoxReportsBarChart = React.createClass({
   componentDidMount: function() {
     if (!this.props.width) {
       this.setProps({
-        width: 700,
-        height: 400
+        width: this.props.is_for_report ? 400 : 700,
+        height: this.props.is_for_report ? 300 : 400
       })
     }
   },
@@ -68,17 +68,18 @@ var BoxReportsBarChart = React.createClass({
 
     return (
       <div className="chart">
-        <svg width="100%"
-             height={this.props.height}
-             ref="svg"
-             {...svgProps} >
+        <svg id="barchart" 
+            width="100%"
+            height={this.props.height}
+            ref="svg"
+            {...svgProps} >
           { this.props.width ?
             <g transform={"translate(" + this.props.margin.left + "," + this.props.margin.top + ")"}>
 
               {/* X Axis */}
               <g className="x axis"
-                 transform={"translate(0," + chartHeight + ")"}
-                 ref={function(ref) { if (ref) { d3.select(ref.getDOMNode()).call(xAxis); rotateLabels(ref); }}}>
+                transform={"translate(0," + chartHeight + ")"}
+                ref={function(ref) { if (ref) { d3.select(ref.getDOMNode()).call(xAxis); rotateLabels(ref); }}}>
               </g>
               <text transform={"translate(" + (chartWidth) + ", "+(chartHeight+this.props.margin.bottom-10)+")"}
                         y="6" dy=".1em" style={{textAnchor: 'end'}}>CONCENTRATION (copies/ml)</text>
@@ -86,8 +87,8 @@ var BoxReportsBarChart = React.createClass({
 
               {/* Y Axis */}
               <g className="y axis"
-                 transform={"translate(" + chartWidth + ",0)"}
-                 ref={function(ref) { if (ref) { d3.select(ref.getDOMNode()).call(yAxis) }}} >
+                transform={"translate(" + chartWidth + ",0)"}
+                ref={function(ref) { if (ref) { d3.select(ref.getDOMNode()).call(yAxis) }}} >
                 <text transform={"translate(" + (-chartWidth - this.props.margin.left) + ",0),rotate(-90)"}
                       y="6" dy=".71em" style={{textAnchor: 'end'}}>{this.props.y_label}</text>
               </g>

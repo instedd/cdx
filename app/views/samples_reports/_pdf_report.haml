@@ -1,0 +1,103 @@
+= Gon::Base.render_data({})
+= stylesheet_link_tag "application", :media => "all"
+= javascript_include_tag "application"
+= csrf_meta_tags
+
+%div{:hidden => true}
+  .samples-report{id:'samples-report'}
+    .report-content 
+      .report-header
+        = image_tag wicked_pdf_asset_base64('cdx-logo-bw.png')
+        %span
+          Box Report: #{@samples_report.name}
+          %br
+          Created at #{@samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
+      %br
+      .title
+        Summary
+      .subtitle 
+        Samples
+      .text 
+        = @samples_report.samples_report_samples.length
+        -if @samples_without_results_count > 0
+          (#{@samples_without_results_count} without results)
+      .subtitle 
+        Box Purpose
+      .text 
+        = @samples_report.samples[0].box.purpose
+
+      %br
+      .title
+        Confusion Matrix
+      %br
+      = render 'confusion_matrix'
+
+      .pdf-page-break
+
+      .report-header
+        = image_tag wicked_pdf_asset_base64('cdx-logo-bw.png')
+        %span
+          Box Report: #{@samples_report.name}
+          %br
+          Created at #{@samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
+      .title
+        Measured signal
+      %br
+      %br
+      %br
+      %div
+        = react_component('BoxReportsBarChart', 
+                    data: @reports_data, 
+                    height: 400, 
+                    width: 600, 
+                    barVariable: "average",
+                    errorBarsVariable: "errors",
+                    y_label: 'Measured Signal', 
+                    x_labels: ["Virus"],
+                    is_for_report: true)
+
+      - if @samples_report.samples[0].box.purpose == "LOD"
+        .pdf-page-break
+        .report-header
+          = image_tag wicked_pdf_asset_base64('cdx-logo-bw.png')
+          %span
+            Box Report: #{@samples_report.name}
+            %br
+            Created at #{@samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
+        
+        .title
+          Limit of detection
+        %br
+        %br
+        %br
+        %div
+          = react_component('BoxReportsLineChart', 
+                      data: @reports_data, 
+                      height: 400, 
+                      width: 600, 
+                      dotsVariable: "measurements",
+                      y_label: 'Measured Signal', 
+                      x_labels: [])
+
+:javascript
+  function addScript(url) {
+    var script = document.createElement('script');
+    script.type = 'application/javascript';
+    script.src = url;
+    document.head.appendChild(script);
+  }
+  addScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js');
+
+  window.onload =
+    function() {
+      var element = document.getElementById('samples-report');
+      
+      var opt = {
+        filename: '#{@samples_report.name}.pdf',
+        pagebreak: { before: '.pdf-page-break' },
+        jsPDF: { format: 'A4', orientation: 'landscape' },
+        margin: [15,15,15,15],
+      };
+      html2pdf().set(opt).from(element).save().then(() => window.close());
+      //html2pdf().set(opt).from(element).save();
+    }

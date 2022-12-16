@@ -9,8 +9,8 @@ var BoxReportsLineChart = React.createClass({
     componentDidMount: function() {
       if (!this.props.width) {
         this.setProps({
-          width: 700,
-          height: 400
+          width: this.props.is_for_report ? 400 : 700,
+          height: this.props.is_for_report ? 300 : 400
         })
       }
     },
@@ -47,8 +47,8 @@ var BoxReportsLineChart = React.createClass({
           .orient("left")
           .ticks(10, "s");
   
-        x.domain([d3.min(this.props.data, function(d) { return parseFloat(d.label); }), d3.max(this.props.data, function(d) { return parseFloat(d.label); })]);
-        y.domain([0, d3.max(this.props.data, function(d) { return d3.max(d[dotsVariable]); })]);
+        x.domain([d3.min(this.props.data, function(d) { return parseFloat(d.label); }), d3.max(this.props.data, function(d) { return parseFloat(d.label)*1.05; })]);
+        y.domain([0, d3.max(this.props.data, function(d) { return d3.max(d[dotsVariable])*1.05; })]);
 
         var linearRegression = function (data) {
           var xValues = []
@@ -105,7 +105,8 @@ var BoxReportsLineChart = React.createClass({
   
       return (
         <div className="chart">
-          <svg width="100%"
+          <svg id="linechart"
+               width="100%"
                height={this.props.height}
                ref="svg"
                {...svgProps} >

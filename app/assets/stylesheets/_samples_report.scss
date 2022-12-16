@@ -12,6 +12,18 @@
     padding: 18px 10px 18px 30px;
   }
   
+  .report-header {
+    font-size: 12px;
+    color: $gray3;
+    float: right;
+    display: flex;
+    align-items: center;
+
+    span{
+      margin: 10px;
+    }
+  }
+  
   .title {
     font-size: 16px;
     font-weight: bold;

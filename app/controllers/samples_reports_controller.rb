@@ -87,6 +87,15 @@ class SamplesReportsController < ApplicationController
     
     redirect_to samples_reports_path, notice: 'Box report was successfully deleted.'
   end
+
+  def print
+    @samples_report = SamplesReport.find(params[:id])
+    @reports_data = measured_signal_data(@samples_report)
+    @samples_without_results_count = @samples_report.samples.where("core_fields NOT LIKE '%measured_signal%'").count
+    return unless authorize_resource(@samples_report, READ_SAMPLES_REPORT)
+
+    render '_pdf_report', :layout => false
+  end
   
   def bulk_destroy
     samples_reports_ids = params[:samples_report_ids]
