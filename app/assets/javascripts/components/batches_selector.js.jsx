@@ -2,28 +2,37 @@ var BatchesSelector = React.createClass({
   getInitialState: function () {
     return {
       batches: this.props.batches,
-      concentrations: this.props.concentrations,
-      list: this.props.list,
+      samples: this.props.samples,
+      concentration: this.props.concentration,
+      replicate: this.props.replicate,
+      list: [],
     };
   },
 
   render: function () {
+    let button;
+    if (this.state.batches.length > 0) {
+      button = '';
+    } else {
+      button = <a className="add-items" href="#" onClick={this.addBatch}>
+        <div className="add-items">
+          <div className="icon-circle-plus icon-blue icon-margin"></div>
+          <div className="add-link">ADD BATCH</div>
+        </div>
+      </a>;
+    }
+
     return (<div className="batches-selector">
       {this.renderTitle()}
       {this.state.list ? this.state.list.map(this.renderList) : false}
       {this.state.batches.map(this.renderBatch)}
 
-      <a className="add-items" href="#" onClick={this.addBatch}>
-        <div className="add-items">
-          <div className="icon-circle-plus icon-blue icon-margin"></div>
-          <div className="add-link">ADD BATCH</div>
-        </div>
-      </a>
+      {button}
     </div>);
   },
 
   renderTitle() {
-    var batches = this.state.batches;
+    var batches = this.state.list;
     if (!batches.length) return;
 
     var count = batches.reduce(function (a, e) {
@@ -37,8 +46,8 @@ var BatchesSelector = React.createClass({
 
   renderConcentration(concentration, index) {
     console.log('renderConcentration', concentration, index);
-    function removeConcentration(event) {
-      this.removeConcentration(event, index);
+    function removeSample(event) {
+      this.removeSample(event, index);
     }
     return (<div className="list-items" key={"concentrations-selector-" + index}>
       <div className="items-row">
@@ -46,13 +55,13 @@ var BatchesSelector = React.createClass({
           <div className="items-row-actions">
             <input type="hidden" name={this.props.name + "[" + index + "]"} value={concentration.replicate}/>
             <input type="hidden" name={this.props.name + "[" + index + "]"} value={concentration.concentration}/>
-            <a href="#" onClick={removeConcentration.bind(this)} title="Remove this concentration">
+            <a href="#" onClick={removeSample.bind(this)} title="Remove this concentration">
               <i className="icon-delete hex-gray bigger"></i>
             </a>
           </div>
-          <div className="items-item">{concentration.replicate}</div>
+          <div className="items-item">{concentration.replicate}&nbsp; replicate{concentration.replicate > 1 ? 's' : ''}</div>
         </div>
-        <div className="items-concentration">{concentration.concentration} copies/ml</div>
+        <div className="items-concentration">{concentration.concentration}&nbsp; copies/ml</div>
       </div>
     </div>);
   },
@@ -64,11 +73,11 @@ var BatchesSelector = React.createClass({
       function removeBatch(event) {
         this.removeBatch(event, index);
       }
-      function addList(_, options) {
-        this.addList(index, options && options[0]);
+      function addList(event) {
+        this.addList(event);
       }
-      function addConcentration(_, options) {
-        this.addConcentration(index, options && options[0]);
+      function addConcentration(event) {
+        this.addConcentration(event);
       }
       return (<div className="list-items" key={"batches-selector-" + index}>
         <div className="items-cols">
@@ -95,16 +104,16 @@ var BatchesSelector = React.createClass({
           <div>
             <span className="subtitle">Accomplished Concentrations</span>
 
-              {this.state.concentrations ? this.state.concentrations.map(this.renderConcentration) : false}
+              {batch.samples.map(this.renderConcentration)}
 
             <div className="list-items">
               <div className="items-row">
                 <div className="items-left">
                   <div className="items-row-actions">&nbsp;</div>
-                  <div className="items-item"><input type="text" name="Replicates" value={this.state.Replicates} /> replicates</div>
+                  <div className="items-item"><input type="text" name="Replicates" value={this.state.replicate} onChange={this.changeReplicate} /> replicates</div>
                 </div>
                 <div className="items-concentration">
-                  <input type="text" name="Concentration" value={this.state.Concentration} /> copies/ml
+                  <input type="text" name="Concentration" value={this.state.concentration} onChange={this.changeConcentration} /> copies/ml
                   <button className="hex-blue icon-check" onClick={addConcentration.bind(this)}></button>
                 </div>
               </div>
@@ -139,6 +148,15 @@ var BatchesSelector = React.createClass({
 
   renderList(batch, index) {
     console.log('renderList', batch, index);
+    batch = batch[0];
+    var different = [];
+    var count = 0;
+    batch.samples.reduce(function (a, e) {
+      different.push(e.concentration);
+      count += parseInt(e.replicate);
+    }, 0);
+    let unique = [...new Set(different)];
+
     function removeList(event) {
       this.removeList(event, index);
     }
@@ -146,14 +164,13 @@ var BatchesSelector = React.createClass({
       <div className="items-row">
         <div className="items-left">
           <div className="items-row-actions">
-            /* here comes the input hidden values */
             <a href="#" onClick={removeList.bind(this)} title="Remove this batch">
               <i className="icon-delete hex-gray bigger"></i>
             </a>
           </div>
-          <div className="items-item">{batch.uuid} <span>{batch.batch_number}</span></div>
+          <div className="items-item">{batch.value}&nbsp; <span>({batch.label})</span></div>
         </div>
-        <div className="items-concentration">{batch.concentration} copies/ml</div>
+        <div className="items-concentration">{count} in {unique.length} different concentrations</div>
       </div>
     </div>);
   },
@@ -170,23 +187,25 @@ var BatchesSelector = React.createClass({
     batches.push({ value: "", label: "" });
     this.setState({ batches: batches });
   },
-
   selectBatch: function (index, batch) {
     var batches = this.state.batches;
     batches[index] = batch;
     this.setState({ batches: batches });
   },
-  addList: function (index, batch) {
-    var batches = this.state.list;
-    batches[index] = batch;
-    batches[index].push({concentrations: this.state.concentrations })
-    this.setState({ list: batches });
+  addList: function (event) {
+    event.preventDefault();
+    console.log('addList');
+    var list = this.state.list;
+    var batches = this.state.batches;
+    list.push(batches)
+    this.setState({ list: list });
+    this.setState({ batches: [] });
   },
-  addConcentration: function (index, concentration) {
-    console.log('addConcentration', concentration, index);
-    var concentrations = this.state.concentrations;
-    concentrations[index] = concentration;
-    this.setState({ concentrations: concentrations });
+  addConcentration: function (event) {
+    event.preventDefault();
+    this.state.batches[0].samples.push({ replicate: this.state.replicate, concentration: this.state.concentration});
+    this.setState({concentration: null });
+    this.setState({replicate: null });
   },
 
   removeBatch: function (event, index) {
@@ -205,12 +224,18 @@ var BatchesSelector = React.createClass({
 
     this.setState({ list: batches });
   },
-  removeConcentration: function (event, index) {
+  removeSample: function (event, index) {
     event.preventDefault();
 
-    // var samples = this.state.batches.samples;
-    // samples.splice(index, 1);
-    //
-    // this.setState({ samples: batches });
+    var samples = this.state.batches[0].samples;
+    samples.splice(index, 1);
+    this.setState({ samples: samples });
   },
+
+  changeConcentration: function( event ) {
+    this.setState({concentration: event.target.value});
+  },
+  changeReplicate: function( event ) {
+    this.setState({replicate: event.target.value});
+  }
 });
