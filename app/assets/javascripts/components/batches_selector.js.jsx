@@ -45,7 +45,6 @@ var BatchesSelector = React.createClass({
   },
 
   renderConcentration(concentration, index) {
-    console.log('renderConcentration', concentration, index);
     function removeSample(event) {
       this.removeSample(event, index);
     }
@@ -67,8 +66,6 @@ var BatchesSelector = React.createClass({
   },
 
   renderBatch(batch, index) {
-    console.log('renderBatch', batch, index);
-
     if (batch.value && batch.label) {
       function removeBatch(event) {
         this.removeBatch(event, index);
@@ -89,7 +86,7 @@ var BatchesSelector = React.createClass({
           </div>
           <div>
             <span className="subtitle">Batch</span>
-            <div className="items-item">{batch.value}</div>
+            <div className="items-item">{batch.label}</div>
             <div>
               <input type="checkbox" id="distractor" name="distractor" value="{batch.distractor}"/>
               <label htmlFor="distractor">Distractor</label>
@@ -147,7 +144,6 @@ var BatchesSelector = React.createClass({
   },
 
   renderList(batch, index) {
-    console.log('renderList', batch, index);
     batch = batch[0];
     var different = [];
     var count = 0;
@@ -168,7 +164,7 @@ var BatchesSelector = React.createClass({
               <i className="icon-delete hex-gray bigger"></i>
             </a>
           </div>
-          <div className="items-item">{batch.value}&nbsp; <span>({batch.label})</span></div>
+          <div className="items-item">{batch.label}</div>
         </div>
         <div className="items-concentration">{count} in {unique.length} different concentrations</div>
       </div>
@@ -194,7 +190,6 @@ var BatchesSelector = React.createClass({
   },
   addList: function (event) {
     event.preventDefault();
-    console.log('addList');
     var list = this.state.list;
     var batches = this.state.batches;
     list.push(batches)
