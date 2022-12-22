@@ -5,6 +5,12 @@
     &.b2 { fill: $gray3; }
   }
 
+  .roc-line{
+    fill: none;
+    stroke: $red;
+    stroke-width: 3px;
+  }
+
   .circle{
     fill: $red;
     opacity: 0.9;

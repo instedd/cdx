@@ -25,15 +25,15 @@
             .subtitle 
               Box Purpose
             .text 
-              = @samples_report.samples[0].box.purpose
+              = @purpose
             .separation 
             .action
-              = link_to "", :onclick => "{downloadSvg('barchart', 'measured_signal');downloadSvg('linechart', 'LOD');}", id: "download-svg" do
+              = link_to "", :onclick => "downloadCharts()", id: "download-svg" do
                 .subtitle 
                   = icon_tag "barchart", class: "btn-icon icon-text-color"
                   Download charts as svg
             .action
-              =link_to print_samples_report_path, id: @samples_report.id, target: "_blank" do
+              =link_to print_samples_report_path(:samples_report_id => @samples_report.id), id: "print-pdf-link", target: "_blank" do
                 .subtitle{id:'print-as-pdf'}
                   = icon_tag "as-pdf", class: "btn-icon icon-text-color"
                   Download PDF
@@ -46,12 +46,22 @@
                 Delete Report
               
       .col
-        .samples-report{id:'samples-report'}
+        .samples-report.hidden{id:'samples-report'}
           .report-content 
+            - if @purpose == "Challenge"
+              .title{id: "treshold-title"}
+              .range{style:"--step:#{@max_signal/100}; --min: 0; --max:#{@max_signal};"}
+                %input{type:"range", id:"threshold", class: "slider", onchange:"updateThreshold()", min:0, max:@max_signal, step:@max_signal/100, value:0}
+              .separation 
+
+            - if @purpose == "LOD"
+              %input{type:"hidden", id:"threshold", value: 0.0}
+            
             .title
               Confusion Matrix
             .separation 
-            = render 'confusion_matrix'
+              %div#confusion-matrix
+                = render 'confusion_matrix'
             .separation 
             .title
               Measured signal
@@ -61,9 +71,9 @@
                         barVariable: "average",
                         errorBarsVariable: "errors",
                         y_label: 'Measured Signal', 
-                        x_labels: ["Virus"])
+                        x_labels: @purpose == "Challenge" ? ["Virus", "Distractor"]:[])
 
-            - if @samples_report.samples[0].box.purpose == "LOD"
+            - if @purpose == "LOD"
               .separation 
               .title
                 Limit of detection
@@ -74,11 +84,12 @@
                           y_label: 'Measured Signal', 
                           x_labels: [])
 
-          // - if @samples_report.samples[0].box.purpose == "Challenge"
-          //.separation 
-          //.title
-          //  ROC Curve
-          //  = react_component('BoxReportsLineChart' <- TO DO
+            - if @purpose == "Challenge"
+              .separation 
+              .title
+                ROC Curve
+              = react_component('BoxReportsRocChart',
+                data: roc_curve(@samples_report))
 
 :javascript
 
@@ -141,3 +152,93 @@
     document.body.removeChild(downloadLink);
   }
 
+  function downloadCharts(){
+    downloadSvg("barchart", "measured_signal");
+    if ("#{@purpose}" == "Challenge") 
+      downloadSvg("rocchart", "roc_curve");
+    else 
+      downloadSvg("linechart", "limit_of_detection");
+  }
+
+  var getUrlParameter = function getUrlParameter(sParam) {
+      var sPageURL = window.location.search.substring(1),
+          sURLVariables = sPageURL.split('&'),
+          sParameterName,
+          i;
+
+      for (i = 0; i < sURLVariables.length; i++) {
+          sParameterName = sURLVariables[i].split('=');
+
+          if (sParameterName[0] === sParam) {
+              return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+          }
+      }
+      return false;
+  };
+
+  async function updateThreshold(){
+    var threshold = document.getElementById("threshold").value;
+    
+    var context = getUrlParameter('context');
+    var url = '/samples_reports/update_threshold?context='+context+"&samples_report_id="+#{@samples_report.id}+"&threshold="+threshold;
+    var ret = await fetch(url)
+        .then((response) => response.json())
+        .then((r) => {
+            return r;
+    })
+    
+    if ("#{@purpose}" == "Challenge") {
+      var minthreshold = document.getElementById("threshold").min;
+      var maxthreshold = document.getElementById("threshold").max;
+
+      document.getElementById("treshold-title").innerHTML = "Threshold: " + parseFloat(ret.threshold).toFixed(2);
+      document.getElementById("print-pdf-link").href += "&threshold="+parseFloat(ret.threshold).toFixed(2);
+      document.getElementById("print-pdf-link").href += "&minthreshold="+parseFloat(minthreshold).toFixed(2);
+      document.getElementById("print-pdf-link").href += "&maxthreshold="+parseFloat(maxthreshold).toFixed(2);
+    
+
+      // For the bar chart
+      var threshold_percentage = (threshold - minthreshold) / (maxthreshold - minthreshold);
+      var svg_mintreshold = parseFloat(d3.select("#threshold-line-down").attr("y1"));
+      var svg_maxtreshold = parseFloat(d3.select("#threshold-line-up").attr("y1"));
+      var svg_pergentage = svg_mintreshold + (svg_maxtreshold - svg_mintreshold) * threshold_percentage;
+      d3.select("#threshold-line").attr("y1", svg_pergentage);
+      d3.select("#threshold-line").attr("y2", svg_pergentage);
+
+      // For the ROC curve
+      var fpr = (ret.confusion_matrix.false_positive || 0) / ((ret.confusion_matrix.false_positive || 0) + (ret.confusion_matrix.true_negative || 0));
+      var svg_minfpr = parseFloat(d3.select("#threshold-fpr-down").attr("x1"));
+      var svg_maxfpr = parseFloat(d3.select("#threshold-fpr-up").attr("x1"));
+      var fpr_pergentage = svg_minfpr + (svg_maxfpr - svg_minfpr) * fpr;
+      d3.select("#threshold-fpr").attr("x1", fpr_pergentage);
+      d3.select("#threshold-fpr").attr("x2", fpr_pergentage);
+
+      var tpr = (ret.confusion_matrix.true_positive || 0)/ ((ret.confusion_matrix.true_positive || 0)+ (ret.confusion_matrix.false_negative || 0));
+      var svg_mintpr = parseFloat(d3.select("#threshold-tpr-down").attr("y1"));
+      var svg_maxtpr = parseFloat(d3.select("#threshold-tpr-up").attr("y1"));
+      var svg_pergentage = svg_mintpr + (svg_maxtpr - svg_mintpr) * tpr;
+      d3.select("#threshold-tpr").attr("y1", svg_pergentage);
+      d3.select("#threshold-tpr").attr("y2", svg_pergentage);
+    }
+    else {
+      d3.select("#threshold-line").style("display", "none") 
+    }
+
+    document.getElementById("true_negative").innerHTML =  ret.confusion_matrix.true_negative || 0;
+    document.getElementById("true_positive").innerHTML =  ret.confusion_matrix.true_positive || 0;
+    document.getElementById("false_negative").innerHTML =  ret.confusion_matrix.false_negative || 0;
+    document.getElementById("false_positive").innerHTML =  ret.confusion_matrix.false_positive || 0;
+    document.getElementById("predicted_negative").innerHTML =  ret.confusion_matrix.predicted_negative || 0;
+    document.getElementById("predicted_positive").innerHTML =  ret.confusion_matrix.predicted_positive || 0;
+    document.getElementById("actual_negative").innerHTML =  ret.confusion_matrix.predicted_negative || 0;
+    document.getElementById("actual_positive").innerHTML =  ret.confusion_matrix.actual_positive || 0;
+    document.getElementById("total").innerHTML =  ret.confusion_matrix.total || 0;
+
+  }
+
+  {
+    updateThreshold().then(() => {
+      document.getElementById("samples-report").classList.remove("hidden");
+    });
+  }
+  

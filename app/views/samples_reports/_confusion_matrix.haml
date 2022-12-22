@@ -19,18 +19,15 @@
       %br
       NEGATIVE
     .confusion-matrix-cell.gray
-      .number
-        = confusion_matrix(@samples_report)[:true_negative]
+      .number{id: "true_negative"}
       .legend 
         True Negative
     .confusion-matrix-cell.gray
-      .number
-        = confusion_matrix(@samples_report)[:false_positive]
+      .number{id: "false_positive"}
       .legend 
         False Positive
     .confusion-matrix-cell.muted
-      .number
-        = confusion_matrix(@samples_report)[:actual_negative]
+      .number{id: "actual_negative"}
       .legend 
         Actual Negative
 
@@ -40,18 +37,15 @@
       %br
       POSITIVE
     .confusion-matrix-cell.gray
-      .number
-        = confusion_matrix(@samples_report)[:false_negative]
+      .number{id: "false_negative"}
       .legend 
         False Negative
     .confusion-matrix-cell.gray
-      .number
-        = confusion_matrix(@samples_report)[:true_positive]
+      .number{id: "true_positive"}
       .legend 
         True Positive
     .confusion-matrix-cell.muted
-      .number
-        = confusion_matrix(@samples_report)[:actual_positive]
+      .number{id: "actual_positive"}
       .legend 
         Actual Positive
 
@@ -59,17 +53,14 @@
     .confusion-matrix-subtitle.rotated.muted
       TOTAL
     .confusion-matrix-cell.muted
-      .number
-        = confusion_matrix(@samples_report)[:predicted_negative]
+      .number{id: "predicted_negative"}
       .legend 
         Predicted Negative
     .confusion-matrix-cell.muted
-      .number
-        = confusion_matrix(@samples_report)[:predicted_positive]
+      .number{id: "predicted_positive"}
       .legend 
         Predicted Positive
     .confusion-matrix-cell.muted
-      .number
-        = confusion_matrix(@samples_report)[:total]
+      .number{id: "total"}
       .legend 
         Total

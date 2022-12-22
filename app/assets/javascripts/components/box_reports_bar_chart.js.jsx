@@ -20,6 +20,8 @@ var BoxReportsBarChart = React.createClass({
     var errorBarsVariable = this.props.errorBarsVariable
 
     if (this.props.width) {
+      this.props.margin.bottom = d3.max(this.props.data.map(function(d) { return d.label.toString().length*8; }))+30
+
       var chartWidth = this.props.width - this.props.margin.left - this.props.margin.right,
           chartHeight = this.props.height - this.props.margin.top - this.props.margin.bottom;
 
@@ -67,7 +69,8 @@ var BoxReportsBarChart = React.createClass({
     }
 
     return (
-      <div className="chart">
+      <div className="chart"
+            id="barchart-container">
         <svg id="barchart" 
             width="100%"
             height={this.props.height}
@@ -98,7 +101,7 @@ var BoxReportsBarChart = React.createClass({
                 return d[barVariable].map(function (v, j) {
                   return (
                     <rect key={[i,j]}
-                          className={"bar b" + j}
+                          className={"bar b" + (d.isDistractor ?"1":"0")}
                           x={x(d.label)}
                           y={y(v)}
                           width={x.rangeBand()}
@@ -138,6 +141,35 @@ var BoxReportsBarChart = React.createClass({
                   return null;
               }
             )}
+
+            {/* Threshold line */}
+            <line id="threshold-line-down"
+                  className={"bar b1"}
+                  x1={x(x.domain()[0])}
+                  y1={y(y.domain()[0])}
+                  x2={x(x.domain().slice(-1))}
+                  y2={y(y.domain()[0])}
+                  hidden={true}
+                />
+            <line id="threshold-line-up"
+                  className={"bar b1"}
+                  x1={x(x.domain()[0])}
+                  y1={y(y.domain()[1])}
+                  x2={x(x.domain().slice(-1))}
+                  y2={y(y.domain()[1])}
+                  hidden={true}
+                />
+            <line id="threshold-line"
+                  className={"bar b1"}
+                  x1={x(x.domain()[0])}
+                  y1={y(y.domain()[0])}
+                  x2={x(x.domain().slice(-1))}
+                  y2={y(y.domain()[0])}
+                  stroke={"black"}
+                  strokeDasharray={"5,5"}
+                />
+
+
 
             </g>
             : null }
