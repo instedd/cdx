@@ -9,21 +9,14 @@ class SamplesReportsController < ApplicationController
     @can_delete = has_access?(SamplesReport, DELETE_SAMPLES_REPORT)
 
     @samples_reports = SamplesReport.where(institution: @navigation_context.institution)
-    @samples_reports = check_access(@samples_reports, READ_SAMPLES_REPORT).order('created_at DESC')
+    @samples_reports = check_access(@samples_reports, READ_SAMPLES_REPORT).order('samples_reports.created_at DESC')
   
     # Filter by search params
-    @samples_reports = @samples_reports.where("name LIKE concat('%', ?, '%')", params[:name]) unless params[:name].blank?
-    @samples_reports = @samples_reports.joins(samples: :sample_identifiers).where("sample_identifiers.uuid LIKE concat('%', ?, '%')", params[:sample_uuid]) unless params[:sample_uuid].blank?
-    @samples_reports = @samples_reports.joins("LEFT JOIN samples_report_samples ON samples_report_samples.samples_report_id = samples_reports.id 
-                                               LEFT JOIN samples ON samples_report_samples.sample_id = samples.id 
-                                               LEFT JOIN boxes ON boxes.id = samples.box_id")
-                                        .where("boxes.uuid LIKE concat('%', ?, '%')", params[:box_uuid])
-                                        .group(:samples_report_id) unless params[:box_uuid].blank?
-    @samples_reports = @samples_reports.joins("LEFT JOIN samples_report_samples ON samples_report_samples.samples_report_id = samples_reports.id 
-                                        LEFT JOIN samples ON samples_report_samples.sample_id = samples.id 
-                                        LEFT JOIN batches ON batches.id = samples.batch_id")
-                                 .where("batches.batch_number LIKE concat('%', ?, '%')", params[:batch_number])
-                                 .group(:samples_report_id) unless params[:batch_number].blank?
+
+    @samples_reports = @samples_reports.partial_name(params[:name])
+    @samples_reports = @samples_reports.partial_sample_uuid(params[:sample_uuid])
+    @samples_reports = @samples_reports.partial_box_uuid(params[:box_uuid])
+    @samples_reports = @samples_reports.partial_batch_number(params[:batch_number])
 
     #paginate samples report
     @samples_reports = perform_pagination(@samples_reports)

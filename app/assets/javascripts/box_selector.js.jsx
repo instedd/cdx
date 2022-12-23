@@ -2,9 +2,6 @@ var BoxSelector = React.createClass({
   getInitialState: function() {
     return {
       includeQcInfo: this.props.includeQcInfo,
-      displayQcInfo: this.props.displayQcInfo,
-      maxBoxes: this.props.maxBoxes,
-      caller: this.props.caller,
       boxes: this.props.boxes,
       search: "",
       error: null,
@@ -17,10 +14,40 @@ var BoxSelector = React.createClass({
     const missingQuantity = selectedBoxes.length - haveQc
     return (
       <div>
-        {haveQc > 0 && this.state.displayQcInfo && this.includeQcInfoCheckbox()}
-        {missingQuantity > 0 && this.state.displayQcInfo && this.qcInfoMessage(missingQuantity, selectedBoxes)}
+        {haveQc > 0 && this.props.displayQcInfo && this.includeQcInfoCheckbox()}
+        {missingQuantity > 0 && this.props.displayQcInfo && this.qcInfoMessage(missingQuantity, selectedBoxes)}
       </div>
     )
+  },
+
+  renderBoxSamplesReport: function(box, id) {
+    let name = `samples_report[boxes_attributes][${id}][box_id]`;
+    return <div>
+      <div className="batches-samples">
+        <div className="samples-row-with-remove">
+          <a href="#" className="selector-list-item__remove" title="Remove box" onClick={handleClick}>
+            <i className="icon-circle-minus icon-gray" />
+          </a>
+          <div className="samples-row" dangerouslySetInnerHTML={{ __html: box.preview }}></div>
+        </div>
+        <input type="hidden" name={name} value={box.id} />
+      </div>
+        { box.samplesWithoutResults ? 
+          (<div className="muted"><div className="icon-info-outline icon-gray"/>Samples without results will be ignored</div>) :
+          ("") }
+    </div>
+  },
+
+  renderBoxTransferPackage: function(box, id) {
+    let name = `transfer_package[box_transfers_attributes][${id}][box_id]`;
+      
+    return <div className="selector-list-item">
+      <div dangerouslySetInnerHTML={{ __html: box.preview }}></div>
+      <input type="hidden" name={name} value={box.id} />
+      <a href="#" className="selector-list-item__remove" title="Remove box" onClick={handleClick}>
+        <i className="icon-close" />
+      </a>
+    </div>
   },
 
   renderBoxes: function() {
@@ -33,35 +60,12 @@ var BoxSelector = React.createClass({
       }
 
       let id = Math.floor(Math.random() * 1000000000);
-      if (selector.state.caller == 'samples_reports'){
-        let name = `samples_report[boxes_attributes][${id}][box_id]`;
-        return <div>
-          <div className="batches-samples">
-            <div className="samples-row-with-remove">
-              <a href="#" className="selector-list-item__remove" title="Remove box" onClick={handleClick}>
-                <i className="icon-circle-minus icon-gray" />
-              </a>
-              <div className="samples-row" dangerouslySetInnerHTML={{ __html: box.preview }}></div>
-            </div>
-            <input type="hidden" name={name} value={box.id} />
-          </div>
-            { box.samplesWithoutResults ? 
-              (<div className="muted"><div className="icon-info-outline icon-gray"/>Samples without results will be ignored</div>) :
-              ("") }
-        </div>
+      if (selector.props.caller == 'samples_reports'){
+        renderBoxSamplesReport(box, id)
       }
       else {
-        let name = `transfer_package[box_transfers_attributes][${id}][box_id]`;
-      
-        return <div className="selector-list-item">
-          <div dangerouslySetInnerHTML={{ __html: box.preview }}></div>
-          <input type="hidden" name={name} value={box.id} />
-          <a href="#" className="selector-list-item__remove" title="Remove box" onClick={handleClick}>
-            <i className="icon-close" />
-          </a>
-        </div>
+        renderBoxTransferPackage(box, id)
       }
-      
     }
 
     const listItems = this.state.boxes.map(renderBox)
@@ -117,7 +121,7 @@ var BoxSelector = React.createClass({
   },
 
   loadBox: function(uuid) {
-    url = "/"+this.state.caller+"/find_box"
+    url = "/"+this.props.caller+"/find_box"
     this.setState({
       error: null,
       status: "loading",
@@ -217,7 +221,7 @@ var BoxSelector = React.createClass({
             <div className="selector-list">
               {this.renderBoxes()}
             </div>
-            {(this.state.maxBoxes ==-1 || this.state.boxes.length < this.state.maxBoxes) &&
+            {(this.props.maxBoxes ==-1 || this.state.boxes.length < this.props.maxBoxes) &&
             <input type="text" size="36" maxlength="36" placeholder="Enter, paste or scan box ID"
               value={this.state.search}
               onChange={this.handleChange} onKeyDown={this.onKeyDown}
