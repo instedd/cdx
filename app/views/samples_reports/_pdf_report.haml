@@ -15,21 +15,37 @@
       %br
       .title
         Summary
-      .subtitle 
-        Samples
-      .text 
-        = @samples_report.samples_report_samples.length
-        -if @samples_without_results_count > 0
-          (#{@samples_without_results_count} without results)
-      .subtitle 
-        Box Purpose
-      .text 
-        = @purpose
-      - if @purpose == "Challenge"
-        .subtitle 
-          Threshold
-        .text 
-          = @threshold
+      %table
+        %td{width: "200px"}
+          .subtitle 
+            Samples
+          .text 
+            = @samples_report.samples_report_samples.length
+            -if @samples_without_results_count > 0
+              (#{@samples_without_results_count} without results)
+          .subtitle 
+            Box Purpose
+          .text 
+            = @purpose
+        - if @purpose == "Challenge"
+          %td{width: "200px"}
+            .subtitle 
+              Threshold
+            .text 
+              = @threshold
+            -if @purpose == "Challenge"
+              .subtitle 
+                Computed ROC AUC
+              .text 
+                = auc(roc_curve(@samples_report))
+              %td{width: "200px"}
+                .subtitle
+                  Threshold's TPR
+                .text{id: "computed-tpr"}
+                .subtitle
+                  Threshold's FPR
+                .text{id: "computed-fpr"}
+        .separation 
       %br
       .title
         Confusion Matrix
@@ -152,6 +168,9 @@
       var svg_pergentage = svg_mintpr + (svg_maxtpr - svg_mintpr) * tpr;
       d3.select("#threshold-tpr").attr("y1", svg_pergentage);
       d3.select("#threshold-tpr").attr("y2", svg_pergentage);
+
+      document.getElementById("computed-fpr").innerHTML =  fpr.toFixed(2);
+      document.getElementById("computed-tpr").innerHTML =  tpr.toFixed(2);
     }
     else {
       d3.select("#threshold-line").style("display", "none") 

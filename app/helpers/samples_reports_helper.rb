@@ -46,4 +46,14 @@ module SamplesReportsHelper
     roc_curve
   end
 
+  def auc(roc_curve)
+    auc = 0
+    roc_curve.each_with_index do |point, i|
+      if i > 0
+        auc += (point[0] - roc_curve[i-1][0]) * (point[1] + roc_curve[i-1][1]) / 2
+      end
+    end
+    auc.round(2)
+  end
+
 end

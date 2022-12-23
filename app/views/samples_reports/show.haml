@@ -26,7 +26,19 @@
               Box Purpose
             .text 
               = @purpose
+            -if @purpose == "Challenge"
+              .subtitle 
+                Computed ROC AUC
+              .text 
+                = auc(roc_curve(@samples_report))
+              .subtitle
+                Threshold's TPR
+              .text{id: "computed-tpr"}
+              .subtitle
+                Threshold's FPR
+              .text{id: "computed-fpr"}
             .separation 
+              
             .action
               = link_to "", :onclick => "downloadCharts()", id: "download-svg" do
                 .subtitle 
@@ -219,6 +231,9 @@
       var svg_pergentage = svg_mintpr + (svg_maxtpr - svg_mintpr) * tpr;
       d3.select("#threshold-tpr").attr("y1", svg_pergentage);
       d3.select("#threshold-tpr").attr("y2", svg_pergentage);
+
+      document.getElementById("computed-fpr").innerHTML =  fpr.toFixed(2);
+      document.getElementById("computed-tpr").innerHTML =  tpr.toFixed(2);
     }
     else {
       d3.select("#threshold-line").style("display", "none") 
