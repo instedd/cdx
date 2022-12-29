@@ -17,6 +17,8 @@ class BoxForm
 
   def initialize(box, params)
     @box = box
+    @option = params[:samples].presence
+    @concentrations = params[:concentrations].presence
     @media = params[:media].presence
     @batch_uuids = params[:batch_uuids].presence.to_h
     @sample_uuids = params[:sample_uuids].presence.to_h
@@ -39,26 +41,14 @@ class BoxForm
   end
 
   def build_samples
-    case @box.purpose
-    when "LOD"
-      @box.build_samples(@batches["lod"], concentrations: (1..8).map{|e| 10**e}, replicates: 3, media: media)
-      @box.build_samples(@batches["lod"], concentrations: [0], replicates: 4, media: media)
-
-    when "Variants"
-      @batches.each_value do |batch|
-        @box.build_samples(batch, concentrations: [1, 4, 8].map{|e| 10**e}, replicates: 3, media: media)
-      end
-
-    when "Challenge"
+    case @option
+    when "add_batch"
       @batches.each do |key, batch|
-        if key == "virus"
-          @box.build_samples(batch, concentrations: [1, 4, 8].map{|e| 10**e}, replicates: 18, media: media)
-        else
-          @box.build_samples(batch, concentrations: [1, 4, 8].map{|e| 10**e}, replicates: 3, media: media)
+        @concentrations[key].each do |i, concentration|
+          @box.build_samples(batch, concentrations: [concentration['concentration']], replicates: concentration['replicate'].to_i, media: media, distractor: concentration['distractor'] == "on", instruction: concentration['instruction'])
         end
       end
-
-    when "Other"
+    when "add_samples"
       @box.samples = @samples.values
     end
   end
@@ -67,7 +57,7 @@ class BoxForm
     @box.valid?
     validate_existence_of_batches
     validate_existence_of_samples
-    validate_batches_or_samples_for_purpose
+    # validate_batches_or_samples_for_purpose
     @box.errors.empty?
   end
 
@@ -98,25 +88,25 @@ class BoxForm
   end
 
   def validate_batches_or_samples_for_purpose
-    case @box.purpose
-    when "LOD"
-      @box.errors.add(:lod, "A batch is required") unless @batches["lod"] || @box.errors.include?(:lod)
-    when "Variants"
-      @box.errors.add(:base, "You must select at least two batches") unless unique_batch_count >= 2
-    when "Challenge"
-      if @batches["virus"]
-        @box.errors.add(:base, "You must select at least one distractor batch") unless unique_batch_count >= 2
-      else
-        @box.errors.add(:virus, "A virus batch is required") unless @box.errors.include?(:virus)
-        @box.errors.add(:base, "You must select at least one distractor batch") unless unique_batch_count >= 1
-      end
-    when "Other"
-      if @samples.empty?
-        @box.errors.add(:base, "You must select at least one sample")
-      elsif @samples.any? { |_, sample| sample.is_quality_control? }
-        @box.errors.add(:base, "You can't select a QC sample")
-      end
-    end
+    # case @box.purpose
+    # when "LOD"
+    #   @box.errors.add(:lod, "A batch is required") unless @batches["lod"] || @box.errors.include?(:lod)
+    # when "Variants"
+    #   @box.errors.add(:base, "You must select at least two batches") unless unique_batch_count >= 2
+    # when "Challenge"
+    #   if @batches["virus"]
+    #     @box.errors.add(:base, "You must select at least one distractor batch") unless unique_batch_count >= 2
+    #   else
+    #     @box.errors.add(:virus, "A virus batch is required") unless @box.errors.include?(:virus)
+    #     @box.errors.add(:base, "You must select at least one distractor batch") unless unique_batch_count >= 1
+    #   end
+    # when "Other"
+    #   if @samples.empty?
+    #     @box.errors.add(:base, "You must select at least one sample")
+    #   elsif @samples.any? { |_, sample| sample.is_quality_control? }
+    #     @box.errors.add(:base, "You can't select a QC sample")
+    #   end
+    # end
   end
 
   def unique_batch_count

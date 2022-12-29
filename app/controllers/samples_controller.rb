@@ -35,7 +35,7 @@ class SamplesController < ApplicationController
 
   def autocomplete
     samples = Sample
-      .where(institution: @navigation_context.institution)
+      .where(institution: @navigation_context.institution, box_id: nil)
       .within(@navigation_context.entity, @navigation_context.exclude_subsites)
 
     samples = samples.without_qc if params[:qc] == "0"
