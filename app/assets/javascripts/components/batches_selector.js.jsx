@@ -5,6 +5,8 @@ var BatchesSelector = React.createClass({
       samples: this.props.samples,
       concentration: this.props.concentration,
       replicate: this.props.replicate,
+      distractor: this.props.distractor,
+      instruction: this.props.instruction,
       list: [],
     };
   },
@@ -88,15 +90,15 @@ var BatchesSelector = React.createClass({
             <span className="subtitle">Batch</span>
             <div className="items-item">{batch.label}</div>
             <div>
-              <input type="checkbox" id="distractor" name="distractor" value="{batch.distractor}"/>
+              <input type="checkbox" id="distractor" name="distractor" value={this.state.distractor} onChange={this.changeDistractor}/>
               <label htmlFor="distractor">Distractor</label>
               <p className="distractor-description">When enabled, the system will consider that the sample test result should be negative regardless of its concentration and threshold</p>
             </div>
 
             <div>
-              <span className="subtitle">Instructions</span>
+              <label htmlFor="batch-instructions" className="subtitle">Instructions</label>
             </div>
-            <input type="text" name="instructions" className="full-input" />
+            <input type="text" id="batch-instructions" name="instructions" value={this.state.instruction} onChange={this.changeInstruction} className="full-input" />
           </div>
           <div>
             <span className="subtitle">Accomplished Concentrations</span>
@@ -167,9 +169,28 @@ var BatchesSelector = React.createClass({
           <div className="items-item">{batch.label}</div>
         </div>
         <div className="items-concentration">{count} in {unique.length} different concentrations</div>
+        <input type="hidden" name={"box[batch_uuids][" + index + "]"} value={batch.value}/>
+        {batch.samples ? batch.samples.map((sample, concentration_index) =>
+            <span>
+              <input type="hidden" name={"box[concentrations][" + index + "][" + concentration_index + "][concentration]"} value={sample.concentration} />
+              <input type="hidden" name={"box[concentrations][" + index + "][" + concentration_index + "][replicate]"} value={sample.replicate} />
+              <input type="hidden" name={"box[concentrations][" + index + "][" + concentration_index + "][distractor]"} value={sample.distractor} />
+              <input type="hidden" name={"box[concentrations][" + index + "][" + concentration_index + "][instruction]"} value={sample.instruction} />
+            </span>
+          ) : false}
       </div>
     </div>);
   },
+
+  // renderInputs(sample, index) {
+  //   console.log(sample)
+  //   return (
+  //     <span>
+  //       <input type="hidden" name={"batch[" + {batch} + "][concentration]"} value={sample.concentration} />
+  //       <input type="hidden" name={"replicate_" + index} value={sample.replicate} />
+  //     </span>
+  //   )
+  // },
 
   prepareOptions: function (options) {
     return options.map(function (option) {
@@ -195,10 +216,12 @@ var BatchesSelector = React.createClass({
     list.push(batches)
     this.setState({ list: list });
     this.setState({ batches: [] });
+    this.setState({distractor: null });
+    this.setState({instruction: null });
   },
   addConcentration: function (event) {
     event.preventDefault();
-    this.state.batches[0].samples.push({ replicate: this.state.replicate, concentration: this.state.concentration});
+    this.state.batches[0].samples.push({ replicate: this.state.replicate, concentration: this.state.concentration, distractor: this.state.distractor, instruction: this.state.instruction });
     this.setState({concentration: null });
     this.setState({replicate: null });
   },
@@ -232,5 +255,11 @@ var BatchesSelector = React.createClass({
   },
   changeReplicate: function( event ) {
     this.setState({replicate: event.target.value});
+  },
+  changeDistractor: function( event ) {
+    this.setState({distractor: event.target.value});
+  },
+  changeInstruction: function( event ) {
+    this.setState({instruction: event.target.value});
   }
 });

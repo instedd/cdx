@@ -59,10 +59,13 @@ class BoxesController < ApplicationController
 
   def create
     return unless authorize_resource(@navigation_context.institution, CREATE_INSTITUTION_BOX)
-
     @box_form = BoxForm.build(@navigation_context, box_params)
+
     @box_form.batches = check_access(load_batches, READ_BATCH)
     @box_form.samples = check_access(load_samples, READ_SAMPLE)
+
+    puts 'add_batch_acolá'
+    puts @box_form.inspect
 
     if @box_form.valid?
       @box_form.build_samples
@@ -141,12 +144,13 @@ class BoxesController < ApplicationController
 
   def box_params
     if Rails::VERSION::MAJOR == 5 && Rails::VERSION::MINOR == 0
-      params.require(:box).permit(:purpose, :media, :blinded).tap do |allowed|
+      params.require(:box).permit(:purpose, :media, :blinded, :samples).tap do |allowed|
         allowed[:batch_uuids] = params[:box][:batch_uuids].try(&:permit!)
         allowed[:sample_uuids] = params[:box][:sample_uuids].try(&:permit!)
+        allowed[:concentrations] = params[:box][:concentrations].try(&:permit!)
       end
     else
-      params.require(:box).permit(:purpose, :media, :blinded, batch_uuids: {}, sample_uuids: [])
+      params.require(:box).permit(:purpose, :media, :blinded, :samples, batch_uuids: {}, sample_uuids: [], concentrations: [])
     end
   end
 
