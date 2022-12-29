@@ -63,9 +63,6 @@ class BoxesController < ApplicationController
     @box_form.batches = check_access(load_batches, READ_BATCH)
     @box_form.samples = check_access(load_samples, READ_SAMPLE)
 
-    puts 'add_batch_acolá'
-    puts @box_form.inspect
-
     if @box_form.valid?
       @box_form.build_samples
 
