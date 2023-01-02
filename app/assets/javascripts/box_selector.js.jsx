@@ -29,8 +29,7 @@ var BoxSelector = React.createClass({
         selector.removeBox(box);
       }
 
-      let id = Math.floor(Math.random() * 1000000000);
-      if (selector.state.caller == 'samples_reports'){
+      function renderOnSamplesReports(box,id){
         let name = `samples_report[boxes_attributes][${id}][box_id]`;
         return <div>
           <div className="batches-samples">
@@ -47,9 +46,9 @@ var BoxSelector = React.createClass({
               ("") }
         </div>
       }
-      else {
+
+      function renderOnTransferPackages(box,id){
         let name = `transfer_package[box_transfers_attributes][${id}][box_id]`;
-      
         return <div className="selector-list-item">
           <div dangerouslySetInnerHTML={{ __html: box.preview }}></div>
           <input type="hidden" name={name} value={box.id} />
@@ -57,6 +56,14 @@ var BoxSelector = React.createClass({
             <i className="icon-close" />
           </a>
         </div>
+      }
+
+      let id = Math.floor(Math.random() * 1000000000);
+      if (selector.props.caller == 'samples_reports'){
+        return renderOnSamplesReports(box, id);
+      }
+      else if (selector.props.caller == 'transfer_packages') {
+        return renderOnTransferPackages(box, id);
       }
       
     }
