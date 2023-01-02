@@ -82,6 +82,15 @@
         - else
           = f.text_field :media, readonly: true
 
+      .row.form-field
+        .col.form-field__label
+          %label Distractor
+        .col
+          = f.check_box :distractor
+          = f.label :distractor, "When enabled, the system will consider that the sample test result should be negative regardless of its concentration and threshold", class: "faded"
+
+      = f.form_field :instruction do
+        = f.text_field :instruction
   .col
     = render (@can_update ? 'form_assays' : 'show_assays'), f: f
 
