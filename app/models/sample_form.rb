@@ -19,6 +19,8 @@ class SampleForm
       :concentration,
       :replicate,
       :media,
+      :distractor,
+      :instruction,
       :qc_info ]
   end
 

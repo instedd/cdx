@@ -127,6 +127,10 @@ input[type="checkbox"] {
     cursor: pointer;
     line-height: 40px;
 
+    &.faded {
+      color: $gray3;
+    }
+
     &:before {
       content: '';
       font-family: $sans;
