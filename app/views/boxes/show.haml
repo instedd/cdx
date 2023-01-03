@@ -34,9 +34,9 @@
   .col.pe-3
     %label Contents
   .col
-    .row
+    .row.border-bottom
       .col.pe-3
-        .samples-count
+        .items-count.border-right
           .title
             = "#{@box.samples.count} samples" + (@box.blinded ? ' (blinded)' : '')
       .col.pe-3
@@ -54,9 +54,9 @@
     .row
       .col
         - @samples.each do |sample|
-          .col.pe-7.batches-samples
-            .samples-row
-              .samples-item= sample.uuid
+          .col.pe-7.list-items
+            .items-row
+              .items-item= sample.uuid
               - unless sample.blinded_attribute?(:batch_number)
                 .sample-row-action= sample.batch_number
 
