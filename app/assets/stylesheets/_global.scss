@@ -377,9 +377,26 @@ a[title="Back"] {
 .faded {
   color: $gray3;
 }
-input[type=date].filled { 
+input[type=date].filled {
   color: $black;
 }
 input[type=date] {
     color: $gray3;
+}
+
+.border-right {
+  border-right: 1px solid rgba(0,0,0,0.1);
+
+  &.strong {
+    border-color: #000;
+    border-right-width: 3px;
+  }
+}
+.border-bottom {
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+
+  &.strong {
+    border-color: #000;
+    border-bottom-width: 3px;
+  }
 }
