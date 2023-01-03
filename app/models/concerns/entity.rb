@@ -2,8 +2,8 @@ module Entity
   extend ActiveSupport::Concern
 
   included do
-    serialize :custom_fields, Hash
-    serialize :core_fields, Hash
+    # serialize :custom_fields, JSON
+    # serialize :core_fields, JSON
 
     after_initialize do
       self.custom_fields  ||= {}
@@ -148,7 +148,33 @@ module Entity
     end
 
     def entity_fields
-      Cdx::Fields.entities.core_field_scopes.find{|s| s.name == entity_scope}.fields
+      @entity_fields ||= Cdx::Fields.entities.core_field_scopes.find{|s| s.name == entity_scope}.fields
+    end
+
+    def existing_entity(name)
+      where("JSON_CONTAINS_PATH(#{quoted_table_name}.core_fields, 'one', #{entity_field_name_as_json_path(name)})")
+    end
+
+    def missing_entity(name)
+      where("NOT JSON_CONTAINS_PATH(#{quoted_table_name}.core_fields, 'one', #{entity_field_name_as_json_path(name)})")
+    end
+
+    def where_entity(name, value)
+      where("#{quoted_table_name}.core_fields->>#{entity_field_name_as_json_path(name)} = ?", value)
+    end
+
+    def where_entity_not(name, value)
+      where("#{quoted_table_name}.core_fields)->>#{entity_field_name_as_json_path(name)} <> ?", value)
+    end
+
+    def entity_field_name_as_json_path(field_name)
+      field_name = field_name.to_s
+
+      if Rails.env.production? || entity_fields.any? { |f| f.name == field_name }
+        connection.quote("$.#{field_name}")
+      else
+        raise ArgumentError.new("BUG: unknown entity field #{field_name} for #{self.class.name}")
+      end
     end
   end
 
