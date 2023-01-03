@@ -24,7 +24,7 @@
 
   .row
     .col
-      = button_tag id: 'bulk_process_csv', class: 'btn-primary', name: 'bulk_action', value: 'process_csv', disabled: true, data: { confirm_title_class: "red", confirm_button_message: "Continue", method: "delete", confirm_title: "Warning", confirm: "This action will unblind samples and cannot be undone. <br><br> Samples' with previously uploaded measurements won't be overwritten. <br><br> " } do
+      = button_tag id: 'bulk_process_csv', class: 'btn-primary', name: 'bulk_action', value: 'process_csv', disabled: true, data: { color_class: "red", confirm_button_message: "Continue", method: "delete", confirm_title: "Warning", confirm: "This action will unblind samples and cannot be undone. <br><br> Samples' with previously uploaded measurements won't be overwritten. <br><br> " } do
         Upload Results
       = link_to 'Cancel', samples_path, class: 'btn-link'
 
@@ -48,7 +48,7 @@
                       cancelFunction: "cancelFunc",
                       confirmFunction: "confirmFunc", 
                       id: "my-confirmation-modal", 
-                      titleClass: "red", 
+                      colorClass: "red", 
                       confirmMessage: "Skip invalid IDs", 
                       title: "Results Upload Error", 
                       message: "Some IDs found on this CSV don't exist, please remove those rows and try again. ")

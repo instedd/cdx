@@ -51,8 +51,8 @@ var ConfirmationModal = React.createClass({
     return this.props.deletion ? "btn-primary btn-danger" : "btn-primary";
   },
   
-  titleClass: function() {
-    return this.props.titleClass ? this.props.titleClass : "";
+  colorClass: function() {
+    return this.props.colorClass ? this.props.colorClass : "";
   },
   
   showCancelButton: function() {
@@ -66,8 +66,8 @@ var ConfirmationModal = React.createClass({
     }
     return (
       <Modal ref="confirmationModal" show="true">
-        <h1 className={this.titleClass()}>{this.modalTitle()}</h1>
-        <div className="modal-content" dangerouslySetInnerHTML={this.message()}>
+        <h1 className={this.colorClass()}>{this.modalTitle()}</h1>
+        <div className={this.colorClass()+ " modal-content"} dangerouslySetInnerHTML={this.message()}>
         </div>
         <div className="modal-footer button-actions">
           <button type="button" className={this.confirmButtonClass()} onClick={this.onConfirm}>{this.confirmMessage()}</button>
