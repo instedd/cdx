@@ -35,6 +35,10 @@
       margin: 0 -45px 30px;
       padding: 30px 45px;
       border-bottom: 1px solid $gray1;
+
+      &.red {
+        color: $red;
+      }
     }
 
     h2 {
