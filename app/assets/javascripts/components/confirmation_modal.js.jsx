@@ -66,13 +66,13 @@ var ConfirmationModal = React.createClass({
     }
     return (
       <Modal ref="confirmationModal" show="true">
-      <h1 className={this.titleClass()}>{this.modalTitle()}</h1>
-      <div className="modal-content" dangerouslySetInnerHTML={this.message()}>
-      </div>
-      <div className="modal-footer button-actions">
-      <button type="button" className={this.confirmButtonClass()} onClick={this.onConfirm}>{this.confirmMessage()}</button>
-      { cancelButton }
-      </div>
+        <h1 className={this.titleClass()}>{this.modalTitle()}</h1>
+        <div className="modal-content" dangerouslySetInnerHTML={this.message()}>
+        </div>
+        <div className="modal-footer button-actions">
+          <button type="button" className={this.confirmButtonClass()} onClick={this.onConfirm}>{this.confirmMessage()}</button>
+          { cancelButton }
+        </div>
       </Modal>
       );
     }
