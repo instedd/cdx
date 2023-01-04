@@ -43,12 +43,11 @@ class SamplesReportsController < ApplicationController
     @samples_report.name = params[:samples_report][:name]
     
     samples_report_samples = []
-    @boxes = [] # For form reloading in case of validation error
-    if params[:samples_report][:boxes_attributes]
-      @boxes_p = params[:samples_report][:boxes_attributes]
-      @boxes_p.each do |box_param|
-        box_id = @boxes_p[box_param][:box_id]
-        box = Box.find_by_id(box_id)
+    if params[:samples_report][:box_ids] 
+      params[:samples_report][:box_ids].each do |box_id|
+        box = Box.find(box_id)
+        box = check_access(box, READ_BOX)
+        next if box.nil?
         box.samples.each do |sample|
           samples_report_samples  << SamplesReportSample.new(samples_report: @samples_report, sample: sample)
         end
@@ -56,7 +55,7 @@ class SamplesReportsController < ApplicationController
     end
 
     @samples_report.samples_report_samples = samples_report_samples
-    
+
     if @samples_report.save
       redirect_to samples_reports_path, notice: 'Box report was successfully created.'
     else
@@ -65,16 +64,16 @@ class SamplesReportsController < ApplicationController
   end
 
   def show
-    @samples_report = SamplesReport.find_by_id(params[:id])
+    @samples_report = SamplesReport.find(params[:id])
     return unless authorize_resource(@samples_report, READ_SAMPLES_REPORT)
     @can_delete = has_access?(@samples_report, DELETE_SAMPLES_REPORT)
   end
 
   def delete
-    @samples_report = SamplesReport.find_by_id(params[:id])
+    @samples_report = SamplesReport.find(params[:id])
     return unless authorize_resource(@samples_report, DELETE_SAMPLES_REPORT)
   
-    SamplesReport.destroy(params[:id])
+    @samples_report.destroy
     
     redirect_to samples_reports_path, notice: 'Box report was successfully deleted.'
   end
@@ -98,18 +97,16 @@ class SamplesReportsController < ApplicationController
   def find_box
     @navigation_context = NavigationContext.new(nil, params[:context])
 
-    uuid = params[:uuid]
-    full_uuid = uuid.size == 36
     @boxes = Box
       .within(@navigation_context.entity, @navigation_context.exclude_subsites)
       .left_joins(:box_transfers)
       .where(box_transfers: {id: nil})
-      .autocomplete(uuid)
+      .autocomplete(params[:uuid])
       .order("created_at DESC")
       .count_samples
       .count_samples_without_results
       .limit(5)
-
+    
     @boxes = check_access(@boxes, READ_BOX)
 
     render json: { boxes: boxes_data(@boxes) }
@@ -119,15 +116,19 @@ class SamplesReportsController < ApplicationController
   private
 
   def boxes_data(boxes)
-    boxes.map { |box|
-      {
-        id: box.id,
-        uuid: box.uuid,
-        hasQcReference: box.samples.any?(&:has_qc_reference?),
-        preview: render_to_string(partial: "boxes/preview_for_report", locals: { box: box }),
-        samplesWithoutResults: box.samples_without_results_count>0 ? true : false 
+    if boxes
+      boxes.map { |box|
+        {
+          id: box.id,
+          uuid: box.uuid,
+          hasQcReference: box.samples.any?(&:has_qc_reference?),
+          preview: render_to_string(partial: "boxes/preview_for_report", locals: { box: box }),
+          samplesWithoutResults: box.count_samples_without_results > 0
+        }
       }
-    }
+    else
+      []
+    end
   end
 
 end

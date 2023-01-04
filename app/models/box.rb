@@ -40,7 +40,7 @@ class Box < ApplicationRecord
   }
 
   scope :count_samples_without_results, -> {
-    select("COUNT(CASE WHEN samples.core_fields LIKE '%measured_signal%' THEN NULL ELSE 1 END) AS samples_without_results_count")
+    select("COUNT(CASE WHEN samples.core_fields LIKE '%measured_signal%' THEN NULL ELSE 1 END) AS count_samples_without_results")
   }
 
   def self.purposes

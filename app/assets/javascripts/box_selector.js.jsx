@@ -29,8 +29,8 @@ var BoxSelector = React.createClass({
         selector.removeBox(box);
       }
 
-      function renderOnSamplesReports(box,id){
-        let name = `samples_report[boxes_attributes][${id}][box_id]`;
+      function renderOnSamplesReports(box){
+        let name = `samples_report[box_ids][]`;
         return <div>
           <div className="batches-samples">
             <div className="samples-row-with-remove">
