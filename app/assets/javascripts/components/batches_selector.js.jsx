@@ -57,7 +57,7 @@ var BatchesSelector = React.createClass({
             <input type="hidden" name={this.props.name + "[" + index + "]"} value={concentration.replicate}/>
             <input type="hidden" name={this.props.name + "[" + index + "]"} value={concentration.concentration}/>
             <a href="#" onClick={removeSample.bind(this)} title="Remove this concentration">
-              <i className="icon-delete hex-gray bigger"></i>
+              <i className="icon-delete icon-gray bigger"></i>
             </a>
           </div>
           <div className="items-item">{concentration.replicate}&nbsp; replicate{concentration.replicate > 1 ? 's' : ''}</div>
@@ -83,7 +83,7 @@ var BatchesSelector = React.createClass({
           <div className="items-row-actions">
             <input type="hidden" name={this.props.name + "[" + index + "]"} value={batch.value}/>
             <a href="#" onClick={removeBatch.bind(this)} title="Remove this batch">
-              <i className="icon-delete hex-gray bigger"></i>
+              <i className="icon-delete icon-gray bigger"></i>
             </a>
           </div>
           <div>
@@ -96,7 +96,7 @@ var BatchesSelector = React.createClass({
             </div>
 
             <div>
-              <label htmlFor="batch-instructions" className="subtitle">Instructions</label>
+              <label htmlFor="batch-instructions">Instructions</label>
             </div>
             <input type="text" id="batch-instructions" name="instructions" value={this.state.instruction} onChange={this.changeInstruction} className="full-input" />
           </div>
@@ -113,7 +113,7 @@ var BatchesSelector = React.createClass({
                 </div>
                 <div className="items-concentration">
                   <input type="text" name="Concentration" value={this.state.concentration} onChange={this.changeConcentration} /> copies/ml
-                  <button className="hex-blue icon-check" onClick={addConcentration.bind(this)}></button>
+                  <button className="icon-blue icon-check" onClick={addConcentration.bind(this)}></button>
                 </div>
               </div>
             </div>
@@ -163,7 +163,7 @@ var BatchesSelector = React.createClass({
         <div className="items-left">
           <div className="items-row-actions">
             <a href="#" onClick={removeList.bind(this)} title="Remove this batch">
-              <i className="icon-delete hex-gray bigger"></i>
+              <i className="icon-delete icon-gray bigger"></i>
             </a>
           </div>
           <div className="items-item">{batch.label}</div>

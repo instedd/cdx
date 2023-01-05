@@ -43,10 +43,14 @@
 .items-cols {
   display: grid;
   grid-template-columns: 40px 1fr 1fr;
+  gap: 20px;
 
   .items-row-actions {
     align-items: flex-start;
     padding: 10px;
+  }
+  label[for=batch-instructions] {
+    line-height: unset;
   }
 }
 
@@ -144,6 +148,16 @@
   }
   [class^="icon-"], [class*=" icon-"] {
     font-size: 30px;
+  }
+}
+
+.items-concentration {
+  .icon-check {
+    width: 24px;
+    height: 24px;
+    margin-left: 10px;
+    background-size: 100%;
+    cursor: pointer;
   }
 }
 

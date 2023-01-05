@@ -43,7 +43,7 @@ var SamplesSelector = React.createClass({
             <div className="items-row-actions">
               <input type="hidden" name={this.props.name + "[" + index + "]"} value={sample.uuid}/>
               <a href="#" onClick={removeSample.bind(this)} title="Remove this sample">
-                <i className="icon-delete hex-gray bigger"></i>
+                <i className="icon-delete icon-gray bigger"></i>
               </a>
             </div>
             <div className="items-item">{sample.uuid} <span>{sample.batch_number}</span></div>
