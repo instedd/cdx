@@ -80,7 +80,7 @@ gem 'sidekiq-cron', '~> 0.3' # TODO: not maintained, consider sidekiq-scheduler 
 gem 'whenever', '~> 1.0' # TODO: replace with a sidekiq-cron job
 
 # External services
-gem 'location_service', git: 'https://github.com/instedd/ruby-location_service.git', ref: '99c97016c240af0d8e942add2e5ddc3e994a4d62'
+gem 'location_service', git: 'https://github.com/instedd/ruby-location_service.git', branch: 'master'
 gem 'nuntium_api', '~> 0.21'
 gem 'sentry-raven', '~> 2.13'
 
