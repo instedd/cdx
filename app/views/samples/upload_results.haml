@@ -13,14 +13,23 @@
     .col.pe-3
       %label Results
     .col
-      #uploaded-files
-
+      .row.samples-row
+        .col
+          .text-bold#file-count
+            0 files
+        .col.align-right
+          =link_to '/template.csv', target: "_blank" do
+            .icon-download.icon-gray
+            %span.btn-download
+              CSV TEMPLATE
       .row
-        .col.pe-3
-        .col.pe-10
-          = button_tag id: 'add-results-file', class: 'btn-link', type: "button" do
-            .icon-circle-plus.icon-blue.icon-margin
-            Add file
+        .col
+          #uploaded-files
+          .add-file-btn
+            = button_tag id: 'add-results-file', class: 'btn-link', type: "button" do
+              .icon-circle-plus.icon-blue.icon-margin
+              %span.btn-upload
+                Add file
 
   .row
     .col
