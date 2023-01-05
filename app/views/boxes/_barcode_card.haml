@@ -6,18 +6,9 @@
       .uuid
         #{@box.uuid}
     .code
-      %strong
-        Box:
-      = @box.samples.count
-      samples
+      #{(@box.institution.name).truncate(35)}
     .code
-      %strong
-        Institution:
-      = @box.institution.name
-    .code
-      %strong
-        Purpose:
-      #{@box.purpose}
+      #{@box.purpose} (#{@box.samples.count} samples)
     .logo
       = image_tag 'cdx-logo-bw.png'
       .label https://cdx.io
