@@ -1,0 +1,19 @@
+= cdx_form_for(@samples_report) do |f|
+  .row
+    .col
+      = f.form_field :name do
+        = f.text_field :name
+      = f.form_field :samples_report_samples, label: {text: "Box"} do
+        = react_component("BoxSelector",
+          context: @navigation_context.uuid,
+          includeQcInfo: true, 
+          displayQcInfo: false,
+          maxBoxes: 1,
+          caller: "samples_reports",
+          boxes: boxes_data(@boxes))
+        = f.field_errors :"samples_report_samples "
+
+  = f.form_actions do
+    = f.submit 'Generate Report', class: 'btn-primary'
+    = link_to 'Cancel', samples_reports_path, class: 'btn-link'
+

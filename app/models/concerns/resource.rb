@@ -15,7 +15,8 @@ module Resource
       Patient,
       Sample,
       Batch,
-      Box
+      Box,
+      SamplesReport
     ].freeze
   end
 

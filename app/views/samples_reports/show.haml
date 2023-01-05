@@ -1,0 +1,57 @@
+- content_for(:subheader) do
+  .row.center.edit
+    .col.pe-10
+      .row
+        .col
+          %h2
+            = link_to samples_reports_path, class: "side-link", title: "Back" do
+              = image_tag "arrow-left.png"
+            = @samples_report.name
+
+.row
+  .col
+    .row
+      .col.pe-4
+        .samples-report
+          .report-summary-content 
+            .title
+              Summary
+            .subtitle 
+              Samples
+            .text 
+              = @samples_report.samples_report_samples.length
+            .separation 
+            .action
+              .subtitle 
+                = icon_tag "barchart", class: "btn-icon icon-text-color"
+                Download charts as svg
+            .action
+              .subtitle
+                = icon_tag "as-pdf", class: "btn-icon icon-text-color"
+                Download PDF
+        - if @can_delete
+          .report-summary-after
+            =link_to delete_samples_report_path, id: @samples_report.id, data: { method: "delete", confirm: "You're about to permanently this box report. This action CANNOT be undone. Are you sure you want to proceed?" } do
+              .subtitle
+                = icon_tag "trash", class: "btn-icon icon-text-color"
+                Delete Report
+              
+            
+      .col
+        .samples-report
+          .report-content 
+            .title
+              Confusion Matrix
+            = image_tag confusion_matrix_svg(@samples_report.id)
+            .separation 
+            .title
+              Measured signal
+            = image_tag measured_signal_svg(@samples_report.id)
+            .separation 
+            .title
+              Limit of detection
+            = image_tag limit_of_detection_svg(@samples_report.id)
+            .separation 
+            .title
+              ROC Curve
+            = image_tag roc_curve_svg(@samples_report.id)
