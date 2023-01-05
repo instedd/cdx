@@ -182,16 +182,6 @@ var BatchesSelector = React.createClass({
     </div>);
   },
 
-  // renderInputs(sample, index) {
-  //   console.log(sample)
-  //   return (
-  //     <span>
-  //       <input type="hidden" name={"batch[" + {batch} + "][concentration]"} value={sample.concentration} />
-  //       <input type="hidden" name={"replicate_" + index} value={sample.replicate} />
-  //     </span>
-  //   )
-  // },
-
   prepareOptions: function (options) {
     return options.map(function (option) {
       return option;
