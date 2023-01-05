@@ -35,6 +35,7 @@
       margin: 0 -45px 30px;
       padding: 30px 45px;
       border-bottom: 1px solid $gray1;
+
     }
 
     h2 {
@@ -69,6 +70,10 @@
     }
     &.small {
       min-width: 250px;
+    }
+
+    .red {
+      color: $red;
     }
   }
 }

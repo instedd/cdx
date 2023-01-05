@@ -1,50 +1,64 @@
 var ConfirmationModal = React.createClass({
-
+  
   modalTitle: function() {
     return this.props.title || (this.props.deletion ? "Delete confirmation" : "Confirmation");
   },
-
+  
   cancelMessage: function() {
     return this.props.cancelMessage || "Cancel";
   },
-
+  
   confirmMessage: function() {
     return this.props.confirmMessage || (this.props.deletion ? "Delete" : "Confirm");
   },
-
+  
   componentDidMount: function() {
     this.refs.confirmationModal.show();
   },
-
+  
   onCancel: function() {
-    this.refs.confirmationModal.hide();
-		if (this.props.target instanceof Function ) {
-		this.props.cancel_target();	
-	}
-
+    if (this.props.cancelFunction) {
+      window[this.props.cancelFunction]();
+    }
+    else{
+      this.refs.confirmationModal.hide();
+      if (this.props.target instanceof Function ) {
+        this.props.cancel_target();	
+      }
+    }    
   },
-
+  
   onConfirm: function() {
-		if (this.props.target instanceof Function ) {
-	  this.props.target();	
-	} else {
-    window[this.props.target]();
-  }
-    this.refs.confirmationModal.hide();
+    if (this.props.confirmFunction) {
+      window[this.props.confirmFunction]();
+    }
+    else
+    { 
+      if (this.props.target instanceof Function ) {
+        this.props.target();	
+      } else {
+        window[this.props.target]();
+      }
+      this.refs.confirmationModal.hide();
+    }
   },
-
+  
   message: function() {
     return {__html: this.props.message};
   },
-
+  
   confirmButtonClass: function() {
     return this.props.deletion ? "btn-primary btn-danger" : "btn-primary";
   },
-
+  
+  colorClass: function() {
+    return this.props.colorClass ? this.props.colorClass : "";
+  },
+  
   showCancelButton: function() {
     return this.props.hideCancel != true;
   },
-
+  
   render: function() {
     var cancelButton = null;
     if (this.showCancelButton()) {
@@ -52,14 +66,15 @@ var ConfirmationModal = React.createClass({
     }
     return (
       <Modal ref="confirmationModal" show="true">
-        <h1>{this.modalTitle()}</h1>
-        <div className="modal-content" dangerouslySetInnerHTML={this.message()}>
+        <h1 className={this.colorClass()}>{this.modalTitle()}</h1>
+        <div className={this.colorClass()+ " modal-content"} dangerouslySetInnerHTML={this.message()}>
         </div>
         <div className="modal-footer button-actions">
           <button type="button" className={this.confirmButtonClass()} onClick={this.onConfirm}>{this.confirmMessage()}</button>
           { cancelButton }
         </div>
       </Modal>
-    );
-  }
-});
+      );
+    }
+  });
+  

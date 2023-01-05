@@ -1,4 +1,7 @@
 :javascript
+    var cancelFunc = function() {}
+    var confirmFunc = function() {}
+
     var getUrlParameter = function getUrlParameter(sParam) {
         var sPageURL = window.location.search.substring(1),
             sURLVariables = sPageURL.split('&'),
@@ -65,10 +68,11 @@
                 var not_found = samples.filter(function(x) {
                     return found.indexOf(x) < 0;
                 });
-                
+
                 // Create row from template with filename and upload info
                 var template = document.getElementById(`csvFileRow`).content;
                 var fragment = template.cloneNode(true);
+
                 fragment.querySelector(`.uploaded-samples-count`).textContent = `${samples.length} Samples ` ;
                 if (found.length != samples.length){
                     fragment.querySelector(`.uploaded-samples-count`).innerHTML += `(<span class="dashed-underline">${(not_found.length)} sample UUID${(not_found.length>1?'s':'')}</span> not found) `
@@ -98,8 +102,21 @@
                 fragment.querySelector(".remove_file").upload_info = fragment.querySelector(`.upload_info`)
                 fragment.querySelector(".remove_file").addEventListener('click', removeFileRow, false)
 
+                // If some samples were not found, show a warning modal
+                if (not_found.length > 0) {
+                    document.querySelector(`.results-upload-error-modal-container`).style.visibility = 'visible';
+                    confirmFunc = function() {
+                        document.querySelector(`.results-upload-error-modal-container`).style.visibility = 'hidden';
+                    }
+                    cancelFunc = function() {
+                        var removeFileNodes = document.querySelectorAll(".remove_file")
+                        removeFileNodes[removeFileNodes.length-1].click()
+                        document.querySelector(`.results-upload-error-modal-container`).style.visibility = 'hidden';
+                    }
+                }
+
                 document.getElementById(`uploaded-files`).append(fragment)
-                
+
                 checkUploadEnabling();
             }
         })(f);
