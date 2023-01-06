@@ -173,7 +173,7 @@ class SamplesReportsController < ApplicationController
       if s.measured_signal
         label = purpose == "LOD" ? s.concentration : s.batch.batch_number + "-" + s.concentration.to_s 
         measurements[label] << s.measured_signal
-        truths[label] = s.distractor?
+        truths[label] = s.distractor
       end
     end 
     
@@ -192,7 +192,7 @@ class SamplesReportsController < ApplicationController
     samples_report.samples.each do |s|
       if s.measured_signal
         confusion_matrix[:total] += 1
-        if s.concentration == 0 || s.distractor?
+        if s.concentration == 0 || s.distractor
           confusion_matrix[:actual_negative] += 1
           if s.measured_signal > threshold.to_f
             confusion_matrix[:predicted_positive] += 1

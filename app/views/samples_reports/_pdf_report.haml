@@ -194,11 +194,8 @@
     document.head.appendChild(script);
   }
 
-  {
-    addScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js');
-    updateThreshold();
-  }
-
+  addScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js');
+      
   window.onload =
     function() {
       var element = document.getElementById('samples-report');
@@ -209,6 +206,6 @@
         jsPDF: { format: 'A4', orientation: 'landscape' },
         margin: [15,15,15,15],
       };
-      html2pdf().set(opt).from(element).save().then(() => window.close());
+      updateThreshold().then(() => html2pdf().set(opt).from(element).save().then(() => window.close()));
     }
   

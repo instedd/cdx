@@ -62,8 +62,15 @@
           .report-content 
             - if @purpose == "Challenge"
               .title{id: "treshold-title"}
-              .range{style:"--step:#{@max_signal/100}; --min: 0; --max:#{@max_signal};"}
+              
+              .slider 
+                .min-signal 
+                  0.00
+                .progress 
                 %input{type:"range", id:"threshold", class: "slider", onchange:"updateThreshold()", min:0, max:@max_signal, step:@max_signal/100, value:0}
+                .max-signal
+                  #{@max_signal.round(2)}
+
               .separation 
 
             - if @purpose == "LOD"
@@ -118,7 +125,6 @@
 
     matches.forEach(rule => {
       for (var prop of rule.style) {
-
         let val = srcRules.getPropertyValue(prop) || rule.style.getPropertyValue(prop);
         let priority = rule.style.getPropertyPriority(prop);
 

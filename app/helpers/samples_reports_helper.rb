@@ -4,7 +4,7 @@ module SamplesReportsHelper
 
     samples.each do |s|
       if s.measured_signal
-        if s.concentration == 0 || s.distractor?
+        if s.concentration == 0 || s.distractor
           confusion_matrix[:actual_negative] += 1
           if s.measured_signal > signal
             confusion_matrix[:false_positive] += 1
