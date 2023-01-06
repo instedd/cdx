@@ -25,7 +25,6 @@ Dir[Rails.root.join("features/support/page_objects/*.rb")].each {|f| require f}
 Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}
 
 WebMock.disable_net_connect!(
-  net_http_connect_on_start: true,
   allow_localhost: true,
   allow: ALLOWED_WEBMOCK_HOSTS.compact
 )
