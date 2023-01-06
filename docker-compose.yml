@@ -27,6 +27,8 @@ services:
       - elasticsearch
       - redis
     command: /bin/sh -c './bin/rails s -b 0.0.0.0'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   selenium:
     build:
