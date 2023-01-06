@@ -1,15 +1,8 @@
 FROM alpine
 
-RUN apk add firefox-esr
+RUN echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
+RUN apk add firefox-esr geckodriver
 RUN ln -sf /usr/bin/firefox-esr /usr/bin/firefox
-
-# FIXME: can't upgrade to 0.30 because Geckodriver only starts on loopback
-RUN apk add curl && \
-    curl -L https://github.com/mozilla/geckodriver/releases/download/v0.29.1/geckodriver-v0.29.1-linux64.tar.gz | tar -C /usr/local/bin -zx && \
-    apk del curl
 
 EXPOSE 4444
 EXPOSE 5900
-
-ENTRYPOINT ["geckodriver", "--host", "0.0.0.0"]
-
