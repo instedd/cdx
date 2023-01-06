@@ -23,6 +23,15 @@ Capybara.configure do |config|
   config.server_port = ENV["SERVER_PORT"].to_i
 end
 
+# Resolve domain name as IP (mainly for geckodriver to accept any connections)
+begin
+  selenium_uri = URI(ENV["SELENIUM_URL"])
+  selenium_uri.host = Addrinfo.tcp(selenium_uri.host, selenium_uri.port).ip_address
+  ENV["SELENIUM_URL"] = selenium_uri.to_s
+rescue SocketError
+  STDERR.puts "WARNING: can't reach selenium server on #{ENV["SELENIUM_URL"]}"
+end
+
 if defined?(ALLOWED_WEBMOCK_HOSTS)
   ALLOWED_WEBMOCK_HOSTS << /http:\/\/#{Capybara.server_host}:#{Capybara.server_port}/
   ALLOWED_WEBMOCK_HOSTS << /^#{Regexp.escape(ENV["SELENIUM_URL"])}/
@@ -51,8 +60,6 @@ Capybara.javascript_driver = :selenium
 # quickly in the DOM after submitting a form for example, by introducing an
 # implicit 5 seconds timeout to continuously retry the finder.
 #
-# We must also tell SitePrism to respect this implicit wait time.
-#
 # WARNING: this also affects matchers that want to verify that an element
 # doesn't exist, in which case you should override the wait time!
-Capybara.default_max_wait_time = 5
+Capybara.default_max_wait_time = 2

@@ -32,6 +32,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.selenium
+    command: ['/usr/bin/geckodriver', '--host', '0.0.0.0']
     working_dir: /src
     volumes:
       - .:/src # we mount the source to be able to attach fixture files
