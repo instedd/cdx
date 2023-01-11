@@ -62,7 +62,6 @@
           .report-content 
             - if @purpose == "Challenge"
               .title{id: "treshold-title"}
-              
               .slider 
                 .min-signal 
                   0.00
@@ -70,12 +69,9 @@
                 %input{type:"range", id:"threshold", class: "slider", onchange:"updateThreshold()", min:0, max:@max_signal, step:@max_signal/100, value:0}
                 .max-signal
                   #{@max_signal.round(2)}
-
               .separation 
-
-            - if @purpose == "LOD"
+            - if @purpose == "LOD" || @purpose == "Variants"
               %input{type:"hidden", id:"threshold", value: 0.0}
-            
             .title
               Confusion Matrix
             .separation 
