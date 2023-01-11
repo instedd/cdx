@@ -74,6 +74,10 @@ th.text-right {
     color: $gray3;
   }
 }
+.text-bold {
+  font-weight: bold;
+}
+
 .align-top {
   @include align-self(flex-start);
 }

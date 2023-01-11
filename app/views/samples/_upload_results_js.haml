@@ -18,7 +18,10 @@
         return false;
     };
 
-    var checkUploadEnabling = function checkUploadEnabling() {
+    var updateFormElements = function updateFormElements() {
+        // Update file count
+        var fileCount = document.querySelectorAll('.csv_file').length;
+        document.getElementById('file-count').textContent = `${fileCount} file` + (fileCount > 1 ? 's' : '');
         // Enable upload button if there are uploaded files
         var hasFilesToUpload = document.getElementById('uploaded-files').innerHTML.trim() != "";
         document.getElementById(`bulk_process_csv`).disabled = !hasFilesToUpload;
@@ -33,6 +36,11 @@
         else {
             tooltip.classList.toggle("hidden")
         }
+    }
+
+    var isUUID = function(str) {
+      const regexExp = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/gi;
+      return regexExp.test(str);
     }
 
     function handleFileSelect(change_event) {
@@ -50,7 +58,7 @@
                 var samples = [] // samples uuids
 
                 lines.forEach(function(line) { 
-                    if (line != ''){
+                    if (line != '' && isUUID(line.split(',')[0])){
                         samples_param.push( 'uuids[]=' + line.split(',')[0] );
                         samples.push( line.split(',')[0] );
                     } 
@@ -97,7 +105,7 @@
                 var removeFileRow = function(evt) {
                     evt.currentTarget.upload_info.remove();
                     change_event.target.remove();
-                    checkUploadEnabling();
+                    updateFormElements();
                 }                
                 fragment.querySelector(".remove_file").upload_info = fragment.querySelector(`.upload_info`)
                 fragment.querySelector(".remove_file").addEventListener('click', removeFileRow, false)
@@ -116,8 +124,7 @@
                 }
 
                 document.getElementById(`uploaded-files`).append(fragment)
-
-                checkUploadEnabling();
+                updateFormElements();
             }
         })(f);
 

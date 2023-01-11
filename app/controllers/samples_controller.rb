@@ -210,11 +210,13 @@ class SamplesController < ApplicationController
   end
 
   def bulk_process_csv
+    uuid_regex = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/i
+
     params[:csv_files].each do |csv_file|
       CSV.open(csv_file.path) do |csv_stream|
         csv_stream.each do |row|
           sample_id, measured_signal = row[0], row[1]
-
+          next if !sample_id.match(uuid_regex) # non uuids are ignored
           sample = Sample.find_by_uuid(sample_id)
           unless sample.nil?
             sample.measured_signal ||= Float(measured_signal) if measured_signal.present?
