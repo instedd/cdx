@@ -2,7 +2,6 @@ var BoxSelector = React.createClass({
   getInitialState: function() {
     return {
       includeQcInfo: this.props.includeQcInfo,
-      displayQcInfo: this.props.displayQcInfo,
       boxes: this.props.boxes,
       search: "",
       error: null,
