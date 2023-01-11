@@ -65,7 +65,7 @@ class SamplesReportsController < ApplicationController
 
 
   def show
-    @samples_report = SamplesReport.find_by_id(params[:id])
+    @samples_report = SamplesReport.find(params[:id])
     @reports_data = measured_signal_data(@samples_report)
     @samples_without_results_count = @samples_report.samples.where("core_fields NOT LIKE '%measured_signal%'").count
     @purpose = @samples_report.samples[0].box.purpose
@@ -79,10 +79,10 @@ class SamplesReportsController < ApplicationController
   end
 
   def delete
-    @samples_report = SamplesReport.find_by_id(params[:id])
+    @samples_report = SamplesReport.find(params[:id])
     return unless authorize_resource(@samples_report, DELETE_SAMPLES_REPORT)
   
-    SamplesReport.destroy(params[:id])
+    @samples_report.destroy
     
     redirect_to samples_reports_path, notice: 'Box report was successfully deleted.'
   end
@@ -119,13 +119,11 @@ class SamplesReportsController < ApplicationController
   def find_box
     @navigation_context = NavigationContext.new(nil, params[:context])
 
-    uuid = params[:uuid]
-    full_uuid = uuid.size == 36
     @boxes = Box
       .within(@navigation_context.entity, @navigation_context.exclude_subsites)
       .left_joins(:box_transfers)
       .where(box_transfers: {id: nil})
-      .autocomplete(uuid)
+      .autocomplete(params[:uuid])
       .order("created_at DESC")
       .count_samples
       .count_samples_without_results
@@ -146,15 +144,19 @@ class SamplesReportsController < ApplicationController
   private
 
   def boxes_data(boxes)
-    boxes.map { |box|
-      {
-        id: box.id,
-        uuid: box.uuid,
-        hasQcReference: box.samples.any?(&:has_qc_reference?),
-        preview: render_to_string(partial: "boxes/preview_for_report", locals: { box: box }),
-        samplesWithoutResults: box.samples_without_results_count>0 ? true : false 
+    if boxes
+      boxes.map { |box|
+        {
+          id: box.id,
+          uuid: box.uuid,
+          hasQcReference: box.samples.any?(&:has_qc_reference?),
+          preview: render_to_string(partial: "boxes/preview_for_report", locals: { box: box }),
+          samplesWithoutResults: box.count_samples_without_results > 0
+        }
       }
-    }
+    else
+      []
+    end
   end
 
   def measured_signal_data(samples_report)
