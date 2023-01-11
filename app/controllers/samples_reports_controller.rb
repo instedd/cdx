@@ -63,19 +63,41 @@ class SamplesReportsController < ApplicationController
     end
   end
 
+
   def show
-    @samples_report = SamplesReport.find(params[:id])
+    @samples_report = SamplesReport.find_by_id(params[:id])
+    @reports_data = measured_signal_data(@samples_report)
+    @samples_without_results_count = @samples_report.samples.where("core_fields NOT LIKE '%measured_signal%'").count
+    @purpose = @samples_report.samples[0].box.purpose
+    @max_signal = 0
+    @reports_data.each do |s|
+      next if s[:max] <= @max_signal
+      @max_signal = s[:max]
+    end
     return unless authorize_resource(@samples_report, READ_SAMPLES_REPORT)
     @can_delete = has_access?(@samples_report, DELETE_SAMPLES_REPORT)
   end
 
   def delete
-    @samples_report = SamplesReport.find(params[:id])
+    @samples_report = SamplesReport.find_by_id(params[:id])
     return unless authorize_resource(@samples_report, DELETE_SAMPLES_REPORT)
   
-    @samples_report.destroy
+    SamplesReport.destroy(params[:id])
     
     redirect_to samples_reports_path, notice: 'Box report was successfully deleted.'
+  end
+
+  def print
+    @samples_report = SamplesReport.find(params[:samples_report_id])
+    @threshold = params[:threshold].to_f
+    @minthreshold = params[:minthreshold].to_f
+    @maxthreshold = params[:maxthreshold].to_f
+    @reports_data = measured_signal_data(@samples_report)
+    @samples_without_results_count = @samples_report.samples.where("core_fields NOT LIKE '%measured_signal%'").count
+    @purpose = @samples_report.samples[0].box.purpose
+    return unless authorize_resource(@samples_report, READ_SAMPLES_REPORT)
+
+    render '_pdf_report', :layout => false
   end
   
   def bulk_destroy
@@ -97,38 +119,96 @@ class SamplesReportsController < ApplicationController
   def find_box
     @navigation_context = NavigationContext.new(nil, params[:context])
 
+    uuid = params[:uuid]
+    full_uuid = uuid.size == 36
     @boxes = Box
       .within(@navigation_context.entity, @navigation_context.exclude_subsites)
       .left_joins(:box_transfers)
       .where(box_transfers: {id: nil})
-      .autocomplete(params[:uuid])
+      .autocomplete(uuid)
       .order("created_at DESC")
       .count_samples
       .count_samples_without_results
       .limit(5)
-    
+
     @boxes = check_access(@boxes, READ_BOX)
 
     render json: { boxes: boxes_data(@boxes) }
   end
 
+  def update_threshold
+    @threshold = params[:threshold]
+    @samples_report = SamplesReport.find(params[:samples_report_id])
+    @confusion_matrix = confusion_matrix(@samples_report, @threshold)
+    render json: { threshold: @threshold, confusion_matrix: @confusion_matrix }
+  end
 
   private
 
   def boxes_data(boxes)
-    if boxes
-      boxes.map { |box|
-        {
-          id: box.id,
-          uuid: box.uuid,
-          hasQcReference: box.samples.any?(&:has_qc_reference?),
-          preview: render_to_string(partial: "boxes/preview_for_report", locals: { box: box }),
-          samplesWithoutResults: box.count_samples_without_results > 0
-        }
+    boxes.map { |box|
+      {
+        id: box.id,
+        uuid: box.uuid,
+        hasQcReference: box.samples.any?(&:has_qc_reference?),
+        preview: render_to_string(partial: "boxes/preview_for_report", locals: { box: box }),
+        samplesWithoutResults: box.samples_without_results_count>0 ? true : false 
       }
-    else
-      []
-    end
+    }
   end
+
+  def measured_signal_data(samples_report)
+    measurements = Hash.new { |hash, key| hash[key] = [] }
+    truths = Hash.new { true }
+    purpose = samples_report.samples[0].box.purpose
+
+    samples_report.samples.map do |s| 
+      if s.measured_signal
+        label = purpose == "LOD" ? s.concentration : s.batch.batch_number + "-" + s.concentration.to_s 
+        measurements[label] << s.measured_signal
+        truths[label] = s.distractor
+      end
+    end 
+    
+    ret = measurements.sort_by { |k, v| k }.map do | label, signals | 
+      avg = signals.inject(:+) / signals.size
+      errors = signals.map { |s| (s - avg).abs}
+      max = avg + Math.sqrt(errors.inject(:+) / errors.size)
+      {label: label, average: [avg], measurements: signals, errors: errors, isDistractor: truths[label], max:max}
+    end
+    ret.map { |h| h.symbolize_keys }
+  end
+
+  def confusion_matrix(samples_report, threshold)
+    confusion_matrix = Hash.new{0}
+    
+    samples_report.samples.each do |s|
+      if s.measured_signal
+        confusion_matrix[:total] += 1
+        if s.concentration == 0 || s.distractor
+          confusion_matrix[:actual_negative] += 1
+          if s.measured_signal > threshold.to_f
+            confusion_matrix[:predicted_positive] += 1
+            confusion_matrix[:false_positive] += 1
+          else
+            confusion_matrix[:predicted_negative] += 1
+            confusion_matrix[:true_negative] += 1
+          end
+        else
+          confusion_matrix[:actual_positive] += 1
+          if s.measured_signal > threshold.to_f
+            confusion_matrix[:predicted_positive] += 1
+            confusion_matrix[:true_positive] += 1
+          else
+            confusion_matrix[:predicted_negative] += 1
+            confusion_matrix[:false_negative] += 1
+          end
+        end
+      end
+    end
+
+    confusion_matrix
+  end
+
 
 end
