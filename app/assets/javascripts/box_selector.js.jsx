@@ -17,8 +17,8 @@ var BoxSelector = React.createClass({
     const missingQuantity = selectedBoxes.length - haveQc
     return (
       <div>
-        {haveQc > 0 && this.state.displayQcInfo && this.includeQcInfoCheckbox()}
-        {missingQuantity > 0 && this.state.displayQcInfo && this.qcInfoMessage(missingQuantity, selectedBoxes)}
+        {haveQc > 0 && this.props.displayQcInfo && this.includeQcInfoCheckbox()}
+        {missingQuantity > 0 && this.props.displayQcInfo && this.qcInfoMessage(missingQuantity, selectedBoxes)}
       </div>
     )
   },
@@ -32,9 +32,8 @@ var BoxSelector = React.createClass({
         selector.removeBox(box);
       }
 
-      let id = Math.floor(Math.random() * 1000000000);
-      if (selector.state.caller == 'samples_reports'){
-        let name = `samples_report[boxes_attributes][${id}][box_id]`;
+      function renderOnSamplesReports(box){
+        let name = `samples_report[box_ids][]`;
         return <div>
           <div className="batches-samples">
             <div className="samples-row-with-remove">
@@ -50,9 +49,9 @@ var BoxSelector = React.createClass({
               ("") }
         </div>
       }
-      else {
+
+      function renderOnTransferPackages(box,id){
         let name = `transfer_package[box_transfers_attributes][${id}][box_id]`;
-      
         return <div className="selector-list-item">
           <div dangerouslySetInnerHTML={{ __html: box.preview }}></div>
           <input type="hidden" name={name} value={box.id} />
@@ -60,6 +59,14 @@ var BoxSelector = React.createClass({
             <i className="icon-close" />
           </a>
         </div>
+      }
+
+      let id = Math.floor(Math.random() * 1000000000);
+      if (selector.props.caller == 'samples_reports'){
+        return renderOnSamplesReports(box, id);
+      }
+      else if (selector.props.caller == 'transfer_packages') {
+        return renderOnTransferPackages(box, id);
       }
       
     }
@@ -117,7 +124,7 @@ var BoxSelector = React.createClass({
   },
 
   loadBox: function(uuid) {
-    url = "/"+this.state.caller+"/find_box"
+    url = "/"+this.props.caller+"/find_box"
     this.setState({
       error: null,
       status: "loading",
@@ -217,7 +224,7 @@ var BoxSelector = React.createClass({
             <div className="selector-list">
               {this.renderBoxes()}
             </div>
-            {(this.state.maxBoxes ==-1 || this.state.boxes.length < this.state.maxBoxes) &&
+            {(this.props.maxBoxes ==-1 || this.state.boxes.length < this.props.maxBoxes) &&
             <input type="text" size="36" maxlength="36" placeholder="Enter, paste or scan box ID"
               value={this.state.search}
               onChange={this.handleChange} onKeyDown={this.onKeyDown}

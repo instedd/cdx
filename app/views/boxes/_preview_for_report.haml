@@ -2,9 +2,9 @@
   .box__uuid{title: "UUID"}
     = box.uuid
 .actions
-  - if box.samples_without_results_count > 0
+  - if box.count_samples_without_results > 0
     %span.input-required
-      #{box.purpose} with #{box.samples_count} samples (#{box.samples_without_results_count} without results)
+      #{box.purpose} with #{box.samples_count} samples (#{box.count_samples_without_results} without results)
       .icon-alert.icon-red
   - else
     #{box.purpose} with #{box.samples_count} samples
