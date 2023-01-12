@@ -91,6 +91,11 @@
 
       = f.form_field :instruction do
         = f.text_field :instruction
+
+      - if @sample_form.measured_signal
+        = f.form_field :measured_signal do
+          = f.text_field :measured_signal, readonly: true
+
   .col
     = render (@can_update ? 'form_assays' : 'show_assays'), f: f
 
