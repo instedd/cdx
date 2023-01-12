@@ -152,6 +152,9 @@
 }
 
 .items-concentration {
+  display: flex;
+  align-items: center;
+  
   .icon-check {
     width: 24px;
     height: 24px;

@@ -286,7 +286,12 @@ RSpec.describe BoxesController, type: :controller do
 
     it "should create box with optional params" do
       expect do
-        post :create, params: { box: box_plan.merge(media: "Saliva", blinded: true) }
+        post :create, params: { box: box_plan.merge(
+                                  media: "Saliva", 
+                                  blinded: true,
+                                  samples: "add_batch",
+                                  batch_uuids: { "0" => batch.uuid },
+                                  concentrations: {"0" => { "0" => {"concentration"=>"1", "replicate"=>"2", "distractor"=>"", "instruction"=>""} } } ) }
         expect(response).to redirect_to boxes_path
       end.to change(institution.boxes, :count).by(1)
 
@@ -330,162 +335,64 @@ RSpec.describe BoxesController, type: :controller do
       end
     end
 
-    describe "LOD purpose" do
-      it "creates samples" do
-        expect do
-          post :create, params: { box: {
-            purpose: "LOD",
-            batch_uuids: { "lod" => batch.uuid },
-            blinded: true
-          } }
-          expect(response).to redirect_to(boxes_path)
-        end.to change(institution.samples, :count).by(28)
-
-        expect(Box.last.samples.count).to eq(28)
-        expect_samples(batch, concentrations: (1..8).map{|e| 10**e}, replicates: 3)
-        expect_samples(batch, concentrations: [0], replicates: 4)
+    describe "with new samples" do
+      let :virus_batch do
+        Batch.make!(institution: institution, site: site)
       end
 
-      it "requires one batch" do
-        expect do
-          post :create, params: { box: {
-            purpose: "LOD",
-            batch_uuids: { "lod" => "" },
-          } }
-          expect(response).to have_http_status(:unprocessable_entity)
-        end.to change(institution.samples, :count).by(0)
+      let :distractor_batch do
+        Batch.make!(institution: institution, site: site)
       end
+  
+      let :box_plan do
+        {
+          purpose: "LOD",
+          batch_uuids: { "lod" => batch.uuid },
+          blinded: true,
+        }
+      end
+
+      it "creates with with proper replicates and concentrations for virus and distractor samples" do
+        expect do
+          post :create, params: { box: box_plan.merge(
+                                    media: "Saliva", 
+                                    blinded: true,
+                                    samples: "add_batch",
+                                    batch_uuids: { "0" => virus_batch.uuid, "1" => distractor_batch.uuid },
+                                    concentrations: {"0" => { "0" => 
+                                                              {"concentration"=>"1", "replicate"=>"2", "distractor"=>"", "instruction"=>""} 
+                                                            },
+                                                     "1" => { "0" => 
+                                                              {"concentration"=>"4e5", "replicate"=>"2", "distractor"=>"on", "instruction"=>""}, 
+                                                              "1" => 
+                                                              {"concentration"=>"4e4", "replicate"=>"2", "distractor"=>"on", "instruction"=>""} 
+                                                            } 
+                                                    } ) }
+          expect(response).to redirect_to boxes_path
+        end.to change(institution.boxes, :count).by(1)
+  
+        box = assigns(:box_form).box.reload
+        expect(box.samples.count).to eq(6)
+        expect(box.samples.where(batch: virus_batch).count).to eq(2)
+        expect(box.samples.where(batch: virus_batch).map(&:distractor).uniq).to eq([false])
+        expect(box.samples.where(batch: virus_batch).map(&:concentration).uniq).to eq([1])
+        expect(box.samples.where(batch: distractor_batch).count).to eq(4)
+        expect(box.samples.where(batch: distractor_batch).map(&:distractor).uniq).to eq([true])
+        expect(box.samples.where(batch: distractor_batch).map(&:concentration).uniq.sort).to eq([40000,400000])
+        expect(box.blinded).to eq true
+      end
+
     end
 
-    describe "Variants purpose" do
-      it "creates samples" do
-        batches = Batch.make!(6, institution: institution)
-        batch_uuids = Hash[batches.map.with_index { |b, i| ["variant_#{i}", b.uuid] }]
-
-        expect do
-          post :create, params: { box: {
-            purpose: "Variants",
-            batch_uuids: batch_uuids,
-            blinded: true,
-          } }
-          expect(response).to redirect_to(boxes_path)
-        end.to change(institution.samples, :count).by(54)
-
-        expect(Box.last.samples.count).to eq(54)
-        batches.each do |b|
-          expect_samples(b, concentrations: [1, 4, 8].map{|e| 10**e}, replicates: 3)
-        end
-      end
-
-      it "requires at least 2 variant batches" do
-        expect do
-          post :create, params: { box: {
-            purpose: "Variants",
-            batch_uuids: { "variant_1" => batch.uuid },
-          } }
-          expect(response).to have_http_status(:unprocessable_entity)
-        end.to change(institution.samples, :count).by(0)
-      end
-
-      it "creates samples from 2 batches" do
-        other_batch = Batch.make!(institution: institution)
-
-        expect do
-          post :create, params: { box: {
-            purpose: "Variants",
-            batch_uuids: {
-              "variant_4" => batch.uuid,
-              "variant_2" => other_batch.uuid,
-            },
-            blinded: true,
-          } }
-          expect(response).to redirect_to(boxes_path)
-        end.to change(institution.samples, :count).by(18)
-      end
-    end
-
-    describe "Challenge purpose" do
-      it "creates samples" do
-        batches = Batch.make!(6, institution: institution)
-        batch_uuids = { "virus" => batch.uuid }
-        batches.each_with_index { |b, i| batch_uuids["distractor_#{i + 1}"] = b.uuid }
-
-        expect do
-          post :create, params: { box: {
-            purpose: "Challenge",
-            batch_uuids: batch_uuids,
-            blinded: true,
-          } }
-          expect(response).to redirect_to(boxes_path)
-        end.to change(institution.samples, :count).by(108)
-
-        expect(Box.last.samples.count).to eq(108)
-
-        # virus batch
-        expect_samples(batch, concentrations: [1, 4, 8].map{|e| 10**e}, replicates: 18)
-
-        # distractor batches
-        batches.each do |b|
-          expect_samples(b, concentrations: [1, 4, 8].map{|e| 10**e}, replicates: 3)
-        end
-      end
-
-      it "requires a virus batch" do
-        distractor = Batch.make!(institution: institution)
-
-        expect do
-          post :create, params: { box: {
-            purpose: "Challenge",
-            batch_uuids: { "1" => distractor.uuid },
-          } }
-          expect(response).to have_http_status(:unprocessable_entity)
-        end.to change(institution.samples, :count).by(0)
-      end
-
-      it "requires at least 1 distractor batches" do
-        expect do
-          post :create, params: { box: {
-            purpose: "Challenge",
-            batch_uuids: { "virus" => batch.uuid },
-          } }
-          expect(response).to have_http_status(:unprocessable_entity)
-        end.to change(institution.samples, :count).by(0)
-      end
-
-      it "creates samples from 1 virus batch and 1 distractor batches" do
-        distractor = Batch.make!(institution: institution)
-
-        expect do
-          post :create, params: { box: {
-            purpose: "Challenge",
-            batch_uuids: {
-              "virus" => batch.uuid,
-              "distractor_4" => distractor.uuid,
-            },
-            blinded: true
-          } }
-          expect(response).to redirect_to(boxes_path)
-        end.to change(institution.samples, :count).by(63)
-      end
-    end
-
-    describe "Other purpose" do
+    describe "with existing samples" do
       it "creates with samples" do
         samples = Sample.make! 2, :filled, institution: institution, specimen_role: "b"
 
-        expect do
-          expect do
-            post :create, params: { box: {
-              purpose: "Other",
-              sample_uuids: {
-                "sample_0" => samples[0].uuid,
-                "sample_1" => samples[1].uuid,
-              },
-              blinded: true,
-            } }
-            expect(response).to redirect_to(boxes_path)
-          end.to change(institution.samples, :count).by(0)
-        end.to change(institution.boxes, :count).by(1)
+        post :create, params: { box: box_plan.merge(
+                                    media: "Saliva", 
+                                    blinded: true,
+                                    samples: "add_samples",
+                                    sample_uuids: { "sample_0" => samples[0].uuid, "sample_1" => samples[1].uuid } ) }
 
         expect(Box.last.samples.map(&:uuid).sort).to eq(samples.map(&:uuid).sort)
       end
@@ -498,13 +405,11 @@ RSpec.describe BoxesController, type: :controller do
 
         expect do
           expect do
-            post :create, params: { box: {
-              purpose: "Other",
-              sample_uuids: {
-                "sample_0" => samples[0].uuid,
-                "sample_1" => samples[1].uuid,
-              }
-            } }
+            post :create, params: { box: box_plan.merge(
+                                    media: "Saliva", 
+                                    blinded: true,
+                                    samples: "add_samples",
+                                    sample_uuids: { "sample_0" => samples[0].uuid, "sample_1" => samples[1].uuid } ) }
             expect(response).to have_http_status(:unprocessable_entity)
           end.to change(institution.samples, :count).by(0)
         end.to change(institution.boxes, :count).by(0)
@@ -513,7 +418,7 @@ RSpec.describe BoxesController, type: :controller do
       it "requires at least 1 sample" do
         expect do
           expect do
-            post :create, params: { box: { purpose: "Other", sample_uuids: {} } }
+            post :create, params: { box: { purpose: "Other", samples: "add_samples", sample_uuids: {}, blinded: false } }
             expect(response).to have_http_status(:unprocessable_entity)
           end.to change(institution.samples, :count).by(0)
         end.to change(institution.boxes, :count).by(0)

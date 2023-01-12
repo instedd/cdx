@@ -158,7 +158,7 @@ class BoxesController < ApplicationController
       {
         uuid: sample.uuid,
         batch_number: sample.batch_number,
-        concentration_number: sample.concetration_number,
+        concentration: sample.concetration,
       }
     end
   end

@@ -57,7 +57,7 @@ class BoxForm
     @box.valid?
     validate_existence_of_batches
     validate_existence_of_samples
-    # validate_batches_or_samples_for_purpose
+    validate_batches_or_samples_for_purpose
     @box.errors.empty?
   end
 
@@ -88,25 +88,41 @@ class BoxForm
   end
 
   def validate_batches_or_samples_for_purpose
-    # case @box.purpose
-    # when "LOD"
-    #   @box.errors.add(:lod, "A batch is required") unless @batches["lod"] || @box.errors.include?(:lod)
-    # when "Variants"
-    #   @box.errors.add(:base, "You must select at least two batches") unless unique_batch_count >= 2
-    # when "Challenge"
-    #   if @batches["virus"]
-    #     @box.errors.add(:base, "You must select at least one distractor batch") unless unique_batch_count >= 2
-    #   else
-    #     @box.errors.add(:virus, "A virus batch is required") unless @box.errors.include?(:virus)
-    #     @box.errors.add(:base, "You must select at least one distractor batch") unless unique_batch_count >= 1
-    #   end
-    # when "Other"
-    #   if @samples.empty?
-    #     @box.errors.add(:base, "You must select at least one sample")
-    #   elsif @samples.any? { |_, sample| sample.is_quality_control? }
-    #     @box.errors.add(:base, "You can't select a QC sample")
-    #   end
-    # end
+    case @option
+    when "add_batch"
+      case @box.purpose
+      when "LOD"
+        @box.errors.add(:lod, "A batch is required") unless unique_batch_count >= 1
+      when "Variants"
+        @box.errors.add(:base, "You must select at least two batches") unless unique_batch_count >= 2
+      when "Challenge"
+        have_virus=false
+        have_distractor=false
+        @batches.each do |key, batch|
+          @concentrations[key].each do |i, concentration|
+            if concentration['distractor'] == "on"
+              have_distractor=true
+            else
+              have_virus=true
+            end
+          end
+        end
+        @box.errors.add(:base, "You must select at least one distractor batch") if !have_distractor
+        @box.errors.add(:virus, "A virus batch is required") if !have_virus
+      when "Other"
+        if @samples.empty?
+          @box.errors.add(:base, "You must select at least one sample")
+        elsif @samples.any? { |_, sample| sample.is_quality_control? }
+          @box.errors.add(:base, "You can't select a QC sample")
+        end
+      end
+    when "add_samples"
+      if @samples.empty?
+        @box.errors.add(:base, "You must select at least one sample")
+      elsif @samples.any? { |_, sample| sample.is_quality_control? }
+        @box.errors.add(:base, "You can't select a QC sample")
+      end
+    end
   end
 
   def unique_batch_count
