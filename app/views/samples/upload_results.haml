@@ -13,18 +13,27 @@
     .col.pe-3
       %label Results
     .col
-      #uploaded-files
-
+      .row.samples-row
+        .col
+          .text-bold#file-count
+            0 files
+        .col.align-right
+          =link_to '/templates/upload_sample_results.csv', target: "_blank" do
+            .icon-download.icon-gray
+            %span.btn-download
+              CSV TEMPLATE
       .row
-        .col.pe-3
-        .col.pe-10
-          = button_tag id: 'add-results-file', class: 'btn-link', type: "button" do
-            .icon-circle-plus.icon-blue.icon-margin
-            Add file
+        .col
+          #uploaded-files
+          .add-file-btn
+            = button_tag id: 'add-results-file', class: 'btn-link', type: "button" do
+              .icon-circle-plus.icon-blue.icon-margin
+              %span.btn-upload
+                Add file
 
   .row
     .col
-      = button_tag id: 'bulk_process_csv', class: 'btn-primary', name: 'bulk_action', value: 'process_csv', disabled: true, data: { method: "process_csv", confirm: "This action will unblind samples and cannot be undone. <br> Samples with uploaded measurements won't be overwritten. " } do
+      = button_tag id: 'bulk_process_csv', class: 'btn-primary', name: 'bulk_action', value: 'process_csv', disabled: true, data: { color_class: "red", confirm_button_message: "Continue", method: "delete", confirm_title: "Warning", confirm: "This action will unblind samples and cannot be undone. <br><br> Samples' with previously uploaded measurements won't be overwritten. <br><br> " } do
         Upload Results
       = link_to 'Cancel', samples_path, class: 'btn-link'
 
@@ -41,5 +50,16 @@
 
 %template{:id => "csvInputFile"}
   = file_field_tag "csv_files[]", hidden: true, class: "csv_file", accept: "text/csv"
+
+.results-upload-error-modal-container.hidden
+  = react_component("ConfirmationModal", 
+                      deletion: true,
+                      cancelFunction: "cancelFunc",
+                      confirmFunction: "confirmFunc", 
+                      id: "my-confirmation-modal", 
+                      colorClass: "red", 
+                      confirmMessage: "Skip invalid IDs", 
+                      title: "Results Upload Error", 
+                      message: "Some IDs found on this CSV don't exist, please remove those rows and try again. ")
 
 = render 'upload_results_js'

@@ -102,7 +102,7 @@ jobs:
           path: coverage/
           retention-days: 60
 
-      - uses: geekyeggo/delete-artifact@v1
+      - uses: geekyeggo/delete-artifact@v2
         with:
           name: |
             unit_tests_coverage

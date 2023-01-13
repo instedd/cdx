@@ -1,3 +1,5 @@
+require_relative "./xml_message_serializer"
+
 class ManifestFieldMapping
   include DateDistanceHelper
 
@@ -121,42 +123,32 @@ class ManifestFieldMapping
   end
 
   def run_script(script, data)
-    ctx = V8::Context.new
-    begin
-      ctx["message"] = data
+    ctx = MiniRacer::Context.new
 
-      if @device
-        ctx["device"] = script_device(@device)
-        if site = @device.site
-          ctx["site"] = script_site(site)
-        end
-        if location = site.try(&:location)
-          ctx["location"] = script_location(location)
-        end
+    if data.is_a?(Nokogiri::XML::Node)
+      ctx.eval "var message = #{data.cdx_serializable_hash.to_json};"
+      ctx.attach "message.xpath", ->(query) { data.xpath(query).cdx_serializable_hash }
+    else
+      ctx.eval "var message = #{data.to_json};"
+    end
+
+    if @device
+      ctx.eval "var device = #{script_device(@device).to_json};"
+
+      if site = @device.site
+        ctx.eval "var site = #{script_site(site).to_json};"
       end
+      if location = site.try(&:location)
+        ctx.eval "var location = #{script_location(location).to_json};"
+      end
+    end
 
-      result = ctx.eval(script)
-      result = to_ruby(result)
-      result
-    rescue V8::Error => e
+    begin
+      ctx.eval(script)
+    rescue MiniRacer::Error => e
       raise ManifestParsingError.script_error(@field.target_field, e.message)
     ensure
       ctx.dispose
-    end
-  end
-
-  def to_ruby(v8_object)
-    case v8_object
-    when V8::Array
-      array = v8_object.to_a
-      array.map! { |elem| to_ruby(elem) }
-    when V8::Object
-      hash = v8_object.to_h
-      hash.each do |key, value|
-        hash[key] = to_ruby(value)
-      end
-    else
-      v8_object
     end
   end
 

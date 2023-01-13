@@ -107,6 +107,10 @@
   &.px-10 {
     @include flex(0 0 1000px);
   }
+
+  &.align-right { 
+    text-align: right; 
+  }
 }
 
 
