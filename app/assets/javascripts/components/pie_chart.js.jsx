@@ -10,7 +10,7 @@ var PieChart = React.createClass({
   componentDidMount: function() {
     if (!this.props.width) {
       this.setProps({
-        width: this.refs.svg.getDOMNode().clientWidth
+        width: this.refs.svg.clientWidth
       })
     }
   },
@@ -20,7 +20,7 @@ var PieChart = React.createClass({
   },
 
   componentDidMount: function () {
-    var svg = d3.select(this.refs.svg.getDOMNode());
+    var svg = d3.select(this.refs.svg);
     var data = this.props.data;
 
     var total = _.sum(data, 'value');

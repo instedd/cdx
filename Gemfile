@@ -98,7 +98,7 @@ gem 'jquery-rails', '~> 4.0'
 gem 'jquery-turbolinks', '~> 2.1.0'
 gem 'leaflet-rails', '~> 0.7.4'
 gem 'lodash-rails', '~> 3.10.1'
-gem 'react-rails', '~> 1.3.2' # NOTE: required for JSX templates
+gem 'react-rails', '~> 1.6.2' # NOTE: required for JSX templates
 
 source 'https://rails-assets.org' do
   gem 'rails-assets-urijs', '~> 1.17.0'

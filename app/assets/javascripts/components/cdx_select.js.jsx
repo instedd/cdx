@@ -9,7 +9,7 @@ var CdxSelect = React.createClass({
     window.setTimeout(function(){
       // this is deferred so a new input with the new value
       // is rendered by the time the change event is triggered
-      $('input:hidden', this.getDOMNode()).trigger('change');
+      $('input:hidden', ReactDOM.findDOMNode(this)).trigger('change');
     }.bind(this), 0);
     if(this.props.onChange) {
       this.props.onChange(newValue, this);

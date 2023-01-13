@@ -10,7 +10,7 @@ var BarChart = React.createClass({
   componentDidMount: function() {
     if (!this.props.width) {
       this.setProps({
-        width: this.refs.svg.getDOMNode().clientWidth
+        width: this.refs.svg.clientWidth
       })
     }
   },
@@ -31,7 +31,7 @@ var BarChart = React.createClass({
         .orient("bottom");
 
       var rotateLabels = function(dom) {
-        d3.select(dom.getDOMNode()).selectAll("text")
+        d3.select(ReactDOM.findDOMNode(dom)).selectAll("text")
           .attr("y", 0)
           .attr("x", 9)
           .attr("dy", ".35em")
@@ -82,12 +82,12 @@ var BarChart = React.createClass({
               {/* X Axis */}
               <g className="x axis"
                  transform={"translate(0," + chartHeight + ")"}
-                 ref={function(ref) { if (ref) { d3.select(ref.getDOMNode()).call(xAxis); rotateLabels(ref); }}} />
+                 ref={function(ref) { if (ref) { d3.select(ref).call(xAxis); rotateLabels(ref); }}} />
 
               {/* Y Axis */}
               <g className="y axis"
                  transform={"translate(" + chartWidth + ",0)"}
-                 ref={function(ref) { if (ref) { d3.select(ref.getDOMNode()).call(yAxis) }}} >
+                 ref={function(ref) { if (ref) { d3.select(ref).call(yAxis) }}} >
                 <text transform={"translate(" + (-chartWidth - this.props.margin.left) + ",0),rotate(-90)"}
                       y="6" dy=".71em" style={{textAnchor: 'end'}}>{this.props.y_label}</text>
               </g>
