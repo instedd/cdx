@@ -16,7 +16,7 @@ var Modal = React.createClass({
   },
 
   hideOnOuterClick: function(event) {
-    if (this.getDOMNode() == event.target)
+    if (ReactDOM.findDOMNode(this) == event.target)
       this.hide();
   },
 

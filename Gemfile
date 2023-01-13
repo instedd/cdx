@@ -98,7 +98,7 @@ gem 'jquery-rails', '~> 4.0'
 gem 'jquery-turbolinks', '~> 2.1.0'
 gem 'leaflet-rails', '~> 0.7.4'
 gem 'lodash-rails', '~> 3.10.1'
-gem 'react-rails', '~> 1.3.2' # NOTE: required for JSX templates
+gem 'react-rails', '~> 1.6.2' # NOTE: required for JSX templates
 
 source 'https://rails-assets.org' do
   gem 'rails-assets-urijs', '~> 1.17.0'
@@ -136,9 +136,9 @@ group :test do
   gem 'webmock', '~> 2.3.1', require: false
 
   # integration tests
-  gem 'capybara', '~> 3.17.0'
+  gem 'capybara', '~> 3.29.0' # limited by site_prism 3.6
   gem 'capybara-screenshot', '~> 1.0'
   gem 'cucumber-rails', '~> 1.5', require: false
-  gem 'selenium-webdriver', '< 4.0'
-  gem 'site_prism', '~> 3.0'
+  gem 'selenium-webdriver'
+  gem 'site_prism', '~> 3.6.0' # last version to support ruby 2.4
 end

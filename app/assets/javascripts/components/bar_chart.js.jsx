@@ -7,17 +7,10 @@ var BarChart = React.createClass({
     }
   },
 
-  componentDidMount: function() {
-    if (!this.props.width) {
-      this.setProps({
-        width: this.refs.svg.getDOMNode().clientWidth
-      })
-    }
-  },
-
   render: function() {
-    if (this.props.width) {
-      var chartWidth = this.props.width - this.props.margin.left - this.props.margin.right,
+    var width = this.props.width || (this.refs.svg && this.refs.svg.clientWidth);
+    if (width) {
+      var chartWidth = width - this.props.margin.left - this.props.margin.right,
           chartHeight = this.props.height - this.props.margin.top - this.props.margin.bottom;
 
       var x = d3.scale.ordinal()
@@ -31,7 +24,7 @@ var BarChart = React.createClass({
         .orient("bottom");
 
       var rotateLabels = function(dom) {
-        d3.select(dom.getDOMNode()).selectAll("text")
+        d3.select(ReactDOM.findDOMNode(dom)).selectAll("text")
           .attr("y", 0)
           .attr("x", 9)
           .attr("dy", ".35em")
@@ -50,8 +43,8 @@ var BarChart = React.createClass({
     }
 
     var svgProps = {}
-    if (this.props.width) {
-      svgProps.viewBox = "0 0 " + this.props.width + " " + this.props.height
+    if (width) {
+      svgProps.viewBox = "0 0 " + width + " " + this.props.height
     }
 
     return (
@@ -60,7 +53,7 @@ var BarChart = React.createClass({
              height={this.props.height}
              ref="svg"
              {...svgProps} >
-          { this.props.width ?
+          { width ?
             <g transform={"translate(" + this.props.margin.left + "," + this.props.margin.top + ")"}>
 
               {/* Bars */}
@@ -82,12 +75,12 @@ var BarChart = React.createClass({
               {/* X Axis */}
               <g className="x axis"
                  transform={"translate(0," + chartHeight + ")"}
-                 ref={function(ref) { if (ref) { d3.select(ref.getDOMNode()).call(xAxis); rotateLabels(ref); }}} />
+                 ref={function(ref) { if (ref) { d3.select(ref).call(xAxis); rotateLabels(ref); }}} />
 
               {/* Y Axis */}
               <g className="y axis"
                  transform={"translate(" + chartWidth + ",0)"}
-                 ref={function(ref) { if (ref) { d3.select(ref.getDOMNode()).call(yAxis) }}} >
+                 ref={function(ref) { if (ref) { d3.select(ref).call(yAxis) }}} >
                 <text transform={"translate(" + (-chartWidth - this.props.margin.left) + ",0),rotate(-90)"}
                       y="6" dy=".71em" style={{textAnchor: 'end'}}>{this.props.y_label}</text>
               </g>
