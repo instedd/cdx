@@ -33,7 +33,7 @@ class SamplePresenter
 
   def blinded_attribute?(attr_name)
     if box = @sample.box
-      box.blinded? && !!box.blind_attribute?(attr_name)
+      (box.blinded? && !!box.blind_attribute?(attr_name)) && !@sample.measured_signal
     else
       false
     end

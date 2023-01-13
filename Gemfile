@@ -85,10 +85,9 @@ gem 'nuntium_api', '~> 0.21'
 gem 'sentry-raven', '~> 2.13'
 
 # Assets
-gem 'execjs', '< 2.8.0' # 2.8 removed support for therubyracer
 gem 'gon', '~> 6.0'
 gem 'sass-rails', '~> 5.0', '< 5.0.8'
-gem 'therubyracer', '~> 0.12' # FIXME: deprecated for years
+gem 'mini_racer'
 gem 'turbolinks', '~> 2.5' # TODO: upgrade to '~> 5'
 gem 'uglifier', '~> 2.7'
 
