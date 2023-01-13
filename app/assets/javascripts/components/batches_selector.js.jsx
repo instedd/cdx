@@ -25,24 +25,13 @@ var BatchesSelector = React.createClass({
     }
 
     return (<div className="batches-selector">
-      {this.renderTitle()}
+      <div className="items-count">
+        <div className="title">{this.state.list.length}&nbsp;{this.state.list.length == 1 ? "batch" : "batches"}</div>
+      </div>
       {this.state.list ? this.state.list.map(this.renderList) : false}
       {this.state.batches.map(this.renderBatch)}
 
       {button}
-    </div>);
-  },
-
-  renderTitle() {
-    var batches = this.state.list;
-    if (!batches.length) return;
-
-    var count = batches.reduce(function (a, e) {
-      return e.value ? a + 1 : a;
-    }, 0);
-
-    return (<div className="items-count">
-      <div className="title">{count}&nbsp;{count == 1 ? "batch" : "batches"}</div>
     </div>);
   },
 
@@ -158,6 +147,9 @@ var BatchesSelector = React.createClass({
     function removeList(event) {
       this.removeList(event, index);
     }
+
+    var concentrationItem = `${count} in ${unique.length} different concentration ${unique.length>1?"s":""}`;
+
     return (<div className="list-items" key={"list-selector-" + index}>
       <div className="items-row">
         <div className="items-left">
@@ -168,7 +160,7 @@ var BatchesSelector = React.createClass({
           </div>
           <div className="items-item">{batch.label}</div>
         </div>
-        <div className="items-concentration">{count} in {unique.length} different concentrations</div>
+        <div className="items-concentration">{concentrationItem}</div>
         <input type="hidden" name={"box[batch_uuids][" + index + "]"} value={batch.value}/>
         {batch.samples ? batch.samples.map((sample, concentration_index) =>
             <span>
