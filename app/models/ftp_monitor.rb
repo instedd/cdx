@@ -16,14 +16,9 @@ class FtpMonitor
   end
 
   def process!
-    PoirotRails::Activity.start("FtpMonitor process batch") do
-      device_groups.each do |ftp, devices|
-        next if ftp.hostname.blank?
-        # TODO: Should we move these actions to a background task?
-        PoirotRails::Activity.start("FtpProcessor process", ftp: ftp.to_h.except(:password), devices: devices.map(&:id)) do
-          FtpProcessor.new(ftp, devices).process!
-        end
-      end
+    device_groups.each do |ftp, devices|
+      # TODO: Should we move these actions to a background task?
+      FtpProcessor.new(ftp, devices).process! if ftp.hostname.present?
     end
   end
 
@@ -104,13 +99,10 @@ class FtpMonitor
 
     def process_file(remote_name, file)
       file.rewind
-      PoirotRails::Activity.start('FtpProcessor file processing', filename: remote_name) do
-        device = match_device(remote_name)
-        return if device.nil?
-        PoirotRails::Activity.current.merge!(device_id: device.id)
+      device = match_device(remote_name)
+      return if device.nil?
 
-        create_and_process_device_message_for(remote_name, device, file)
-      end
+      create_and_process_device_message_for(remote_name, device, file)
     ensure
       file.close
       file.unlink rescue nil

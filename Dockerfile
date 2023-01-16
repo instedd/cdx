@@ -19,8 +19,6 @@ WORKDIR /app
 # Configuration
 ARG gemfile=Gemfile
 ENV BUNDLE_GEMFILE=${gemfile}
-ENV POIROT_STDOUT true
-ENV POIROT_SUPPRESS_RAILS_LOG true
 ENV PUMA_OPTIONS "--preload -w 4 -p 3000"
 ENV NNDD_VERSION "cdx-0.11-pre7"
 ENV RAILS_ENV=production

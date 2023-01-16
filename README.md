@@ -87,10 +87,6 @@ $ docker-compose restart web
 
 Locations are obtained from the [InSTEDD Location Service](https://github.com/instedd/location_service). You can specify a different path in config/settings/development.yml.local
 
-### Poirot
-
-CDX uses [Poirot](https://github.com/instedd/poirot_rails) for additional logging. You need to install `zeromq` library version 3.2.0 for it to work, or disable it in config/poirot.yml. On Mac OS, run `brew install homebrew/versions/zeromq32`; if you have other versions of `zeromq` installed, it may be required to run `brew link zeromq32 --force` as well.
-
 ### NNDD
 
 To run [notifiable diseases](https://github.com/instedd/notifiable-diseases) on development, checkout the project and symlink the custom settings files in `/etc/nndd` on this project:
