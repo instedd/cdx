@@ -9,7 +9,7 @@ var BarChart = React.createClass({
 
   componentDidMount: function() {
     if (!this.props.width) {
-      this.setProps({
+      ReactDOM.render({
         width: this.refs.svg.clientWidth
       })
     }
