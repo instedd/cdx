@@ -14,7 +14,7 @@ module FeatureSpecHelpers
       else
         # geckodriver doesn't implement the log interface (sigh)
         session.execute_script("return window.__cdx_logs;")
-          .each { |log| puts "JS: #{log.join(" ")}" }
+          &.each { |log| puts "JS: #{log.join(" ")}" }
       end
     end
   end
