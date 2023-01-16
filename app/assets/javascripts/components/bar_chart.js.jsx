@@ -7,17 +7,10 @@ var BarChart = React.createClass({
     }
   },
 
-  componentDidMount: function() {
-    if (!this.props.width) {
-      ReactDOM.render({
-        width: this.refs.svg.clientWidth
-      })
-    }
-  },
-
   render: function() {
-    if (this.props.width) {
-      var chartWidth = this.props.width - this.props.margin.left - this.props.margin.right,
+    var width = this.props.width || (this.refs.svg && this.refs.svg.clientWidth);
+    if (width) {
+      var chartWidth = width - this.props.margin.left - this.props.margin.right,
           chartHeight = this.props.height - this.props.margin.top - this.props.margin.bottom;
 
       var x = d3.scale.ordinal()
@@ -50,8 +43,8 @@ var BarChart = React.createClass({
     }
 
     var svgProps = {}
-    if (this.props.width) {
-      svgProps.viewBox = "0 0 " + this.props.width + " " + this.props.height
+    if (width) {
+      svgProps.viewBox = "0 0 " + width + " " + this.props.height
     }
 
     return (
@@ -60,7 +53,7 @@ var BarChart = React.createClass({
              height={this.props.height}
              ref="svg"
              {...svgProps} >
-          { this.props.width ?
+          { width ?
             <g transform={"translate(" + this.props.margin.left + "," + this.props.margin.top + ")"}>
 
               {/* Bars */}
