@@ -31,7 +31,8 @@ gem 'csv_builder', '~> 2.1'
 gem 'haml-rails', '~> 0.9'
 gem 'jbuilder', '~> 2.5'
 gem 'view_components', git: 'https://github.com/manastech/rails-view_components.git', branch: 'master'
-gem 'wicked_pdf', '~> 2.1'
+gem 'prawn'
+gem 'prawn-svg'
 
 # Authentication
 # gem 'bcrypt-ruby', '~> 3.1.2'

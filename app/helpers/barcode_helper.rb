@@ -14,7 +14,7 @@ module BarcodeHelper
 
   def image_barcode(code)
     barcode = Barby::Code93.new(code)
-    file = Tempfile.new(['barcode', '.png'])
+    file = Tempfile.new(['barcode', '.png'], encoding: "BINARY")
     outputter = Barby::PngOutputter.new(barcode)
     outputter.xdim = 2
     file.write outputter.to_png
