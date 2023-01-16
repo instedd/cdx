@@ -40,8 +40,7 @@ var BoxSelector = React.createClass({
       </div>
     }
 
-    const listItems = this.state.boxes.map(renderBox)
-    return ({ listItems });
+    return this.state.boxes.map(renderBox)
   },
 
   removeBox: function(box) {
@@ -178,13 +177,6 @@ var BoxSelector = React.createClass({
     )
   },
 
-  renderError: function() {
-    let error = this.state.error;
-    return (
-      { error }
-    )
-  },
-
   render: function() {
     return (
       <div>
@@ -193,13 +185,13 @@ var BoxSelector = React.createClass({
             <div className="selector-list">
               {this.renderBoxes()}
             </div>
-            <input type="text" size="36" maxlength="36" placeholder="Enter, paste or scan box ID"
+            <input type="text" size="36" maxLength="36" placeholder="Enter, paste or scan box ID"
               value={this.state.search}
               onChange={this.handleChange} onKeyDown={this.onKeyDown}
               className={this.state.error ? "input-required" : ""} />
 
             <div className="error">
-              {this.renderError()}
+              {this.state.error}
             </div>
           </div>
         </div>

@@ -4,6 +4,19 @@ module FeatureSpecHelpers
   included do
     metadata[:js] = true
     metadata[:elasticsearch] = true
+
+    after(:each) do
+      next unless session = Capybara.current_session
+
+      if session.driver.respond_to?(:log)
+        session.driver.browser.manage.logs.get(:browser)
+          .each { |log| puts "JS: #{log.level} #{log.message}" }
+      else
+        # geckodriver doesn't implement the log interface (sigh)
+        session.execute_script("return window.__cdx_logs;")
+          &.each { |log| puts "JS: #{log.join(" ")}" }
+      end
+    end
   end
 
   def process(args = {})

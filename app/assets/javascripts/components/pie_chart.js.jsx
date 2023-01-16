@@ -7,20 +7,15 @@ var PieChart = React.createClass({
     }
   },
 
-  componentDidMount: function() {
-    if (!this.props.width) {
-      this.setProps({
-        width: this.refs.svg.getDOMNode().clientWidth
-      })
-    }
-  },
-
   buildColorScale: function () {
     return d3.scale.ordinal().range(this.props.colors);
   },
 
   componentDidMount: function () {
-    var svg = d3.select(this.refs.svg.getDOMNode());
+    if (!this.state) this.state = {};
+    this.state.width = this.props.width || (this.refs.svg && this.refs.svg.clientWidth);
+
+    var svg = d3.select(this.refs.svg);
     var data = this.props.data;
 
     var total = _.sum(data, 'value');
@@ -91,7 +86,7 @@ var PieChart = React.createClass({
   },
 
   render: function() {
-    var radius = Math.min(this.props.width || this.props.height, this.props.height) / 2;
+    var radius = Math.min((this.state && this.state.width) || this.props.height, this.props.height) / 2;
 
     var color = this.buildColorScale();
 
@@ -108,8 +103,8 @@ var PieChart = React.createClass({
       .rangePoints([-25 * (this.props.data.length - 1) / 2, 25 * (this.props.data.length - 1) / 2]);
 
     var svgProps = {}
-    if (this.props.width) {
-      svgProps.viewBox = "0 0 " + this.props.width + " " + this.props.height
+    if (this.state && this.state.width) {
+      svgProps.viewBox = "0 0 " + this.state.width + " " + this.props.height
     }
 
     return (
