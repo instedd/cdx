@@ -3,6 +3,7 @@ class SamplesReportsController < ApplicationController
 
   helper_method :boxes_data
   helper_method :available_institutions
+  helper_method :confusion_matrix
 
   def index
     @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_SAMPLES_REPORT)
@@ -66,16 +67,23 @@ class SamplesReportsController < ApplicationController
 
   def show
     @samples_report = SamplesReport.find(params[:id])
-    @reports_data = measured_signal_data(@samples_report)
-    @samples_without_results_count = @samples_report.samples.where("core_fields NOT LIKE '%measured_signal%'").count
-    @purpose = @samples_report.samples[0].box.purpose
-    @max_signal = 0
-    @reports_data.each do |s|
-      next if s[:max] <= @max_signal
-      @max_signal = s[:max]
-    end
     return unless authorize_resource(@samples_report, READ_SAMPLES_REPORT)
-    @can_delete = has_access?(@samples_report, DELETE_SAMPLES_REPORT)
+    @reports_data = measured_signal_data(@samples_report)
+    @samples_without_results_count = @samples_report.samples.without_results.count
+    @purpose = @samples_report.samples[0].box.purpose
+    
+    if params[:display] == "pdf"
+      gon.samples_report_id = @samples_report.id
+      gon.samples_report_name = @samples_report.name
+      gon.purpose = @purpose
+      gon.threshold = params[:threshold]
+      gon.min_threshold = params[:minthreshold]
+      gon.max_threshold = params[:maxthreshold]
+      render "_pdf_report", layout: false
+    else
+      @max_signal = @reports_data.reduce(0) { |a, e| e[:max] > a ? e[:max] : a }
+      @can_delete = has_access?(@samples_report, DELETE_SAMPLES_REPORT)
+    end
   end
 
   def delete
@@ -85,19 +93,6 @@ class SamplesReportsController < ApplicationController
     @samples_report.destroy
     
     redirect_to samples_reports_path, notice: 'Box report was successfully deleted.'
-  end
-
-  def print
-    @samples_report = SamplesReport.find(params[:samples_report_id])
-    @threshold = params[:threshold].to_f
-    @minthreshold = params[:minthreshold].to_f
-    @maxthreshold = params[:maxthreshold].to_f
-    @reports_data = measured_signal_data(@samples_report)
-    @samples_without_results_count = @samples_report.samples.where("core_fields NOT LIKE '%measured_signal%'").count
-    @purpose = @samples_report.samples[0].box.purpose
-    return unless authorize_resource(@samples_report, READ_SAMPLES_REPORT)
-
-    render '_pdf_report', :layout => false
   end
   
   def bulk_destroy
@@ -135,10 +130,10 @@ class SamplesReportsController < ApplicationController
   end
 
   def update_threshold
-    @threshold = params[:threshold]
-    @samples_report = SamplesReport.find(params[:samples_report_id])
-    @confusion_matrix = confusion_matrix(@samples_report, @threshold)
-    render json: { threshold: @threshold, confusion_matrix: @confusion_matrix }
+    threshold = params[:threshold]
+    samples_report = SamplesReport.find(params[:samples_report_id])
+    confusion_matrix = confusion_matrix(samples_report.samples, threshold.to_f)
+    render json: { threshold: threshold, confusion_matrix: confusion_matrix }
   end
 
   private
@@ -172,42 +167,38 @@ class SamplesReportsController < ApplicationController
       end
     end 
     
-    ret = measurements.sort_by { |k, v| k }.map do | label, signals | 
-      avg = signals.inject(:+) / signals.size
-      errors = signals.map { |s| (s - avg).abs}
-      max = avg + Math.sqrt(errors.inject(:+) / errors.size)
-      {label: label, average: [avg], measurements: signals, errors: errors, isDistractor: truths[label], max:max}
+    measurements.sort_by { |k, _| k }.map do |label, signals|
+      avg = signals.sum / signals.size
+      errors = signals.map { |s| (s - avg).abs }
+      max = avg + Math.sqrt(errors.sum / errors.size)
+      {
+        label: label,
+        average: [avg],
+        measurements: signals,
+        errors: errors,
+        isDistractor: truths[label],
+        max: max
+      }
     end
-    ret.map { |h| h.symbolize_keys }
   end
 
-  def confusion_matrix(samples_report, threshold)
+  def confusion_matrix(samples, threshold)
     confusion_matrix = Hash.new{0}
     
-    samples_report.samples.each do |s|
-      if s.measured_signal
-        confusion_matrix[:total] += 1
-        if s.concentration == 0 || s.distractor
-          confusion_matrix[:actual_negative] += 1
-          if s.measured_signal > threshold.to_f
-            confusion_matrix[:predicted_positive] += 1
-            confusion_matrix[:false_positive] += 1
-          else
-            confusion_matrix[:predicted_negative] += 1
-            confusion_matrix[:true_negative] += 1
-          end
-        else
-          confusion_matrix[:actual_positive] += 1
-          if s.measured_signal > threshold.to_f
-            confusion_matrix[:predicted_positive] += 1
-            confusion_matrix[:true_positive] += 1
-          else
-            confusion_matrix[:predicted_negative] += 1
-            confusion_matrix[:false_negative] += 1
-          end
-        end
+    samples.each do |s|
+      next unless s.measured_signal
+      if s.concentration == 0 || s.distractor
+        s.measured_signal > threshold ? confusion_matrix[:false_positive] += 1 : confusion_matrix[:true_negative] += 1
+      else
+        s.measured_signal > threshold ? confusion_matrix[:true_positive] += 1 : confusion_matrix[:false_negative] += 1
       end
     end
+
+    confusion_matrix[:actual_positive] = confusion_matrix[:true_positive] + confusion_matrix[:false_negative]
+    confusion_matrix[:actual_negative] = confusion_matrix[:true_negative] + confusion_matrix[:false_positive]
+    confusion_matrix[:predicted_positive] = confusion_matrix[:true_positive] + confusion_matrix[:false_positive]
+    confusion_matrix[:predicted_negative] = confusion_matrix[:true_negative] + confusion_matrix[:false_negative]
+    confusion_matrix[:total] = confusion_matrix[:actual_positive] + confusion_matrix[:actual_negative]
 
     confusion_matrix
   end

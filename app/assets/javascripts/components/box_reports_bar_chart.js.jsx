@@ -9,8 +9,8 @@ var BoxReportsBarChart = React.createClass({
   componentDidMount: function() {
     if (!this.props.width) {
       this.setProps({
-        width: this.props.is_for_report ? 400 : 700,
-        height: this.props.is_for_report ? 300 : 400
+        width: 700,
+        height: 400
       })
     }
   },
@@ -51,7 +51,7 @@ var BoxReportsBarChart = React.createClass({
         .ticks(10, "s");
 
       x.domain(this.props.data.map(function(d) { return d.label; }));
-      // firt option: y domain goes up to the max avg
+      // first option: y domain goes up to the max avg
       var yDomainMax = d3.max(this.props.data.map( function(d) { return d3.sum(d[barVariable]); }))
       // if error bars are present, y domain goes up to the max avg + max error bar
       this.props.data.map( function(d) { 

@@ -32,7 +32,7 @@
             .subtitle 
               Threshold
             .text 
-              = @threshold
+              = params["threshold"].to_f
             -if @purpose == "Challenge"
               .subtitle 
                 Computed ROC AUC
@@ -133,20 +133,20 @@
   };
 
   async function updateThreshold(){
-    var threshold = parseFloat(#{@threshold});
-    
+    var threshold = parseFloat(gon.threshold);
+
     var context = getUrlParameter('context');
-    var url = '/samples_reports/update_threshold?context='+context+"&samples_report_id="+#{@samples_report.id}+"&threshold="+threshold;
+    var url = '/samples_reports/update_threshold?context='+context+"&samples_report_id="+gon.samples_report_id+"&threshold="+gon.threshold;
     var ret = await fetch(url)
         .then((response) => response.json())
         .then((r) => {
             return r;
     })
     
-    if ("#{@purpose}" == "Challenge") {
+    if (gon.purpose == "Challenge") {
       // For the bar chart
-      var minthreshold = parseFloat(#{@minthreshold});
-      var maxthreshold = parseFloat(#{@maxthreshold});
+      var minthreshold = parseFloat(gon.min_threshold);
+      var maxthreshold = parseFloat(gon.max_threshold);
       var threshold_percentage = (threshold - minthreshold) / (maxthreshold - minthreshold);
       var svg_mintreshold = parseFloat(d3.select("#threshold-line-down").attr("y1"));
       var svg_maxtreshold = parseFloat(d3.select("#threshold-line-up").attr("y1"));
@@ -201,7 +201,7 @@
       var element = document.getElementById('samples-report');
       
       var opt = {
-        filename: '#{@samples_report.name}.pdf',
+        filename: gon.samples_report_name+'.pdf',
         pagebreak: { before: '.pdf-page-break' },
         jsPDF: { format: 'A4', orientation: 'landscape' },
         margin: [15,15,15,15],

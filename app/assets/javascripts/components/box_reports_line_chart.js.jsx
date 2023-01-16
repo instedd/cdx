@@ -9,8 +9,8 @@ var BoxReportsLineChart = React.createClass({
     componentDidMount: function() {
       if (!this.props.width) {
         this.setProps({
-          width: this.props.is_for_report ? 400 : 700,
-          height: this.props.is_for_report ? 300 : 400
+          width: 700,
+          height: 400
         })
       }
     },
