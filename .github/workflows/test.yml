@@ -65,7 +65,7 @@ jobs:
         run: docker-compose up -d selenium
 
       - name: Run specs (capybara)
-        run: docker-compose run --rm -e RAILS_ENV=test -e COVERAGE=true -e FEATURES=true -e SELENIUM_URL web bundle exec rspec
+        run: docker-compose run --rm -e RAILS_ENV=test -e COVERAGE=true -e FEATURES=true -e SELENIUM_URL web bundle exec rspec --format=documentation
 
       - name: Run specs (cucumber)
         run: docker-compose run --rm -e RAILS_ENV=test -e COVERAGE=true -e SELENIUM_URL web bundle exec cucumber
