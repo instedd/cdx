@@ -21,6 +21,4 @@
   capture_logs("log");
   capture_logs("trace");
   capture_logs("warn");
-
-  window.console.debug("captured console")
 })();
