@@ -41,7 +41,6 @@ class DeviceMessageImporter
 
   def load_file(sync_dir)
     lambda do |uuid, filename|
-      PoirotRails::Activity.current.merge! device_uuid: uuid
       Rails.logger.info "Importing #{filename} for device #{uuid}"
       begin
         encoding = CharDet.detect(File.read(filename))

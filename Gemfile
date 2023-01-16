@@ -55,7 +55,6 @@ gem 'ffaker', '< 2.12.0'
 gem 'guid', '~> 0.1'
 gem 'nokogiri', '~> 1.6', '< 1.11.0' # last version to support ruby 2.4
 gem 'oj', '~> 2.12', '< 2.17.3' # NOTE: 2.17.3 will stringify Time as a Float then load a BigDecimal...
-gem 'poirot_rails', git: 'https://github.com/instedd/poirot_rails.git', branch: 'master'
 gem 'rails-i18n', '~> 5.0'
 gem 'rchardet', '~> 1.6'
 gem 'rest-client', '~> 2.1' # NOTE: only used for a single HTTP call + Nuntium (SMS) + LocationService
