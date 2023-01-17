@@ -96,19 +96,8 @@ class BoxForm
       when "Variants"
         @box.errors.add(:base, "You must select at least two batches") unless unique_batch_count >= 2
       when "Challenge"
-        have_virus=false
-        have_distractor=false
-        @batches.each do |key, batch|
-          @concentrations[key].each do |i, concentration|
-            if concentration['distractor'] == "on"
-              have_distractor=true
-            else
-              have_virus=true
-            end
-          end
-        end
-        @box.errors.add(:base, "You must select at least one distractor batch") if !have_distractor
-        @box.errors.add(:virus, "A virus batch is required") if !have_virus
+        @box.errors.add(:base, "You must select at least one distractor batch") unless have_distractor_batch
+        @box.errors.add(:virus, "A virus batch is required") unless have_virus_batch
       when "Other"
         if @samples.empty?
           @box.errors.add(:base, "You must select at least one sample")
@@ -125,7 +114,28 @@ class BoxForm
     end
   end
 
+  private
+
   def unique_batch_count
     @batches.map { |_, b| b.try(&:uuid) }.uniq.size
   end
+
+  def have_distractor_batch
+    @batches.each do |key, _|
+      @concentrations[key].each do |_, concentration|
+        if concentration['distractor'] == "on" then return true end
+      end
+    end
+    return false
+  end
+
+  def have_virus_batch
+    @batches.each do |key, _|
+      @concentrations[key].each do |_, concentration|
+        if concentration['distractor'] != "on" then return true end
+      end
+    end
+    return false
+  end
+
 end

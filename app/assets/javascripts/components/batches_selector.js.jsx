@@ -148,7 +148,7 @@ var BatchesSelector = React.createClass({
       this.removeList(event, index);
     }
 
-    var concentrationItem = `${count} in ${unique.length} different concentration ${unique.length>1?"s":""}`;
+    var concentrationItem = `${count} in ${unique.length} different concentration${unique.length>1?"s":""}`;
 
     return (<div className="list-items" key={"list-selector-" + index}>
       <div className="items-row">
