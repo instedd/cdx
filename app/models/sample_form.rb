@@ -20,6 +20,8 @@ class SampleForm
       :replicate,
       :media,
       :measured_signal,
+      :distractor,
+      :instruction,
       :qc_info ]
   end
 

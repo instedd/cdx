@@ -1,4 +1,4 @@
-.samples-count
+.items-count
   .title
     = check_box_tag 'select_all_samples'
     %label.row{for: "select_all_samples"}
@@ -13,23 +13,23 @@
       Undo
 
 - @batch_form.batch.samples.each do |sample|
-  .col.pe-7.batches-samples
-    .samples-row
-      .samples-item
+  .col.pe-7.list-items
+    .items-row
+      .items-item
         = check_box_tag 'sample_ids[]', sample.id, false, { id: "sample_ids_#{sample.id}", class: "select-checkbox" }
         %label.row{for: "sample_ids_#{sample.id}"}
         = check_box_tag 'destroy_sample_ids[]', sample.id, false, { id: "destroy_sample_ids_#{sample.id}", class: "destroy-checkbox" }
         = sample.uuid
-      .samples-row-actions
+      .items-row-actions
         - if sample.is_quality_control?
           = icon_tag "test", class: "icon-gray", title: "Q - Control specimen"
         = link_to edit_sample_path(sample.id) do
           = icon_tag "keyboard-arrow-right", class: "icon-gray"
 
 = link_to add_sample_batch_path, method: :post, class: 'add-samples' do
-  .col.pe-7.add-samples
+  .col.pe-7.add-items
     = icon_tag "circle-plus", class: "icon-blue icon-margin"
-    .add-sample-link
+    .add-link
       = "ADD SAMPLE"
 
 = render 'samples_js'
