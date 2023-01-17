@@ -1,0 +1,66 @@
+.confusion-matrix 
+  .confusion-matrix-row
+    .confusion-matrix-subtitle.muted
+      
+    .confusion-matrix-subtitle.muted
+      PREDICTED 
+      %br
+      NEGATIVE
+    .confusion-matrix-subtitle.muted
+      PREDICTED 
+      %br
+      POSITIVE
+    .confusion-matrix-subtitle.muted
+      TOTAL
+
+  .confusion-matrix-row
+    .confusion-matrix-subtitle.rotated.muted
+      ACTUAL 
+      %br
+      NEGATIVE
+    .confusion-matrix-cell.gray
+      .number#true_negative
+      .legend 
+        True Negative
+    .confusion-matrix-cell.gray
+      .number#false_positive
+      .legend 
+        False Positive
+    .confusion-matrix-cell.muted
+      .number#actual_negative"
+      .legend 
+        Actual Negative
+
+  .confusion-matrix-row
+    .confusion-matrix-subtitle.rotated.muted
+      ACTUAL 
+      %br
+      POSITIVE
+    .confusion-matrix-cell.gray
+      .number#false_negative
+      .legend 
+        False Negative
+    .confusion-matrix-cell.gray
+      .number#true_positive
+      .legend 
+        True Positive
+    .confusion-matrix-cell.muted
+      .number#actual_positive
+      .legend 
+        Actual Positive
+
+  .confusion-matrix-row
+    .confusion-matrix-subtitle.rotated.muted
+      TOTAL
+    .confusion-matrix-cell.muted
+      .number#predicted_negative
+      .legend 
+        Predicted Negative
+    .confusion-matrix-cell.muted
+      .number#predicted_positive
+      .legend 
+        Predicted Positive
+    .confusion-matrix-cell.muted
+      .number#total
+      .legend 
+        Total

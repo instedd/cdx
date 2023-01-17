@@ -130,11 +130,11 @@ Rails.application.routes.draw do
   end
   resources :samples_reports do
     member do
-      get 'print'
       get 'show'
       delete 'delete'
     end
     collection do
+      get 'update_threshold'
       get "find_box"
       get 'autocomplete'
       post 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy

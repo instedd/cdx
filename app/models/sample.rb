@@ -91,6 +91,9 @@ class Sample < ApplicationRecord
 
   scope :without_qc, -> { where.not(specimen_role: "q") }
 
+  scope :without_results, ->() {
+    where("samples.core_fields NOT LIKE '%measured_signal%'")
+  }
   def self.media
     entity_fields.find { |f| f.name == 'media' }.options
   end
