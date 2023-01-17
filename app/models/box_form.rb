@@ -121,12 +121,11 @@ class BoxForm
   end
 
   def have_distractor_batch
-    @batches.each do |key, _|
-      @concentrations[key].each do |_, concentration|
-        if concentration['distractor'] == "on" then return true end
+    @batches.any? do |key, _|
+      @concentrations[key].any? do |_, concentration|
+        concentration['distractor'] == "on"
       end
     end
-    return false
   end
 
   def have_virus_batch
