@@ -1,48 +1,36 @@
 = cdx_form_for(@box_form) do |f|
   .row
     .col
-      = f.form_field :purpose do
-        = react_component "CdxSelectSectionToggler", { name: "box[purpose]",
-          items: Box.purposes.map { |v| { label: v, value: v } },
-          value: @box_form.purpose, submit: "#btn-save" }
+      .row.form-field
+        .col.form-field__label
+          %label Purpose
+        .col
+          = cdx_select form: f, name: :purpose, searchable: false, :class => 'input-large' do |select|
+            - select.items Box.purposes
 
       = f.form_field :media do
         = cdx_select form: f, name: :media, searchable: false, class: "input-large" do |select|
-          - select.item "", " "
           - select.items Sample.media
+
+      .row.form-field
+        .col.form-field__label
+          %label Samples
+        .col.radiotoggle
+          = f.radio_button :samples, "add_batch"
+          = f.label :samples, "Create new samples", value: "add_batch"
+          = f.radio_button :samples, "add_samples"
+          = f.label :samples, "Select samples from inventory", value: "add_samples"
 
       .row.form-field
         .col.form-field__label
           %label Contents
         .col
-          %fieldset#LOD(disabled)
-            = f.form_field "lod", label: { text: "Batch", class: "is-normal-case" }, full_message: false do
-              = react_component "CdxSelectAutocomplete", { url: autocomplete_batches_path(format: "json", context: params[:context]),
-                name: "box[batch_uuids][lod]", value: @box_form.batch_uuids["lod"],
-                placeholder: "Enter batch id", className: "input-block" }
+          %fieldset#add_batch{ :disabled => "true", :style => "display: none" }
+            = react_component "BatchesSelector", { url: autocomplete_batches_path(format: "json", context: params[:context]),
+              name: "box[batch_uuids]", placeholder: "Enter batch id", className: "input-block",
+              batches: [] }
 
-          %fieldset#Variants(disabled)
-            - 1.upto(6) do |index|
-              - key = "variant_#{index}"
-              = f.form_field key, label: { text: "Variant #{index}", class: "is-normal-case" }, full_message: false do
-                = react_component "CdxSelectAutocomplete", { url: autocomplete_batches_path(format: "json", context: params[:context]),
-                  name: "box[batch_uuids][#{key}]", value: @box_form.batch_uuids[key],
-                  placeholder: "Enter batch id", className: "input-block" }
-
-          %fieldset#Challenge(disabled)
-            = f.form_field "virus", label: { text: "Virus", class: "is-normal-case" }, full_message: false do
-              = react_component "CdxSelectAutocomplete", { url: autocomplete_batches_path(format: "json", context: params[:context]),
-                name: "box[batch_uuids][virus]", value: @box_form.batch_uuids["virus"],
-                placeholder: "Enter batch id", className: "input-block" }
-
-            - 1.upto(6) do |index|
-              - key = "distractor_#{index}"
-              = f.form_field key, label: { text: "Distractor #{index}", class: "is-normal-case" }, full_message: false do
-                = react_component "CdxSelectAutocomplete", { url: autocomplete_batches_path(format: "json", context: params[:context]),
-                  name: "box[batch_uuids][#{key}]", value: @box_form.batch_uuids[key],
-                  placeholder: "Enter batch id", className: "input-block" }
-
-          %fieldset#Other(disabled)
+          %fieldset#add_samples{ :disabled => "true", :style => "display: none" }
             = react_component "SamplesSelector", { url: autocomplete_samples_path(format: "json", context: params[:context], qc: 0),
               name: "box[sample_uuids]", placeholder: "Enter sample id", className: "input-block",
               samples: samples_data(@box_form.samples) }

@@ -47,7 +47,7 @@ class Box < ApplicationRecord
     entity_fields.find { |f| f.name == 'purpose' }.options
   end
 
-  def build_samples(batch, concentrations: [0], replicates:, media:)
+  def build_samples(batch, concentrations: [0], replicates:, media:, distractor:, instruction:)
     concentrations.each do |concentration|
       1.upto(replicates) do |replicate|
         samples << batch.build_sample(
@@ -56,6 +56,8 @@ class Box < ApplicationRecord
           institution: institution,
           site: site,
           media: media,
+          distractor: distractor,
+          instruction: instruction
         )
       end
     end
