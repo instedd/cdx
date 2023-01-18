@@ -85,7 +85,7 @@
                 if (found.length != samples.length){
                     fragment.querySelector(`.uploaded-samples-count`).innerHTML += `(<span class="dashed-underline">${(not_found.length)} sample UUID${(not_found.length>1?'s':'')}</span> not found) `
                     fragment.querySelector(`.upload-icon`).classList.add(`icon-alert`,`icon-red`)
-                    fragment.querySelector(`.samples-row-action`).classList.add(`ttip`,`input-required`)
+                    fragment.querySelector(`.items-row-action`).classList.add(`ttip`,`input-required`)
                 }
                 else {
                     fragment.querySelector(`.upload-icon`).classList.add(`icon-checkmark`)

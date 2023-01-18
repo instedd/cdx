@@ -38,6 +38,8 @@
       .pagination
         = render 'shared/pagination'
 
-// = render 'index_js'
-// = render 'samples/index_bulk_actions_js'
+:javascript
+  function checkboxesName() { return "samples_report_ids[]" }
+  function actionsId() { return ["bulk_destroy"] }
 
+= render "samples/index_bulk_actions_js"

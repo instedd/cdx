@@ -32,12 +32,12 @@ var BoxSelector = React.createClass({
       function renderOnSamplesReports(box){
         let name = `samples_report[box_ids][]`;
         return <div>
-          <div className="batches-samples">
-            <div className="samples-row-with-remove">
+          <div className="list-items">
+            <div className="items-row-with-remove">
               <a href="#" className="selector-list-item__remove" title="Remove box" onClick={handleClick}>
                 <i className="icon-circle-minus icon-gray" />
               </a>
-              <div className="samples-row" dangerouslySetInnerHTML={{ __html: box.preview }}></div>
+              <div className="items-row" dangerouslySetInnerHTML={{ __html: box.preview }}></div>
             </div>
             <input type="hidden" name={name} value={box.id} />
           </div>

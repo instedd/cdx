@@ -4,7 +4,7 @@
       = @batch_form.batch.samples.count.to_s + ' ' + "Samples"
 
 - @batch_form.batch.samples.each do |sample|
-  .col.pe-7.batches-samples
+  .col.pe-7.list-items
     .items-row
       .items-item
         = sample.uuid

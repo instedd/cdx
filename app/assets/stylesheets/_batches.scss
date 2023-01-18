@@ -83,13 +83,13 @@
   gap: 20px;
 }
 
-.samples-row-with-remove {
+.items-row-with-remove {
   display: flex;
   align-items: center;
   width: 100%;
 }
 
-.samples-row.mark-destroy {
+.items-row.mark-destroy {
   text-decoration: line-through;
   opacity: 0.3;
 
