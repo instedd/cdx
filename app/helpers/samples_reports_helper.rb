@@ -6,6 +6,8 @@ module SamplesReportsHelper
       tpr=confusion_matrix[:true_positive].to_f/confusion_matrix[:actual_positive].to_f
       fpr =confusion_matrix[:false_positive].to_f/confusion_matrix[:actual_negative].to_f
       [fpr, tpr]
+    else
+      [0,0]
     end
   end
 

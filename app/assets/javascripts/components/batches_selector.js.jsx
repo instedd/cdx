@@ -195,6 +195,9 @@ var BatchesSelector = React.createClass({
     event.preventDefault();
     var list = this.state.list;
     var batches = this.state.batches;
+    batches[0].samples = batches[0].samples.map( (sample) => {
+      return { replicate: sample.replicate, concentration: sample.concentration, distractor: this.state.distractor, instruction: this.state.instruction }
+    })
     list.push(batches)
     this.setState({ list: list });
     this.setState({ batches: [] });
@@ -203,7 +206,7 @@ var BatchesSelector = React.createClass({
   },
   addConcentration: function (event) {
     event.preventDefault();
-    this.state.batches[0].samples.push({ replicate: this.state.replicate, concentration: this.state.concentration, distractor: this.state.distractor, instruction: this.state.instruction });
+    this.state.batches[0].samples.push({ replicate: this.state.replicate, concentration: this.state.concentration });
     this.setState({concentration: null });
     this.setState({replicate: null });
   },
