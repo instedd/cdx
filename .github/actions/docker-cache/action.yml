@@ -1,37 +1,32 @@
-name: Docker Compose cache
+name: Docker cache
 
 inputs:
-  docker-images:
-    default: ""
+  context:
+    default: .
+
+  dockerfile:
+    default: Dockerfile
+
+  image:
+    type: string
+
+  tag:
+    default: latest
 
   version:
-    default: "v1"
-
-outputs:
-  cache-hit:
-    value: ${{ steps.docker-cache.outputs.cache-hit }}
+    default: v2
 
 runs:
   using: composite
 
   steps:
-    - uses: actions/cache@v3
-      id: docker-cache
+    - uses: docker/setup-buildx-action@v2
+
+    - uses: docker/build-push-action@v3
       with:
-        path: tmp/docker
-        key: Docker-${{ inputs.version }}-${{ hashFiles('Dockerfile*', 'docker-compose*') }}
-        restore-keys: |
-          Docker-${{ inputs.version }}-
-
-    - name: Load Docker image
-      if: steps.docker-cache.outputs.cache-hit == 'true'
-      run: |
-        docker load < tmp/docker/docker_images.tar
-      shell: bash
-
-    - name: Build Docker image
-      if: steps.docker-cache.outputs.cache-hit != 'true'
-      run: |
-        docker compose build
-        docker save ${{ inputs.docker-images }} > tmp/docker/docker_images.tar
-      shell: bash
+        context: ${{ inputs.context }}
+        file: ${{ inputs.dockerfile }}
+        tags: ${{ inputs.image }}:${{ inputs.tag }}
+        cache-from: type=gha,scope=docker-${{ inputs.version }}-${{ hashFiles('Dockerfile*') }} \
+        cache-to: type=gha,mode=max,scope=docker-${{ inputs.version }}-${{ hashFiles('Dockerfile*') }}
+        load: true # export the image from buildx cache & load into docker (sloooooooow)

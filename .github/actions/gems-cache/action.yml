@@ -23,7 +23,6 @@ runs:
     - name: Install gems
       if: steps.gems-cache.outputs.cache-hit != 'true'
       run: |
-        docker compose create sshd
         docker compose run --rm --no-deps -e BUNDLE_GEMFILE $COMPOSE_DEFAULT_SERVICE bash -c "bundle install --jobs 4 --retry 3 && bundle clean --force"
         sudo chown -R "$(id -u):$(id -g)" vendor/bundle
       shell: bash

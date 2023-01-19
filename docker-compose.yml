@@ -12,13 +12,14 @@ services:
     volumes:
       - .:/src
       - bundle:/usr/local/bundle
+      - ./tmp/keys:/etc/ssh/keys
+      - ./tmp/.ssh:/home/cdx-sync/.ssh
+      - ./tmp/sync:/home/cdx-sync/tmp/sync
     command: /bin/true
 
   web:
     <<: *base
     pid: host
-    volumes_from:
-      - sshd
     # tty: true
     ports:
       - "3000:3000"
@@ -63,11 +64,13 @@ services:
     image: instedd/cdx-sync-sshd
     environment:
       SYNC_UID: 9999
+    volumes:
+      - ./tmp/keys:/etc/ssh/keys
+      - ./tmp/.ssh:/home/cdx-sync/.ssh
+      - ./tmp/sync:/home/cdx-sync/tmp/sync
 
   csv_watch:
     <<: *base
-    volumes_from:
-      - sshd
     command: /bin/sh -c 'rake csv:watch'
 
   ftp_monitor:
