@@ -10,9 +10,20 @@ var BatchesSelector = React.createClass({
       list: [],
     };
   },
-
+  reset : function() {
+    this.setState({
+      batches: [],
+      samples: this.props.samples,
+      concentration: null,
+      replicate: null,
+      distractor: null,
+      instruction: null,
+      list: [],
+    });
+  },
   render: function () {
     let button;
+    let clearButton = <a className="clear-batches" href="#" onClick={this.reset}></a>;
     if (this.state.batches.length > 0) {
       button = '';
     } else {
@@ -25,6 +36,7 @@ var BatchesSelector = React.createClass({
     }
 
     return (<div className="batches-selector">
+      {clearButton}
       <div className="items-count">
         <div className="title">{this.state.list.length}&nbsp;{this.state.list.length == 1 ? "batch" : "batches"}</div>
       </div>

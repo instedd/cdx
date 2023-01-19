@@ -18,12 +18,6 @@ function cdx_select_on_change(name, callback) {
   });
 }
 
-$(document).on("change", ".radiotoggle input", function(){
-  $(".radiotoggle input").each(function(i, field) {
-    $("#" + field.value).hide().attr("disabled", true);
-  });
-  $("#" + this.value).removeAttr("disabled").show();
-});
 /*
 This is kind of a exception solution. Because input date's behavior are different.
 Consider this points:
