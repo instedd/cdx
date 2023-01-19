@@ -206,9 +206,11 @@ var BatchesSelector = React.createClass({
   },
   addConcentration: function (event) {
     event.preventDefault();
-    this.state.batches[0].samples.push({ replicate: this.state.replicate, concentration: this.state.concentration });
-    this.setState({concentration: null });
-    this.setState({replicate: null });
+    if (parseInt(this.state.replicate) >0 && parseInt(this.state.concentration) >0 ){
+      this.state.batches[0].samples.push({ replicate: this.state.replicate, concentration: this.state.concentration });
+      this.setState({concentration: null });
+      this.setState({replicate: null });
+    }
   },
 
   removeBatch: function (event, index) {
