@@ -1,11 +1,11 @@
-name: Docker cache
+name: Docker Compose cache
 
 inputs:
   docker-images:
     default: ""
 
   version:
-    default: "v0"
+    default: "v1"
 
 outputs:
   cache-hit:
@@ -32,6 +32,6 @@ runs:
     - name: Build Docker image
       if: steps.docker-cache.outputs.cache-hit != 'true'
       run: |
-        docker-compose build --build-arg TARGETARCH=amd64
+        docker compose build
         docker save ${{ inputs.docker-images }} > tmp/docker/docker_images.tar
       shell: bash

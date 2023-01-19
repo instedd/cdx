@@ -12,7 +12,6 @@ env:
   COMPOSE_DEFAULT_SERVICE: web
   BUNDLE_GEMFILE: ${{ inputs.gemfile }}
   BUNDLE_LOCKFILE: ${{ inputs.gemfile }}.lock
-  SELENIUM_URL: http://cdx_selenium_%{test_env_number}:4444/ # dealing with docker-compose v1 name (https://github.com/instedd/cdx/pull/1644)
 
 jobs:
   setup:
@@ -21,7 +20,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/docker-cache
         with:
-          docker-images: cdx_web cdx_selenium
+          docker_images: cdx_web cdx_selenium
       - uses: ./.github/actions/gems-cache
 
   unit:
@@ -34,11 +33,11 @@ jobs:
 
       - name: Setup databases
         run: |
-          docker-compose up -d db elasticsearch redis
-          docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:setup db:test:prepare elasticsearch:setup
+          docker compose up -d db elasticsearch redis
+          docker compose run --rm -e RAILS_ENV=test web bundle exec rake db:setup db:test:prepare elasticsearch:setup
 
       - name: Run specs
-        run: docker-compose run --rm -e RAILS_ENV=test -e COVERAGE=true web bundle exec rspec
+        run: docker compose run --rm -e RAILS_ENV=test -e COVERAGE=true web bundle exec rspec
 
       - run: cp coverage/.resultset.json resultset.unit_tests.json
 
@@ -58,17 +57,17 @@ jobs:
 
       - name: Setup databases
         run: |
-          docker-compose up -d db elasticsearch redis
-          docker-compose run --rm -e RAILS_ENV=test web bundle exec rake db:setup db:test:prepare elasticsearch:setup
+          docker compose up -d db elasticsearch redis
+          docker compose run --rm -e RAILS_ENV=test web bundle exec rake db:setup db:test:prepare elasticsearch:setup
 
       - name: Start services (Selenium)
-        run: docker-compose up -d selenium
+        run: docker compose up -d selenium
 
       - name: Run specs (capybara)
-        run: docker-compose run --rm -e RAILS_ENV=test -e COVERAGE=true -e FEATURES=true -e SELENIUM_URL web bundle exec rspec
+        run: docker compose run --rm -e RAILS_ENV=test -e COVERAGE=true -e FEATURES=true -e SELENIUM_URL web bundle exec rspec
 
       - name: Run specs (cucumber)
-        run: docker-compose run --rm -e RAILS_ENV=test -e COVERAGE=true -e SELENIUM_URL web bundle exec cucumber
+        run: docker compose run --rm -e RAILS_ENV=test -e COVERAGE=true -e SELENIUM_URL web bundle exec cucumber
 
       - run: cp coverage/.resultset.json resultset.integration_tests.json
 
@@ -94,7 +93,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: integration_tests_coverage
-      - run: docker-compose run --no-deps --rm web bundle exec rails coverage:report
+      - run: docker compose run --no-deps --rm web bundle exec rails coverage:report
 
       - uses: actions/upload-artifact@v3
         with:
