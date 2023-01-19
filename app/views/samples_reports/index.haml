@@ -1,0 +1,45 @@
+= render "filters"
+
+.row
+  .col
+    - if @samples_reports.empty?
+      = empty_data icon: 'outline-report' do |c|
+        - c.body do
+          %h1 There are no reports
+          %p Use reports to analize sample results
+    - else
+      =form_tag bulk_action_samples_reports_path, :id => 'samples_report_form' , :method => :post do
+        = cdx_table title: pluralize(@total, "box report") do |t|
+          - t.actions do
+            -if @can_delete
+              =button_tag id: 'bulk_destroy', class: 'btn-link', name: 'bulk_action', value: 'destroy', data: { method: "delete", confirm: "You're about to permanently delete the selected reports. This action CANNOT be undone. Are you sure you want to proceed?" } do
+                = icon_tag "trash", class: "btn-icon"
+          - t.columns do
+            %col{:width => "5%"}
+            %col{:width => "40%"}
+            %col{:width => "30%"}
+            %col{:width => "25%"}
+          - t.thead do
+            %tr
+              %th
+              %th REPORT NAME
+              %th SAMPLES
+              %th CREATION DATE
+          - t.tbody do
+            - @samples_reports.each do |samples_report|
+              %tr.laboratory-sample-row{data: {href: samples_report_path(samples_report)}}
+                %td
+                  =check_box_tag 'samples_report_ids[]', samples_report.id, false, { id: "samples_report_ids.#{samples_report.id}" }
+                  %label.row{for: "samples_report_ids.#{samples_report.id}"}
+                %td= samples_report.name
+                %td= samples_report.samples_report_samples.length
+                %td= samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))
+
+      .pagination
+        = render 'shared/pagination'
+
+:javascript
+  function checkboxesName() { return "samples_report_ids[]" }
+  function actionsId() { return ["bulk_destroy"] }
+
+= render "samples/index_bulk_actions_js"

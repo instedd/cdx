@@ -13,7 +13,7 @@
     .col.pe-3
       %label Results
     .col
-      .row.samples-row
+      .row.items-row
         .col
           .text-bold#file-count
             0 files
@@ -38,12 +38,12 @@
       = link_to 'Cancel', samples_path, class: 'btn-link'
 
 %template{:id => "csvFileRow"}
-  .batches-samples.upload_info
-    .samples-row
-      .samples-item.gap-5
+  .list-items.upload_info
+    .items-row
+      .items-item.gap-5
         .icon-circle-minus.icon-gray.remove_file
         .file-name
-      .samples-row-action.gap-5.not_found_message
+      .items-row-action.gap-5.not_found_message
         .uploaded-samples-count
         .upload-icon.bigger
         .ttext.hidden

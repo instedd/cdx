@@ -1,0 +1,25 @@
+- content_for(:subheader) do
+  .row.center.filters
+    .col.pe-10
+      .row
+        .col
+          %h1
+            - if @can_create
+              = link_to "+", new_samples_report_path, class: 'btn-add side-link fix', title: 'Add Box Report'
+            Box Reports
+
+      %form#filters-form{action: samples_reports_path, "data-auto-submit" => true}
+        %input{type: "hidden", name: "page_size", value: @page_size}
+        .row
+          .filter
+            %label.block REPORT NAME
+            %input.input-large{type: "text", name: "name", value: params["name"], placeholder: "Filter by Report Name"}
+          .filter
+            %label.block SAMPLE UUID
+            %input.input-large{type: "text", name: "sample_uuid", value: params["sample_uuid"], placeholder: "Filter by sample UUID"}
+          .filter
+            %label.block BATCH NUMBER
+            %input.input-large{type: "text", name: "batch_number", value: params["batch_number"], placeholder: "Filter by batch number"}
+          .filter
+            %label.block BOX UUID
+            %input.input-large{type: "text", name: "box_uuid", value: params["box_uuid"], placeholder: "Filter by box UUID"}

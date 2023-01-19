@@ -568,6 +568,32 @@ ActiveRecord::Schema.define(version: 20221223203602) do
     t.index ["specimen_role"], name: "index_samples_on_specimen_role", using: :btree
   end
 
+  create_table "samples_report_samples", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci" do |t|
+    t.integer "sample_id",         null: false
+    t.integer "samples_report_id", null: false
+    t.index ["sample_id"], name: "index_samples_report_samples_on_sample_id", using: :btree
+    t.index ["samples_report_id"], name: "index_samples_report_samples_on_samples_report_id", using: :btree
+  end
+
+  create_table "samples_reports", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci" do |t|
+    t.integer  "institution_id",               null: false
+    t.integer  "site_id"
+    t.string   "site_prefix"
+    t.text     "core_fields",    limit: 65535
+    t.text     "custom_fields",  limit: 65535
+    t.binary   "sensitive_data", limit: 65535
+    t.string   "name"
+    t.float    "threshold",      limit: 24
+    t.datetime "deleted_at"
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+    t.index ["created_at"], name: "index_samples_reports_on_created_at", using: :btree
+    t.index ["deleted_at"], name: "index_samples_reports_on_deleted_at", using: :btree
+    t.index ["institution_id"], name: "index_samples_reports_on_institution_id", using: :btree
+    t.index ["site_id"], name: "index_samples_reports_on_site_id", using: :btree
+    t.index ["site_prefix"], name: "index_samples_reports_on_site_prefix", using: :btree
+  end
+
   create_table "sites", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci" do |t|
     t.string   "name"
     t.integer  "institution_id"

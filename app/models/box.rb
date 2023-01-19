@@ -39,6 +39,10 @@ class Box < ApplicationRecord
       .group("samples.box_id")
   }
 
+  scope :count_samples_without_results, -> {
+    select("COUNT(CASE WHEN samples.core_fields LIKE '%measured_signal%' THEN NULL ELSE 1 END) AS count_samples_without_results")
+  }
+
   def self.purposes
     entity_fields.find { |f| f.name == 'purpose' }.options
   end

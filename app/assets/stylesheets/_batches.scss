@@ -66,6 +66,10 @@
   padding: 0px 10px;
   width: 100%;
 
+  > .actions {
+    text-align: right;
+  }
+
   input {
     width: 60px;
   }
@@ -77,6 +81,12 @@
   display: flex;
   justify-content: space-between;
   gap: 20px;
+}
+
+.items-row-with-remove {
+  display: flex;
+  align-items: center;
+  width: 100%;
 }
 
 .items-row.mark-destroy {

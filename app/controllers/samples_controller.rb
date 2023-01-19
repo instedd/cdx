@@ -226,7 +226,7 @@ class SamplesController < ApplicationController
       end
     end
 
-    redirect_to samples_path
+    redirect_to samples_path, notice: "Sample's results uploaded successfully."
   end
 
   private

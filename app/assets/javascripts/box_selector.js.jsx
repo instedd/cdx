@@ -14,30 +14,58 @@ var BoxSelector = React.createClass({
     const missingQuantity = selectedBoxes.length - haveQc
     return (
       <div>
-        {haveQc > 0 && this.includeQcInfoCheckbox()}
-        {missingQuantity > 0 && this.qcInfoMessage(missingQuantity, selectedBoxes)}
+        {haveQc > 0 && this.props.displayQcInfo && this.includeQcInfoCheckbox()}
+        {missingQuantity > 0 && this.props.displayQcInfo && this.qcInfoMessage(missingQuantity, selectedBoxes)}
       </div>
     )
   },
 
   renderBoxes: function() {
     const selector = this;
-
+    
     function renderBox(box, i) {
       function handleClick(e) {
         e.preventDefault();
         selector.removeBox(box);
       }
 
+      function renderOnSamplesReports(box){
+        let name = `samples_report[box_ids][]`;
+        return <div>
+          <div className="list-items">
+            <div className="items-row-with-remove">
+              <a href="#" className="selector-list-item__remove" title="Remove box" onClick={handleClick}>
+                <i className="icon-circle-minus icon-gray" />
+              </a>
+              <div className="items-row" dangerouslySetInnerHTML={{ __html: box.preview }}></div>
+            </div>
+            <input type="hidden" name={name} value={box.id} />
+          </div>
+            { box.samplesWithoutResults ? 
+              (<div className="muted"><div className="icon-info-outline icon-gray"/>Samples without results will be ignored</div>) :
+              ("") }
+        </div>
+      }
+
+      function renderOnTransferPackages(box,id){
+        let name = `transfer_package[box_transfers_attributes][${id}][box_id]`;
+        return <div className="selector-list-item">
+          <div dangerouslySetInnerHTML={{ __html: box.preview }}></div>
+          <input type="hidden" name={name} value={box.id} />
+          <a href="#" className="selector-list-item__remove" title="Remove box" onClick={handleClick}>
+            <i className="icon-close" />
+          </a>
+        </div>
+      }
+
       let id = Math.floor(Math.random() * 1000000000);
-      let name = `transfer_package[box_transfers_attributes][${id}][box_id]`;
-      return <div className="selector-list-item">
-        <div dangerouslySetInnerHTML={{ __html: box.preview }}></div>
-        <input type="hidden" name={name} value={box.id} />
-        <a href="#" className="selector-list-item__remove" title="Remove box" onClick={handleClick}>
-          <i className="icon-close" />
-        </a>
-      </div>
+      if (selector.props.caller == 'samples_reports'){
+        return renderOnSamplesReports(box, id);
+      }
+      else if (selector.props.caller == 'transfer_packages') {
+        return renderOnTransferPackages(box, id);
+      }
+      
     }
 
     const listItems = this.state.boxes.map(renderBox)
@@ -93,7 +121,7 @@ var BoxSelector = React.createClass({
   },
 
   loadBox: function(uuid) {
-    url = "/transfer_packages/find_box"
+    url = "/"+this.props.caller+"/find_box"
     this.setState({
       error: null,
       status: "loading",
@@ -193,11 +221,12 @@ var BoxSelector = React.createClass({
             <div className="selector-list">
               {this.renderBoxes()}
             </div>
+            {(this.props.maxBoxes ==-1 || this.state.boxes.length < this.props.maxBoxes) &&
             <input type="text" size="36" maxlength="36" placeholder="Enter, paste or scan box ID"
               value={this.state.search}
               onChange={this.handleChange} onKeyDown={this.onKeyDown}
               className={this.state.error ? "input-required" : ""} />
-
+            }
             <div className="error">
               {this.renderError()}
             </div>

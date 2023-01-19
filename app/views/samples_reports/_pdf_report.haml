@@ -1,0 +1,211 @@
+= Gon::Base.render_data({})
+= stylesheet_link_tag "application", :media => "all"
+= javascript_include_tag "application"
+= csrf_meta_tags
+
+%div{:hidden => true}
+  .samples-report{id:'samples-report'}
+    .report-content 
+      .report-header
+        = image_tag wicked_pdf_asset_base64('cdx-logo-bw.png')
+        %span
+          Box Report: #{@samples_report.name}
+          %br
+          Created at #{@samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
+      %br
+      .title
+        Summary
+      %table
+        %td{width: "200px"}
+          .subtitle 
+            Samples
+          .text 
+            = @samples_report.samples_report_samples.length
+            -if @samples_without_results_count > 0
+              (#{@samples_without_results_count} without results)
+          .subtitle 
+            Box Purpose
+          .text 
+            = @purpose
+        - if @purpose == "Challenge"
+          %td{width: "200px"}
+            .subtitle 
+              Threshold
+            .text 
+              = params["threshold"].to_f
+            -if @purpose == "Challenge"
+              .subtitle 
+                Computed ROC AUC
+              .text 
+                = auc(roc_curve(@samples_report))
+              %td{width: "200px"}
+                .subtitle
+                  Threshold's TPR
+                .text{id: "computed-tpr"}
+                .subtitle
+                  Threshold's FPR
+                .text{id: "computed-fpr"}
+        .separation 
+      %br
+      .title
+        Confusion Matrix
+      %br
+      = render 'confusion_matrix'
+
+      .pdf-page-break
+
+      .report-header
+        = image_tag wicked_pdf_asset_base64('cdx-logo-bw.png')
+        %span
+          Box Report: #{@samples_report.name}
+          %br
+          Created at #{@samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
+      .title
+        Measured signal
+      %br
+      %br
+      %br
+      %div
+        = react_component('BoxReportsBarChart', 
+                    data: @reports_data, 
+                    height: 300, 
+                    barVariable: "average",
+                    errorBarsVariable: "errors",
+                    y_label: 'Measured Signal', 
+                    x_labels: @purpose == "Challenge" ? ["Virus", "Distractor"]:[])
+
+      - if @purpose == "LOD"
+        .pdf-page-break
+        .report-header
+          = image_tag wicked_pdf_asset_base64('cdx-logo-bw.png')
+          %span
+            Box Report: #{@samples_report.name}
+            %br
+            Created at #{@samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
+        
+        .title
+          Limit of detection
+        %br
+        %br
+        %br
+        %div
+          = react_component('BoxReportsLineChart', 
+                      data: @reports_data, 
+                      height: 400, 
+                      width: 600, 
+                      dotsVariable: "measurements",
+                      y_label: 'Measured Signal', 
+                      x_labels: [])
+      - if @purpose == "Challenge"
+        .pdf-page-break
+        .report-header
+          = image_tag wicked_pdf_asset_base64('cdx-logo-bw.png')
+          %span
+            Box Report: #{@samples_report.name}
+            %br
+            Created at #{@samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
+        
+        .title
+          ROC Curve
+        %br
+        %br
+        %br
+        %div
+        = react_component('BoxReportsRocChart',
+          data: roc_curve(@samples_report))
+
+:javascript
+  
+  var getUrlParameter = function getUrlParameter(sParam) {
+      var sPageURL = window.location.search.substring(1),
+          sURLVariables = sPageURL.split('&'),
+          sParameterName,
+          i;
+
+      for (i = 0; i < sURLVariables.length; i++) {
+          sParameterName = sURLVariables[i].split('=');
+
+          if (sParameterName[0] === sParam) {
+              return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+          }
+      }
+      return false;
+  };
+
+  async function updateThreshold(){
+    var threshold = parseFloat(gon.threshold);
+
+    var context = getUrlParameter('context');
+    var url = '/samples_reports/update_threshold?context='+context+"&samples_report_id="+gon.samples_report_id+"&threshold="+gon.threshold;
+    var ret = await fetch(url)
+        .then((response) => response.json())
+        .then((r) => {
+            return r;
+    })
+    
+    if (gon.purpose == "Challenge") {
+      // For the bar chart
+      var minthreshold = parseFloat(gon.min_threshold);
+      var maxthreshold = parseFloat(gon.max_threshold);
+      var threshold_percentage = (threshold - minthreshold) / (maxthreshold - minthreshold);
+      var svg_mintreshold = parseFloat(d3.select("#threshold-line-down").attr("y1"));
+      var svg_maxtreshold = parseFloat(d3.select("#threshold-line-up").attr("y1"));
+      var svg_pergentage = svg_mintreshold + (svg_maxtreshold - svg_mintreshold) * threshold_percentage;
+      d3.select("#threshold-line").attr("y1", svg_pergentage);
+      d3.select("#threshold-line").attr("y2", svg_pergentage);
+
+      // For the ROC curve
+      var fpr = (ret.confusion_matrix.false_positive || 0) / ((ret.confusion_matrix.false_positive || 0) + (ret.confusion_matrix.true_negative || 0));
+      var svg_minfpr = parseFloat(d3.select("#threshold-fpr-down").attr("x1"));
+      var svg_maxfpr = parseFloat(d3.select("#threshold-fpr-up").attr("x1"));
+      var fpr_pergentage = svg_minfpr + (svg_maxfpr - svg_minfpr) * fpr;
+      d3.select("#threshold-fpr").attr("x1", fpr_pergentage);
+      d3.select("#threshold-fpr").attr("x2", fpr_pergentage);
+
+      var tpr = (ret.confusion_matrix.true_positive || 0)/ ((ret.confusion_matrix.true_positive || 0)+ (ret.confusion_matrix.false_negative || 0));
+      var svg_mintpr = parseFloat(d3.select("#threshold-tpr-down").attr("y1"));
+      var svg_maxtpr = parseFloat(d3.select("#threshold-tpr-up").attr("y1"));
+      var svg_pergentage = svg_mintpr + (svg_maxtpr - svg_mintpr) * tpr;
+      d3.select("#threshold-tpr").attr("y1", svg_pergentage);
+      d3.select("#threshold-tpr").attr("y2", svg_pergentage);
+
+      document.getElementById("computed-fpr").innerHTML =  fpr.toFixed(2);
+      document.getElementById("computed-tpr").innerHTML =  tpr.toFixed(2);
+    }
+    else {
+      d3.select("#threshold-line").style("display", "none") 
+    }
+
+    document.getElementById("true_negative").innerHTML =  ret.confusion_matrix.true_negative || 0;
+    document.getElementById("true_positive").innerHTML =  ret.confusion_matrix.true_positive || 0;
+    document.getElementById("false_negative").innerHTML =  ret.confusion_matrix.false_negative || 0;
+    document.getElementById("false_positive").innerHTML =  ret.confusion_matrix.false_positive || 0;
+    document.getElementById("predicted_negative").innerHTML =  ret.confusion_matrix.predicted_negative || 0;
+    document.getElementById("predicted_positive").innerHTML =  ret.confusion_matrix.predicted_positive || 0;
+    document.getElementById("actual_negative").innerHTML =  ret.confusion_matrix.predicted_negative || 0;
+    document.getElementById("actual_positive").innerHTML =  ret.confusion_matrix.actual_positive || 0;
+    document.getElementById("total").innerHTML =  ret.confusion_matrix.total || 0;
+  }
+
+  function addScript(url) {
+    var script = document.createElement('script');
+    script.type = 'application/javascript';
+    script.src = url;
+    document.head.appendChild(script);
+  }
+
+  addScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js');
+      
+  window.onload =
+    function() {
+      var element = document.getElementById('samples-report');
+      
+      var opt = {
+        filename: gon.samples_report_name+'.pdf',
+        pagebreak: { before: '.pdf-page-break' },
+        jsPDF: { format: 'A4', orientation: 'landscape' },
+        margin: [15,15,15,15],
+      };
+      updateThreshold().then(() => html2pdf().set(opt).from(element).save().then(() => window.close()));
+    }
+  

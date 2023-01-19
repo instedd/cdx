@@ -128,6 +128,18 @@ Rails.application.routes.draw do
       post 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
     end
   end
+  resources :samples_reports do
+    member do
+      get 'show'
+      delete 'delete'
+    end
+    collection do
+      get 'update_threshold'
+      get "find_box"
+      get 'autocomplete'
+      post 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
+    end
+  end
   resources :transfer_packages, only: [:new, :create, :index, :show] do
     member do
       post :unblind
