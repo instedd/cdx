@@ -12,7 +12,7 @@ source 'https://rubygems.org'
 
 gem 'rails', '~> 5.0.0'
 
-gem 'globalid', '< 0.5.0'        # NOTE: remove gem after upgrading to ruby 2.5
+gem 'globalid', '< 1.1.0'        # NOTE: remove gem after upgrading to ruby 2.5
 gem 'rack', '< 2.2.0'            # NOTE: remove gem after upgrading to ruby 2.3
 gem 'rake', '~> 10.5.0'          # NOTE: remove gem after upgrading rspec
 gem 'sprockets-rails', '< 3.3.0' # NOTE: remove gem after upgrading to ruby 2.5
