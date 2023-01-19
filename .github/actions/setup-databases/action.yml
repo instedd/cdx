@@ -1,0 +1,17 @@
+name: Setup databases
+
+runs:
+  using: composite
+
+  steps:
+    # pull, create and start services
+    - run: docker compose up -d db elasticsearch redis
+      shell: bash
+
+    # wait for MySQL to have started
+    - run: timeout 60s sh -c "while ! nc -z $(docker inspect cdx-db-1 | jq -r '.[0].NetworkSettings.Networks.cdx_default.IPAddress') 3306; do sleep 1; done"
+      shell: bash
+
+    # create the databases
+    - run: docker compose run --rm -e RAILS_ENV=test web bundle exec rake db:setup db:test:prepare elasticsearch:setup
+      shell: bash
