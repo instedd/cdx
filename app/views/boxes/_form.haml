@@ -57,50 +57,52 @@
 
 :javascript
   
-  var confirmSampleSourceChange = function() {}
-  var cancelSampleSourceChange = function() {}
-
   var sourcesRadio = document.querySelectorAll(".radiotoggle input");
   var oldSource = null;
+  var confirmSampleSourceChange;
 
   var applySampleSourceChange = function (displayField) {
     // Hide all the fields and disable them
     sourcesRadio.forEach(function(otherRadio) {
-      document.querySelector(`#${otherRadio.value}`).style.display = 'none';
-      document.querySelector(`#${otherRadio.value}`).setAttribute("disabled", true);
+      document.getElementById(otherRadio.value).style.display = 'none';
+      document.getElementById(otherRadio.value).setAttribute("disabled", true);
     });
     // Show the selected field and enable it
-    document.querySelector(`#${displayField.value}`).style.display = 'block';
-    document.querySelector(`#${displayField.value}`).removeAttribute("disabled");
+    document.getElementById(displayField.value).style.display = 'block';
+    document.getElementById(displayField.value).removeAttribute("disabled");
     // Clear the selectors contents
     document.querySelector(".clear-batches").click()
     document.querySelector(".clear-samples").click()
   }
 
+  function showConfirmModal() {
+    document.querySelector(`.sample-source-change-modal-container`).style.visibility = 'visible';
+  }
+
+  function hideConfirmModal() {
+    document.querySelector(`.sample-source-change-modal-container`).style.visibility = 'hidden';
+  }
+
+  function confirmSampleSourceChangeFn() {
+    applySampleSourceChange(this);
+    hideConfirmModal();
+    // Update the old source only if the user confirmed the change
+    oldSource = this;
+  }
+  function cancelSampleSourceChange() {
+    hideConfirmModal();
+    // Check back the old source since it was not changed
+    oldSource.checked = true;
+  }  
+
   sourcesRadio.forEach(function(radio) {
     radio.addEventListener("change", function(evt) {
-      var thisField = this;
-
-      confirmSampleSourceChange = function() {
-        applySampleSourceChange(thisField);
-        document.querySelector(`.sample-source-change-modal-container`).style.visibility = 'hidden';
-        // Update the old source only if the user confirmed the change
-        oldSource = thisField;
-      }
-      
-      cancelSampleSourceChange = function() {
-        document.querySelector(`.sample-source-change-modal-container`).style.visibility = 'hidden';
-        // Check back the old source since it was not changed
-        oldSource.checked = true;
-      }
-
       if (oldSource) {
-        // If the user changed the source, show the modal
-        document.querySelector(`.sample-source-change-modal-container`).style.visibility = 'visible';
+        confirmSampleSourceChange = confirmSampleSourceChangeFn.bind(this)
+        showConfirmModal();
       } else {
         // For the first time, simulate that the user clicked on the confirm button
-        confirmSampleSourceChange();
+        confirmSampleSourceChangeFn.call(this);
       }
     });
   });
-
