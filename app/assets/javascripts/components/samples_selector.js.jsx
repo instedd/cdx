@@ -4,9 +4,12 @@ var SamplesSelector = React.createClass({
       samples: this.props.samples,
     };
   },
-
+  reset: function() {
+    this.setState({ samples: [] });
+  },
   render: function () {
     return (<div className="samples-selector">
+      <a className="clear-samples" href="#" onClick={this.reset}></a>
       {this.renderTitle()}
       {this.state.samples.map(this.renderSample)}
 
