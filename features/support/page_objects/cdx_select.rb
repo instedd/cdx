@@ -40,13 +40,18 @@ class CdxSelect < SitePrism::Section
 
   def select_elem
     @select_elem ||= begin
-      elem = root_element
+      if root_element[:class].split(/\s+/).include?("Select")
+        root_element
+      else
+        # search until a parent's descendant matches '.Select' (very slow)
+        parent = root_element
 
-      while elem.all(".Select").empty?
-        elem = elem.find(:xpath, '..')
+        until element = parent.first(".Select", minimum: 0, maximum: 1)
+          parent = parent.find(:xpath, "..")
+        end
+
+        element
       end
-
-      elem.find(".Select")
     end
   end
 end

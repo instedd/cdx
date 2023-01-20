@@ -1,4 +1,4 @@
 #!/bin/bash
 source /etc/envvars
 cd /app
-exec su -p -c "bundle exec whenever --update-crontab && bundle exec puma $PUMA_OPTIONS -e $RAILS_ENV -b unix:///app/tmp/app.sock" app
+exec su -p -c "bundle exec whenever --update-crontab && bundle exec puma $PUMA_OPTIONS -e $RAILS_ENV" app

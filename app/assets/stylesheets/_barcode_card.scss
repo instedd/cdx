@@ -66,60 +66,6 @@
   }
 }
 
-// Print Barcode style
-
-.barcode-card-print {
-  page-break-after: always;
-  break-after: page;
-
-  height: 100%;
-  width: 100%;
-
-  font-family: 'Roboto Mono', monospace;
-
-  background: $white;
-  margin: 1px;
-  padding: 3px;
-
-  .barcode {
-    margin: auto; // center barcode
-    margin-top: 0;
-    margin-bottom: 0;
-    width: 40%;
-  }
-
-  .code {
-    font-size: 9px;
-    margin: -1px;
-    padding: 0 1px;
-
-    .uuid {
-      margin: 0px;
-      text-align: center;
-    }
-  }
-
-  .logo {
-    @include flexbox();
-    flex-direction: row;
-    align-items: center;
-
-    font-size: 7px;
-    padding: 0 1px;
-    margin-top: 1px;
-    width: 100%;
-
-    .label {
-      margin-left: 3px;
-    }
-
-    img {
-      width: 15px;
-      height: auto;
-    }
-  }
-}
-
 // INVENTORY
 
 .inventory-button {

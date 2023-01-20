@@ -38,17 +38,10 @@ class BoxesController < ApplicationController
   def print
     return unless authorize_resource(@box, READ_BOX)
 
-    render pdf: "cdx_box_#{@box.uuid}",
-      template: "boxes/print.pdf",
-      layout: "layouts/pdf.html",
-      locals: {
-        box: @box,
-        samples: @box.samples.preload(:batch, :sample_identifiers).map { |s| SamplePresenter.new(s, request.format) },
-      },
-      margin: { top: 0, bottom: 0, left: 0, right: 0 },
-      page_width: "1in",
-      page_height: "1in",
-      show_as_html: params.key?("debug")
+    send_data BoxLabelPdf.render(@box, @box.samples.preload(:batch, :sample_identifiers)),
+      filename: "cdx_box_#{@box.uuid}",
+      type: "application/pdf",
+      disposition: "inline"
   end
 
   def new

@@ -1,4 +1,11 @@
-FROM ruby:2.3
+FROM ruby:2.4
+
+# Cleanup expired Let's Encrypt CA (Sept 30, 2021)
+RUN sed -i '/^mozilla\/DST_Root_CA_X3/s/^/!/' /etc/ca-certificates.conf && update-ca-certificates -f
+
+RUN apt-get update && \
+    apt-get install -y cron default-mysql-client && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # ENV POIROT_STDOUT true
 # ENV POIROT_SUPPRESS_RAILS_LOG true
@@ -8,36 +15,3 @@ FROM ruby:2.3
 # RUN \
 #   mkdir -p /app/public/ && \
 #   curl -L https://github.com/instedd/notifiable-diseases/releases/download/$NNDD_VERSION/nndd.tar.gz | tar -xzv -C /app/public/
-
-ENV LOCAL_SHARE "/usr/local/share"
-
-# Cleanup expired Let's Encrypt CA (Sept 30, 2021)
-RUN sed -i '/^mozilla\/DST_Root_CA_X3/s/^/!/' /etc/ca-certificates.conf && update-ca-certificates -f
-
-RUN \
-  apt-get update && \
-  apt-get install -y \
-    build-essential \
-    chrpath \
-    cron \
-    libssl-dev \
-    libxft-dev \
-    libfreetype6 \
-    libfreetype6-dev \
-    libfontconfig1 \
-    libfontconfig1-dev \
-    # wkhtmltopdf dependencies \
-    xfonts-75dpi \
-    xfonts-base \
-    imagemagick \
-    ghostscript \
-    libgs-dev \
-    mysql-client \
-  && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-ARG TARGETARCH
-
-# wkhtmltopdf
-RUN curl -L https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.stretch_${TARGETARCH}.deb --output wkhtmltopdf.deb && \
-    dpkg -i wkhtmltopdf.deb && \
-    rm -f wkhtmltopdf.deb

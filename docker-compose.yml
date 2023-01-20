@@ -27,11 +27,14 @@ services:
       - elasticsearch
       - redis
     command: /bin/sh -c './bin/rails s -b 0.0.0.0'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   selenium:
     build:
       context: .
       dockerfile: Dockerfile.selenium
+    command: ['/usr/bin/geckodriver', '--host', '0.0.0.0']
     working_dir: /src
     volumes:
       - .:/src # we mount the source to be able to attach fixture files

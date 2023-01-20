@@ -121,31 +121,23 @@ class SamplesController < ApplicationController
   end
 
   def print
-    @sample = Sample.find(params[:id])
-    return unless authorize_resource(@sample, READ_SAMPLE)
+    sample = Sample.find(params[:id])
+    return unless authorize_resource(sample, READ_SAMPLE)
 
-    render pdf: "cdx_sample_#{@sample.uuid}",
-      template: "samples/barcode.pdf",
-      layout: "layouts/pdf.html",
-      locals: { :sample => SamplePresenter.new(@sample, request.format) },
-      margin: { top: 0, bottom: 0, left: 0, right: 0 },
-      page_width: "1in",
-      page_height: "1in",
-      show_as_html: params.key?("debug")
+    send_data SampleLabelPdf.render(sample),
+      filename: "cdx_sample_#{sample.uuid}.pdf",
+      type: "application/pdf",
+      disposition: "inline"
   end
 
   def bulk_print
     samples = Sample.where(id: params[:sample_ids])
     return unless authorize_resources(samples, READ_SAMPLE)
 
-    render pdf: "cdx_samples_#{samples.size}_#{DateTime.now.strftime("%Y%m%d-%H%M")}",
-      template: "samples/bulk_print.pdf",
-      layout: "layouts/pdf.html",
-      locals: { samples: samples.preload(:sample_identifiers).map { |s| SamplePresenter.new(s, request.format) } },
-      margin: { top: 0, bottom: 0, left: 0, right: 0 },
-      page_width: "1in",
-      page_height: "1in",
-      show_as_html: params.key?("debug")
+    send_data SamplesLabelPdf.render(samples.preload(:box, :sample_identifiers)),
+      filename: "cdx_samples_#{samples.size}_#{DateTime.now.strftime("%Y%m%d-%H%M")}",
+      type: "application/pdf",
+      disposition: "inline"
   end
 
   def edit

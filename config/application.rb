@@ -28,7 +28,7 @@ module Cdp
       g.assets = false
     end
     config.autoload_paths << Rails.root.join("features", "support", "page_objects")
-    config.autoload_paths += %W(#{config.root}/lib)
+    config.autoload_paths += %W(#{config.root}/documents #{config.root}/lib)
 
     config.assets.precompile += %w( mailer.css )
 
