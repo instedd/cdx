@@ -34,55 +34,13 @@ namespace :policy do
 
   desc "Add Box permissions to predefined roles (one time migration)"
   task :add_box_permissions => :environment do
-    search = lambda do |statements, resource|
-      statements.find { |s| s["resource"] == resource }
-    end
+    PoliciesMigrator.new.add_resource_to_existing_roles("box", ["institution:createBox"])
+  end
 
-    copy_box_policies = lambda do |predefined_role, actual_role|
-      definition = actual_role.policy.definition
-      actual_statements = definition["statement"]
-      changed = false
-
-      predefined_role.policy.definition["statement"].each do |statement|
-        if statement["resource"].start_with?("box?")
-          unless search.call(actual_statements, statement["resource"])
-            actual_statements << statement
-            changed = true
-          end
-        elsif statement["action"].include?("institution:createBox")
-          if actual = search.call(actual_statements, statement["resource"])
-            unless actual["action"].include?("institution:createBox" )
-              actual["action"] << "institution:createBox"
-              changed = true
-            end
-          end
-        end
-      end
-
-      if changed
-        actual_role.policy.allows_implicit = true
-        actual_role.policy.save!
-      end
-    end
-
-    Institution.find_each do |institution|
-      Policy.predefined_institution_roles(institution).each do |predefined_role|
-        if role = Role.find_by(institution: institution, name: predefined_role.name)
-          puts "Updating #{role.name} ..."
-          copy_box_policies.call(predefined_role, role)
-          role.policy.save
-        end
-      end
-    end
-
-    Site.find_each do |site|
-      Policy.predefined_site_roles(site).each do |predefined_role|
-        if role = Role.find_by(site: site, name: predefined_role.name)
-          puts "Updating #{role.name} ..."
-          copy_box_policies.call(predefined_role, role)
-          role.policy.save
-        end
-      end
+  desc "Add SamplesReport permissions to predefined roles (one time migration)"
+  task :add_samples_report_permissions => :environment do
+    Policy.transaction do
+      PoliciesMigrator.new.add_resource_to_existing_roles("samplesReport", ["institution:createSamplesReport"])
     end
   end
 
@@ -242,6 +200,61 @@ namespace :policy do
         user.computed_policies.destroy_all
         user.update_computed_policies
       end
+    end
+
+    def add_resource_to_existing_roles(resource_name, permissions)
+      Institution.find_each do |institution|
+        Policy.predefined_institution_roles(institution).each do |predefined_role|
+          if role = Role.find_by(institution: institution, name: predefined_role.name)
+            add_resource_permissions_to_existing_predefined_role(predefined_role, role, resource_name, permissions)
+          end
+        end
+      end
+
+      Site.find_each do |site|
+        Policy.predefined_site_roles(site).each do |predefined_role|
+          if role = Role.find_by(site: site, name: predefined_role.name)
+            add_resource_permissions_to_existing_predefined_role(predefined_role, role, resource_name, permissions)
+          end
+        end
+      end
+    end
+
+    private
+
+    def add_resource_permissions_to_existing_predefined_role(predefined_role, actual_role, resource_name, permissions)
+      puts "Updating #{actual_role.name} ..."
+
+      search = ->(statements, resource) { statements.find { |s| s["resource"] == resource } }
+      definition = actual_role.policy.definition
+      actual_statements = definition["statement"]
+      changed = false
+
+      predefined_role.policy.definition["statement"].each do |statement|
+        if statement["resource"].start_with?("#{resource_name}?")
+          unless search.call(actual_statements, statement["resource"])
+            actual_statements << statement
+            changed = true
+          end
+        else
+          permissions.each do |permission|
+            next unless statement["action"].include?(permission)
+            next unless actual = search.call(actual_statements, statement["resource"])
+
+            unless actual["action"].include?(permission)
+              actual["action"] << permission
+              changed = true
+            end
+          end
+        end
+      end
+
+      if changed
+        actual_role.policy.allows_implicit = true
+        actual_role.policy.save!
+      end
+
+      actual_role.policy.save
     end
   end
 end
