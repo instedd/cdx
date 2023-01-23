@@ -117,7 +117,6 @@ class SamplesReportsController < ApplicationController
     @boxes = Box
       .within(@navigation_context.entity, @navigation_context.exclude_subsites)
       .left_joins(:box_transfers)
-      .where(box_transfers: {id: nil})
       .autocomplete(params[:uuid])
       .order("created_at DESC")
       .count_samples
@@ -159,14 +158,14 @@ class SamplesReportsController < ApplicationController
     truths = Hash.new { true }
     purpose = samples_report.samples[0].box.purpose
 
-    samples_report.samples.map do |s| 
+    samples_report.samples.map do |s|
       if s.measured_signal
-        label = purpose == "LOD" ? s.concentration : s.batch.batch_number + "-" + s.concentration.to_s 
+        label = purpose == "LOD" ? s.concentration : s.batch_number + "-" + s.concentration.to_s
         measurements[label] << s.measured_signal
         truths[label] = s.distractor
       end
-    end 
-    
+    end
+
     measurements.sort_by { |k, _| k }.map do |label, signals|
       avg = signals.sum / signals.size
       errors = signals.map { |s| (s - avg).abs }
