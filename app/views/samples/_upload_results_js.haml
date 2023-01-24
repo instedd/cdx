@@ -96,7 +96,6 @@
                     var ttext = fragment.querySelector(".ttext")
                     ttext.innerHTML = not_found.slice(0,5).join("<br>")
                     // Modify classList here won't work because of class order
-                    ttext.style = `color: #EB2122; width: 300px;`
                     fragment.querySelector(".not_found_message").tooltip = ttext
                     fragment.querySelector(".not_found_message").addEventListener('click', showToolTip, false )
                 }
