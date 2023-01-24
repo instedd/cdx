@@ -111,11 +111,11 @@ class BoxesController < ApplicationController
 
   def load_box_samples
     samples = @box.samples.preload(:batch, :sample_identifiers)
-    samples = if @box.blinded? && !params[:unblind] 
+    samples = if @box.blinded? && !params[:unblind]
       samples.scrambled
     else
       samples.sort_by{ |sample|  [ sample.batch_number , sample.concentration , sample.replicate ] }
-    end 
+    end
     SamplePresenter.map(samples, request.format, unblind: params[:unblind])
   end
 
@@ -134,13 +134,16 @@ class BoxesController < ApplicationController
 
   def box_params
     if Rails::VERSION::MAJOR == 5 && Rails::VERSION::MINOR == 0
-      params.require(:box).permit(:purpose, :media, :blinded, :samples).tap do |allowed|
-        allowed[:batch_uuids] = params[:box][:batch_uuids].try(&:permit!)
+      params.require(:box).permit(:purpose, :media, :blinded, :option).tap do |allowed|
+        allowed[:batches] = params[:box][:batches].try(&:permit!)
         allowed[:sample_uuids] = params[:box][:sample_uuids].try(&:permit!)
         allowed[:concentrations] = params[:box][:concentrations].try(&:permit!)
       end
     else
-      params.require(:box).permit(:purpose, :media, :blinded, :samples, batch_uuids: {}, sample_uuids: [], concentrations: [])
+      params.require(:box)
+        .permit(:purpose, :media, :blinded, :option, sample_uuids: [], batches: [
+          :batch_uuid, :distractor, :instruction, concentrations: [:replicate, :concentration]
+        ])
     end
   end
 

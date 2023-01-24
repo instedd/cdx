@@ -1,5 +1,7 @@
+# TODO: extract BoxBatchesForm and BoxSamplesForm descendants to distinguish
+#       selected paths: create new samples from batches OR use samples
 class BoxForm
-  attr_reader :box, :batch_uuids, :sample_uuids
+  attr_reader :box, :option, :batch_uuids, :sample_uuids
   attr_accessor :media
 
   delegate :purpose, :purpose=, to: :box
@@ -17,10 +19,10 @@ class BoxForm
 
   def initialize(box, params)
     @box = box
-    @option = params[:samples].presence
-    @concentrations = params[:concentrations].presence
+    @params = params
+    @option = params[:option]
     @media = params[:media].presence
-    @batch_uuids = params[:batch_uuids].presence.to_h
+    @batch_uuids = params[:batches].presence.to_h.transform_values { |v| v[:batch_uuid] }
     @sample_uuids = params[:sample_uuids].presence.to_h
   end
 
@@ -43,9 +45,20 @@ class BoxForm
   def build_samples
     case @option
     when "add_batch"
-      @batches.each do |key, batch|
-        @concentrations[key].each do |i, concentration|
-          @box.build_samples(batch, concentrations: [concentration['concentration']], replicates: concentration['replicate'].to_i, media: media, distractor: concentration['distractor'] == "on", instruction: concentration['instruction'])
+      @params[:batches].each do |batch_key, b|
+        next if b[:batch_uuid].blank?
+
+        b[:concentrations].each do |_, c|
+          next if c[:replicate].blank? && c[:concentration].blank?
+
+          @box.build_samples(
+            @batches[batch_key],
+            concentrations: [c[:concentration]],
+            replicates: c[:replicate].to_i,
+            distractor: ActiveModel::Type::Boolean.new.cast(b[:distractor]),
+            instruction: b[:instruction].presence,
+            media: @media,
+          )
         end
       end
     when "add_samples"
@@ -96,8 +109,8 @@ class BoxForm
       when "Variants"
         @box.errors.add(:base, "You must select at least two batches") unless unique_batch_count >= 2
       when "Challenge"
-        @box.errors.add(:base, "You must select at least one distractor batch") unless have_distractor_batch
-        @box.errors.add(:virus, "A virus batch is required") unless have_virus_batch
+        @box.errors.add(:virus, "A virus batch is required") unless have_virus_batch?
+        @box.errors.add(:base, "You must select at least one distractor batch") unless have_distractor_batch?
       when "Other"
         if @samples.empty?
           @box.errors.add(:base, "You must select at least one sample")
@@ -120,21 +133,15 @@ class BoxForm
     @batches.map { |_, b| b.try(&:uuid) }.uniq.size
   end
 
-  def have_distractor_batch
-    @batches.any? do |key, _|
-      @concentrations[key].any? do |_, concentration|
-        concentration['distractor'] == "on"
-      end
+  def have_virus_batch?
+    @params[:batches].any? do |_, b|
+      !ActiveModel::Type::Boolean.new.cast(b[:distractor])
     end
   end
 
-  def have_virus_batch
-    @batches.each do |key, _|
-      @concentrations[key].each do |_, concentration|
-        if concentration['distractor'] != "on" then return true end
-      end
+  def have_distractor_batch?
+    @params[:batches].any? do |_, b|
+      ActiveModel::Type::Boolean.new.cast(b[:distractor])
     end
-    return false
   end
-
 end

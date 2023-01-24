@@ -16,19 +16,18 @@
         .col.form-field__label
           %label Samples
         .col.radiotoggle
-          = f.radio_button :samples, "add_batch"
-          = f.label :samples, "Create new samples", value: "add_batch"
-          = f.radio_button :samples, "add_samples"
-          = f.label :samples, "Select samples from inventory", value: "add_samples"
+          = f.radio_button :option, "add_batch"
+          = f.label :option, "Create new samples", value: "add_batch"
+          = f.radio_button :option, "add_samples"
+          = f.label :option, "Select samples from inventory", value: "add_samples"
 
       .row.form-field
         .col.form-field__label
           %label Contents
         .col
           %fieldset#add_batch{ :disabled => "true", :style => "display: none" }
-            = react_component "BatchesSelector", { url: autocomplete_batches_path(format: "json", context: params[:context]),
-              name: "box[batch_uuids]", placeholder: "Enter batch id", className: "input-block",
-              batches: [] }
+            = react_component "BoxBatchesForm", { findBatchUrl: autocomplete_batches_path(format: "json", context: params[:context]),
+              batches: [] } # TODO: batches_data(params[:batches])
 
           %fieldset#add_samples{ :disabled => "true", :style => "display: none" }
             = react_component "SamplesSelector", { url: autocomplete_samples_path(format: "json", context: params[:context], qc: 0),
@@ -45,18 +44,17 @@
     = link_to 'Cancel', boxes_path, class: 'btn-link'
 
 .sample-source-change-modal-container.hidden
-  = react_component("ConfirmationModal", 
+  = react_component("ConfirmationModal",
                       deletion: true,
                       cancelFunction: "cancelSampleSourceChange",
-                      confirmFunction: "confirmSampleSourceChange", 
-                      id: "sample-source-confirmation-modal", 
-                      colorClass: "red", 
-                      confirmMessage: "Continue", 
-                      title: "Warning", 
+                      confirmFunction: "confirmSampleSourceChange",
+                      id: "sample-source-confirmation-modal",
+                      colorClass: "red",
+                      confirmMessage: "Continue",
+                      title: "Warning",
                       message: "If you change the sample source, the box contents will be emptied. ")
 
 :javascript
-  
   var sourcesRadio = document.querySelectorAll(".radiotoggle input");
   var oldSource = null;
   var confirmSampleSourceChange;
@@ -67,9 +65,11 @@
       document.getElementById(otherRadio.value).style.display = 'none';
       document.getElementById(otherRadio.value).setAttribute("disabled", true);
     });
+
     // Show the selected field and enable it
     document.getElementById(displayField.value).style.display = 'block';
     document.getElementById(displayField.value).removeAttribute("disabled");
+
     // Clear the selectors contents
     document.querySelector(".clear-batches").click()
     document.querySelector(".clear-samples").click()
@@ -89,11 +89,12 @@
     // Update the old source only if the user confirmed the change
     oldSource = this;
   }
+
   function cancelSampleSourceChange() {
     hideConfirmModal();
     // Check back the old source since it was not changed
     oldSource.checked = true;
-  }  
+  }
 
   sourcesRadio.forEach(function(radio) {
     radio.addEventListener("change", function(evt) {

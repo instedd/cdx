@@ -49,7 +49,7 @@ var SamplesSelector = React.createClass({
                 <i className="icon-delete icon-gray bigger"></i>
               </a>
             </div>
-            <div className="items-item">{sample.uuid} <span>{sample.batch_number}</span></div>
+            <div className="items-item">{sample.uuid}&nbsp;<span>{sample.batch_number}</span></div>
           </div>
           <div className="items-concentration">{sample.concentration} copies/ml</div>
         </div>
