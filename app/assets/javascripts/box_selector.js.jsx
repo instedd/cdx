@@ -29,8 +29,8 @@ var BoxSelector = React.createClass({
         selector.removeBox(box);
       }
 
-      function renderOnSamplesReports(box){
-        let name = `samples_report[box_ids][]`;
+      function renderOnBoxReports(box){
+        let name = `box_report[box_ids][]`;
         return <div>
           <div className="list-items">
             <div className="items-row-with-remove">
@@ -59,8 +59,8 @@ var BoxSelector = React.createClass({
       }
 
       let id = Math.floor(Math.random() * 1000000000);
-      if (selector.props.caller == 'samples_reports'){
-        return renderOnSamplesReports(box, id);
+      if (selector.props.caller == 'box_reports'){
+        return renderOnBoxReports(box, id);
       }
       else if (selector.props.caller == 'transfer_packages') {
         return renderOnTransferPackages(box, id);

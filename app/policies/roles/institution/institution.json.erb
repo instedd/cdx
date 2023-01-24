@@ -14,7 +14,7 @@
             "institution:createSample",
             "institution:createBatch",
             "institution:createBox",
-            "institution:createSamplesReport",
+            "institution:createBoxReport",
             "institution:createSite",
             "institution:createRole",
             "institution:readUsers"
@@ -47,7 +47,7 @@
           "delegable": true
         },
         {
-          "resource": "samplesReport?institution=<%= institution_id %>",
+          "resource": "boxReport?institution=<%= institution_id %>",
           "action": "*",
           "delegable": true
         },
@@ -108,8 +108,8 @@
           "action": "box:read"
         },
         {
-          "resource": "samplesReport?institution=<%= institution_id %>",
-          "action": "samplesReport:read"
+          "resource": "boxReport?institution=<%= institution_id %>",
+          "action": "boxReport:read"
         },
         {
           "resource": "site?institution=<%= institution_id %>",

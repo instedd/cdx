@@ -16,7 +16,7 @@ module Resource
       Sample,
       Batch,
       Box,
-      SamplesReport
+      BoxReport
     ].freeze
   end
 

@@ -5,10 +5,10 @@
         .col
           %h1
             - if @can_create
-              = link_to "+", new_samples_report_path, class: 'btn-add side-link fix', title: 'Add Box Report'
+              = link_to "+", new_box_report_path, class: 'btn-add side-link fix', title: 'Add Box Report'
             Box Reports
 
-      %form#filters-form{action: samples_reports_path, "data-auto-submit" => true}
+      %form#filters-form{action: box_reports_path, "data-auto-submit" => true}
         %input{type: "hidden", name: "page_size", value: @page_size}
         .row
           .filter

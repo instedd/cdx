@@ -1,4 +1,4 @@
-module SamplesReportsHelper
+module BoxReportsHelper
   def get_rates(samples, signal)
     confusion_matrix = confusion_matrix(samples, signal)
 
@@ -15,18 +15,18 @@ module SamplesReportsHelper
   # This curve is used to evaluate the performance of a binary classifier, it moves
   # the threshold of the classifier from 0 to 1 and calculates the true positive rate
   # and the false positive rate for each threshold.
-  def roc_curve(samples_report)
+  def roc_curve(box_report)
     roc_curve = [[0,0]]
 
     measured_signals = []
-    samples_report.samples.each do |s|
+    box_report.samples.each do |s|
       if s.measured_signal
         measured_signals << s.measured_signal
       end
     end
 
     measured_signals.each do |ms|
-      roc_curve << get_rates(samples_report.samples, ms)
+      roc_curve << get_rates(box_report.samples, ms)
     end
     roc_curve << [1,1]
 

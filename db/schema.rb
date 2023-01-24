@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20221223203602) do
+ActiveRecord::Schema.define(version: 20230123114004) do
 
   create_table "alert_condition_results", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci" do |t|
     t.string  "result"
@@ -146,6 +146,32 @@ ActiveRecord::Schema.define(version: 20221223203602) do
     t.index ["deleted_at"], name: "index_batches_on_deleted_at", using: :btree
     t.index ["institution_id"], name: "index_batches_on_institution_id", using: :btree
     t.index ["site_id"], name: "index_batches_on_site_id", using: :btree
+  end
+
+  create_table "box_report_samples", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci" do |t|
+    t.integer "sample_id",     null: false
+    t.integer "box_report_id", null: false
+    t.index ["box_report_id"], name: "index_box_report_samples_on_box_report_id", using: :btree
+    t.index ["sample_id"], name: "index_box_report_samples_on_sample_id", using: :btree
+  end
+
+  create_table "box_reports", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci" do |t|
+    t.integer  "institution_id",               null: false
+    t.integer  "site_id"
+    t.string   "site_prefix"
+    t.text     "core_fields",    limit: 65535
+    t.text     "custom_fields",  limit: 65535
+    t.binary   "sensitive_data", limit: 65535
+    t.string   "name"
+    t.float    "threshold",      limit: 24
+    t.datetime "deleted_at"
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+    t.index ["created_at"], name: "index_box_reports_on_created_at", using: :btree
+    t.index ["deleted_at"], name: "index_box_reports_on_deleted_at", using: :btree
+    t.index ["institution_id"], name: "index_box_reports_on_institution_id", using: :btree
+    t.index ["site_id"], name: "index_box_reports_on_site_id", using: :btree
+    t.index ["site_prefix"], name: "index_box_reports_on_site_prefix", using: :btree
   end
 
   create_table "box_transfers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci" do |t|
@@ -566,32 +592,6 @@ ActiveRecord::Schema.define(version: 20221223203602) do
     t.index ["qc_info_id"], name: "index_samples_on_qc_info_id", using: :btree
     t.index ["site_id"], name: "index_samples_on_site_id", using: :btree
     t.index ["specimen_role"], name: "index_samples_on_specimen_role", using: :btree
-  end
-
-  create_table "samples_report_samples", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci" do |t|
-    t.integer "sample_id",         null: false
-    t.integer "samples_report_id", null: false
-    t.index ["sample_id"], name: "index_samples_report_samples_on_sample_id", using: :btree
-    t.index ["samples_report_id"], name: "index_samples_report_samples_on_samples_report_id", using: :btree
-  end
-
-  create_table "samples_reports", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci" do |t|
-    t.integer  "institution_id",               null: false
-    t.integer  "site_id"
-    t.string   "site_prefix"
-    t.text     "core_fields",    limit: 65535
-    t.text     "custom_fields",  limit: 65535
-    t.binary   "sensitive_data", limit: 65535
-    t.string   "name"
-    t.float    "threshold",      limit: 24
-    t.datetime "deleted_at"
-    t.datetime "created_at",                   null: false
-    t.datetime "updated_at",                   null: false
-    t.index ["created_at"], name: "index_samples_reports_on_created_at", using: :btree
-    t.index ["deleted_at"], name: "index_samples_reports_on_deleted_at", using: :btree
-    t.index ["institution_id"], name: "index_samples_reports_on_institution_id", using: :btree
-    t.index ["site_id"], name: "index_samples_reports_on_site_id", using: :btree
-    t.index ["site_prefix"], name: "index_samples_reports_on_site_prefix", using: :btree
   end
 
   create_table "sites", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci" do |t|

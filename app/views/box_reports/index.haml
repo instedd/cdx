@@ -2,13 +2,13 @@
 
 .row
   .col
-    - if @samples_reports.empty?
+    - if @box_reports.empty?
       = empty_data icon: 'outline-report' do |c|
         - c.body do
           %h1 There are no reports
           %p Use reports to analize sample results
     - else
-      =form_tag bulk_action_samples_reports_path, :id => 'samples_report_form' , :method => :post do
+      =form_tag bulk_action_box_reports_path, :id => 'box_report_form' , :method => :post do
         = cdx_table title: pluralize(@total, "box report") do |t|
           - t.actions do
             -if @can_delete
@@ -26,20 +26,20 @@
               %th SAMPLES
               %th CREATION DATE
           - t.tbody do
-            - @samples_reports.each do |samples_report|
-              %tr.laboratory-sample-row{data: {href: samples_report_path(samples_report)}}
+            - @box_reports.each do |box_report|
+              %tr.laboratory-sample-row{data: {href: box_report_path(box_report)}}
                 %td
-                  =check_box_tag 'samples_report_ids[]', samples_report.id, false, { id: "samples_report_ids.#{samples_report.id}" }
-                  %label.row{for: "samples_report_ids.#{samples_report.id}"}
-                %td= samples_report.name
-                %td= samples_report.samples_report_samples.length
-                %td= samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))
+                  =check_box_tag 'box_report_ids[]', box_report.id, false, { id: "box_report_ids.#{box_report.id}" }
+                  %label.row{for: "box_report_ids.#{box_report.id}"}
+                %td= box_report.name
+                %td= box_report.box_report_samples.length
+                %td= box_report.created_at.strftime(I18n.t('date.input_format.pattern'))
 
       .pagination
         = render 'shared/pagination'
 
 :javascript
-  function checkboxesName() { return "samples_report_ids[]" }
+  function checkboxesName() { return "box_report_ids[]" }
   function actionsId() { return ["bulk_destroy"] }
 
 = render "samples/index_bulk_actions_js"

@@ -4,14 +4,14 @@
 = csrf_meta_tags
 
 %div{:hidden => true}
-  .samples-report{id:'samples-report'}
+  .box-report{id:'box-report'}
     .report-content 
       .report-header
         = image_tag wicked_pdf_asset_base64('cdx-logo-bw.png')
         %span
-          Box Report: #{@samples_report.name}
+          Box Report: #{@box_report.name}
           %br
-          Created at #{@samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
+          Created at #{@box_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
       %br
       .title
         Summary
@@ -20,7 +20,7 @@
           .subtitle 
             Samples
           .text 
-            = @samples_report.samples_report_samples.length
+            = @box_report.box_report_samples.length
             -if @samples_without_results_count > 0
               (#{@samples_without_results_count} without results)
           .subtitle 
@@ -37,7 +37,7 @@
               .subtitle 
                 Computed ROC AUC
               .text 
-                = auc(roc_curve(@samples_report))
+                = auc(roc_curve(@box_report))
               %td{width: "200px"}
                 .subtitle
                   Threshold's TPR
@@ -57,9 +57,9 @@
       .report-header
         = image_tag wicked_pdf_asset_base64('cdx-logo-bw.png')
         %span
-          Box Report: #{@samples_report.name}
+          Box Report: #{@box_report.name}
           %br
-          Created at #{@samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
+          Created at #{@box_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
       .title
         Measured signal
       %br
@@ -79,9 +79,9 @@
         .report-header
           = image_tag wicked_pdf_asset_base64('cdx-logo-bw.png')
           %span
-            Box Report: #{@samples_report.name}
+            Box Report: #{@box_report.name}
             %br
-            Created at #{@samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
+            Created at #{@box_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
         
         .title
           Limit of detection
@@ -101,9 +101,9 @@
         .report-header
           = image_tag wicked_pdf_asset_base64('cdx-logo-bw.png')
           %span
-            Box Report: #{@samples_report.name}
+            Box Report: #{@box_report.name}
             %br
-            Created at #{@samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
+            Created at #{@box_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
         
         .title
           ROC Curve
@@ -112,7 +112,7 @@
         %br
         %div
         = react_component('BoxReportsRocChart',
-          data: roc_curve(@samples_report))
+          data: roc_curve(@box_report))
 
 :javascript
   
@@ -136,7 +136,7 @@
     var threshold = parseFloat(gon.threshold);
 
     var context = getUrlParameter('context');
-    var url = '/samples_reports/update_threshold?context='+context+"&samples_report_id="+gon.samples_report_id+"&threshold="+gon.threshold;
+    var url = '/box_reports/update_threshold?context='+context+"&box_report_id="+gon.box_report_id+"&threshold="+gon.threshold;
     var ret = await fetch(url)
         .then((response) => response.json())
         .then((r) => {
@@ -198,10 +198,10 @@
       
   window.onload =
     function() {
-      var element = document.getElementById('samples-report');
+      var element = document.getElementById('box-report');
       
       var opt = {
-        filename: gon.samples_report_name+'.pdf',
+        filename: gon.box_report_name+'.pdf',
         pagebreak: { before: '.pdf-page-break' },
         jsPDF: { format: 'A4', orientation: 'landscape' },
         margin: [15,15,15,15],

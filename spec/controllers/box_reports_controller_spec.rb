@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'policy_spec_helper'
 
-RSpec.describe SamplesReportsController, type: :controller do
+RSpec.describe BoxReportsController, type: :controller do
   setup_fixtures do
     @user = User.make!
     @institution = Institution.make! user: @user
@@ -9,9 +9,9 @@ RSpec.describe SamplesReportsController, type: :controller do
     @other_institution = Institution.make! user: @other_user
 
     @box = Box.make!(:overfilled, institution: @institution, purpose: "LOD")
-    @samples_report = SamplesReport.create(institution: @institution, samples_report_samples: @box.samples.map{|s| SamplesReportSample.new(sample: s)}, name: "Test")
+    @box_report = BoxReport.create(institution: @institution, box_report_samples: @box.samples.map{|s| BoxReportSample.new(sample: s)}, name: "Test")
     @box2 = Box.make!(:filled, institution: @institution, purpose: "Challenge")
-    @samples_report2 = SamplesReport.create(institution: @institution, samples_report_samples: @box2.samples.map{|s| SamplesReportSample.new(sample: s)}, name: "Test2")
+    @box_report2 = BoxReport.create(institution: @institution, box_report_samples: @box2.samples.map{|s| BoxReportSample.new(sample: s)}, name: "Test2")
 
     grant @user, @other_user, @institution, READ_INSTITUTION
   end
@@ -26,22 +26,22 @@ RSpec.describe SamplesReportsController, type: :controller do
 
   describe "show" do
     it "should be accessible to institution owner" do
-      get :show, params: { id: samples_report.id }
+      get :show, params: { id: box_report.id }
       expect(response).to have_http_status(:ok)
     end
 
     it "should be allowed if can read" do
-      grant user, other_user, samples_report, READ_SAMPLES_REPORT
+      grant user, other_user, box_report, READ_BOX_REPORT
       sign_in other_user
 
-      get :show, params: { id: samples_report.id }
+      get :show, params: { id: box_report.id }
       expect(response).to have_http_status(:ok)
     end
 
     it "shouldn't be allowed if can't read" do
       sign_in other_user
 
-      get :show, params: { id: samples_report.id }
+      get :show, params: { id: box_report.id }
       expect(response).to have_http_status(:forbidden)
     end
   end
@@ -53,7 +53,7 @@ RSpec.describe SamplesReportsController, type: :controller do
     end
 
     it "should be allowed if can create" do
-      grant @user, @other_user, @institution, CREATE_INSTITUTION_SAMPLES_REPORT
+      grant @user, @other_user, @institution, CREATE_INSTITUTION_BOX_REPORT
       sign_in other_user
 
       get :new
@@ -71,29 +71,29 @@ RSpec.describe SamplesReportsController, type: :controller do
   describe "create" do
     it "should create samples report" do
       expect do
-        post :create, params: { samples_report: { name: "Test", box_ids: [@box.id] } }
-        expect(response).to redirect_to samples_reports_path
-      end.to change(institution.samples_reports, :count).by(1)
+        post :create, params: { box_report: { name: "Test", box_ids: [@box.id] } }
+        expect(response).to redirect_to box_reports_path
+      end.to change(institution.box_reports, :count).by(1)
     end
 
     it "should create samples report if allowed" do
-      grant user, other_user, institution, CREATE_INSTITUTION_SAMPLES_REPORT
+      grant user, other_user, institution, CREATE_INSTITUTION_BOX_REPORT
       grant user, other_user, box, READ_BOX
       sign_in other_user
 
       expect do
-        post :create, params: { samples_report: { name: "Test", box_ids: [@box.id] } }
-        expect(response).to redirect_to samples_reports_path
-      end.to change(institution.samples_reports, :count).by(1)
+        post :create, params: { box_report: { name: "Test", box_ids: [@box.id] } }
+        expect(response).to redirect_to box_reports_path
+      end.to change(institution.box_reports, :count).by(1)
     end
 
     it "should not create samples report if not allowed" do
       sign_in other_user
       
       expect do
-        post :create, params: { samples_report: { name: "Test", samples_report_samples_attributes: @box.samples.map{|s| {sample_id: s.id}} } }
+        post :create, params: { box_report: { name: "Test", box_report_samples_attributes: @box.samples.map{|s| {sample_id: s.id}} } }
         expect(response).to have_http_status(:forbidden)
-      end.to change(institution.samples_reports, :count).by(0)
+      end.to change(institution.box_reports, :count).by(0)
     end
   end
   
@@ -101,14 +101,14 @@ RSpec.describe SamplesReportsController, type: :controller do
     it "should be accessible by institution owner" do
       get :index
       expect(response).to have_http_status(:ok)
-      expect(assigns(:samples_reports).count).to eq(2)
+      expect(assigns(:box_reports).count).to eq(2)
     end
 
     it "should not list samples reports if can not read" do
       sign_in other_user
 
       get :index
-      expect(assigns(:samples_reports).count).to eq(0)
+      expect(assigns(:box_reports).count).to eq(0)
     end
   end
 
@@ -116,25 +116,25 @@ RSpec.describe SamplesReportsController, type: :controller do
     it "by report name" do
       get :index, params: { name: "Test2" }
       expect(response).to have_http_status(:ok)
-      expect(assigns(:samples_reports).count).to eq(1)
+      expect(assigns(:box_reports).count).to eq(1)
     end
 
     it "by sample uuid" do
       get :index, params: { sample_uuid: @box.samples.first.uuid }
       expect(response).to have_http_status(:ok)
-      expect(assigns(:samples_reports).count).to eq(1)
+      expect(assigns(:box_reports).count).to eq(1)
     end
 
     it "by batch number" do
       get :index, params: { batch_number: @box.samples.first.batch.batch_number }
       expect(response).to have_http_status(:ok)
-      expect(assigns(:samples_reports).length).to eq(1)
+      expect(assigns(:box_reports).length).to eq(1)
     end
 
     it "by box uuid" do
       get :index, params: { box_uuid: @box.uuid }
       expect(response).to have_http_status(:ok)
-      expect(assigns(:samples_reports).length).to eq(1)
+      expect(assigns(:box_reports).length).to eq(1)
     end
 
   end
@@ -142,75 +142,75 @@ RSpec.describe SamplesReportsController, type: :controller do
   describe "delete" do
     it "should delete samples report" do
       expect do
-        delete :delete, params: { id: @samples_report.id }
-        expect(response).to redirect_to samples_reports_path
-      end.to change(institution.samples_reports, :count).by(-1)
+        delete :delete, params: { id: @box_report.id }
+        expect(response).to redirect_to box_reports_path
+      end.to change(institution.box_reports, :count).by(-1)
     end
 
     it "should delete samples report if allowed" do
-      grant user, other_user, samples_report, DELETE_SAMPLES_REPORT
+      grant user, other_user, box_report, DELETE_BOX_REPORT
       sign_in other_user
 
       expect do
-        delete :delete, params: { id: @samples_report.id }
-        expect(response).to redirect_to samples_reports_path
-      end.to change(institution.samples_reports, :count).by(-1)
+        delete :delete, params: { id: @box_report.id }
+        expect(response).to redirect_to box_reports_path
+      end.to change(institution.box_reports, :count).by(-1)
 
-      expect(samples_report.reload.deleted_at).to_not be_nil
+      expect(box_report.reload.deleted_at).to_not be_nil
     end
 
     it "should not delete box if not allowed" do
       sign_in other_user
 
       expect do
-        delete :delete, params: { id: @samples_report.id }
+        delete :delete, params: { id: @box_report.id }
         expect(response).to have_http_status(:forbidden)
-      end.to change(institution.samples_reports.unscoped, :count).by(0)
+      end.to change(institution.box_reports.unscoped, :count).by(0)
     end
   end
 
   describe "bulk_destroy" do
     it "should delete samples reports" do
       expect do
-        post :bulk_destroy, params: { samples_report_ids: [@samples_report.id, @samples_report2.id] }
-        expect(response).to redirect_to samples_reports_path
-      end.to change(institution.samples_reports, :count).by(-2)
+        post :bulk_destroy, params: { box_report_ids: [@box_report.id, @box_report2.id] }
+        expect(response).to redirect_to box_reports_path
+      end.to change(institution.box_reports, :count).by(-2)
 
-      expect(@samples_report.reload.deleted_at).to_not be_nil
-      expect(@samples_report2.reload.deleted_at).to_not be_nil
+      expect(@box_report.reload.deleted_at).to_not be_nil
+      expect(@box_report2.reload.deleted_at).to_not be_nil
     end
 
      it "should delete samples reports if allowed" do
-       grant user, other_user, @samples_report, DELETE_SAMPLES_REPORT
-       grant user, other_user, @samples_report2, DELETE_SAMPLES_REPORT
+       grant user, other_user, @box_report, DELETE_BOX_REPORT
+       grant user, other_user, @box_report2, DELETE_BOX_REPORT
        sign_in other_user
 
        expect do
-        post :bulk_destroy, params: { samples_report_ids: [@samples_report.id, @samples_report2.id] }
-        expect(response).to redirect_to samples_reports_path
-      end.to change(institution.samples_reports, :count).by(-2)
+        post :bulk_destroy, params: { box_report_ids: [@box_report.id, @box_report2.id] }
+        expect(response).to redirect_to box_reports_path
+      end.to change(institution.box_reports, :count).by(-2)
 
-      expect(@samples_report.reload.deleted_at).to_not be_nil
-      expect(@samples_report2.reload.deleted_at).to_not be_nil
+      expect(@box_report.reload.deleted_at).to_not be_nil
+      expect(@box_report2.reload.deleted_at).to_not be_nil
     end
 
     it "should not delete samples reports if not all allowed" do
-      grant user, other_user, @samples_report, DELETE_SAMPLES_REPORT
+      grant user, other_user, @box_report, DELETE_BOX_REPORT
       sign_in other_user
 
       expect do
-        post :bulk_destroy, params: { samples_report_ids: [@samples_report2.id] }
+        post :bulk_destroy, params: { box_report_ids: [@box_report2.id] }
         expect(response).to have_http_status(:forbidden)
-      end.to change(institution.samples_reports, :count).by(0)
+      end.to change(institution.box_reports, :count).by(0)
     end
 
     it "should not delete samples reports if not allowed" do
       sign_in other_user
 
       expect do
-        post :bulk_destroy, params: { samples_report_ids: [@samples_report.id, @samples_report2.id] }
+        post :bulk_destroy, params: { box_report_ids: [@box_report.id, @box_report2.id] }
         expect(response).to have_http_status(:forbidden)
-      end.to change(institution.samples_reports, :count).by(0)
+      end.to change(institution.box_reports, :count).by(0)
     end
   end
 end

@@ -14,7 +14,7 @@ class Institution < ApplicationRecord
   has_many :encounters, dependent: :destroy
   has_many :patients, dependent: :destroy
   has_many :samples, dependent: :destroy
-  has_many :samples_reports, dependent: :destroy
+  has_many :box_reports, dependent: :destroy
   has_many :batches, dependent: :destroy
   has_many :boxes, dependent: :destroy
   has_many :test_results, dependent: :destroy

@@ -1,64 +1,64 @@
-class SamplesReportsController < ApplicationController
-  include SamplesReportsHelper
+class BoxReportsController < ApplicationController
+  include BoxReportsHelper
 
   helper_method :boxes_data
   helper_method :available_institutions
   helper_method :confusion_matrix
 
   def index
-    @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_SAMPLES_REPORT)
-    @can_delete = has_access?(SamplesReport, DELETE_SAMPLES_REPORT)
+    @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_BOX_REPORT)
+    @can_delete = has_access?(BoxReport, DELETE_BOX_REPORT)
 
-    @samples_reports = SamplesReport.where(institution: @navigation_context.institution)
-    @samples_reports = check_access(@samples_reports, READ_SAMPLES_REPORT).order('samples_reports.created_at DESC')
+    @box_reports = BoxReport.where(institution: @navigation_context.institution)
+    @box_reports = check_access(@box_reports, READ_BOX_REPORT).order('box_reports.created_at DESC')
   
     # Filter by search params
 
-    @samples_reports = @samples_reports.partial_name(params[:name])
-    @samples_reports = @samples_reports.partial_sample_uuid(params[:sample_uuid])
-    @samples_reports = @samples_reports.partial_box_uuid(params[:box_uuid])
-    @samples_reports = @samples_reports.partial_batch_number(params[:batch_number])
+    @box_reports = @box_reports.partial_name(params[:name])
+    @box_reports = @box_reports.partial_sample_uuid(params[:sample_uuid])
+    @box_reports = @box_reports.partial_box_uuid(params[:box_uuid])
+    @box_reports = @box_reports.partial_batch_number(params[:batch_number])
 
     #paginate samples report
-    @samples_reports = perform_pagination(@samples_reports)
+    @box_reports = perform_pagination(@box_reports)
   end
   
   def new
-    @samples_report = SamplesReport.new({
+    @box_report = BoxReport.new({
       institution: @navigation_context.institution,
       site: @navigation_context.site
     })
 
     @boxes = []
     
-    prepare_for_institution_and_authorize(@samples_report, CREATE_INSTITUTION_SAMPLES_REPORT)
+    prepare_for_institution_and_authorize(@box_report, CREATE_INSTITUTION_BOX_REPORT)
   end
 
   def create
     @institution = @navigation_context.institution
-    return unless authorize_resource(@institution, CREATE_INSTITUTION_SAMPLES_REPORT)
+    return unless authorize_resource(@institution, CREATE_INSTITUTION_BOX_REPORT)
 
-    @samples_report = SamplesReport.new()
-    @samples_report.institution = @institution
-    @samples_report.site = @navigation_context.site
-    @samples_report.name = params[:samples_report][:name]
+    @box_report = BoxReport.new()
+    @box_report.institution = @institution
+    @box_report.site = @navigation_context.site
+    @box_report.name = params[:box_report][:name]
     
-    samples_report_samples = []
-    if params[:samples_report][:box_ids] 
-      params[:samples_report][:box_ids].each do |box_id|
+    box_report_samples = []
+    if params[:box_report][:box_ids] 
+      params[:box_report][:box_ids].each do |box_id|
         box = Box.find(box_id)
         box = check_access(box, READ_BOX)
         next if box.nil?
         box.samples.each do |sample|
-          samples_report_samples  << SamplesReportSample.new(samples_report: @samples_report, sample: sample)
+          box_report_samples  << BoxReportSample.new(box_report: @box_report, sample: sample)
         end
       end
     end
 
-    @samples_report.samples_report_samples = samples_report_samples
+    @box_report.box_report_samples = box_report_samples
 
-    if @samples_report.save
-      redirect_to samples_reports_path, notice: 'Box report was successfully created.'
+    if @box_report.save
+      redirect_to box_reports_path, notice: 'Box report was successfully created.'
     else
       render action: 'new'
     end
@@ -66,15 +66,15 @@ class SamplesReportsController < ApplicationController
 
 
   def show
-    @samples_report = SamplesReport.find(params[:id])
-    return unless authorize_resource(@samples_report, READ_SAMPLES_REPORT)
-    @reports_data = measured_signal_data(@samples_report)
-    @samples_without_results_count = @samples_report.samples.without_results.count
-    @purpose = @samples_report.samples[0].box.purpose
+    @box_report = BoxReport.find(params[:id])
+    return unless authorize_resource(@box_report, READ_BOX_REPORT)
+    @reports_data = measured_signal_data(@box_report)
+    @samples_without_results_count = @box_report.samples.without_results.count
+    @purpose = @box_report.samples[0].box.purpose
     
     if params[:display] == "pdf"
-      gon.samples_report_id = @samples_report.id
-      gon.samples_report_name = @samples_report.name
+      gon.box_report_id = @box_report.id
+      gon.box_report_name = @box_report.name
       gon.purpose = @purpose
       gon.threshold = params[:threshold]
       gon.min_threshold = params[:minthreshold]
@@ -82,33 +82,33 @@ class SamplesReportsController < ApplicationController
       render "_pdf_report", layout: false
     else
       @max_signal = @reports_data.reduce(0) { |a, e| e[:max] > a ? e[:max] : a }
-      @can_delete = has_access?(@samples_report, DELETE_SAMPLES_REPORT)
+      @can_delete = has_access?(@box_report, DELETE_BOX_REPORT)
     end
   end
 
   def delete
-    @samples_report = SamplesReport.find(params[:id])
-    return unless authorize_resource(@samples_report, DELETE_SAMPLES_REPORT)
+    @box_report = BoxReport.find(params[:id])
+    return unless authorize_resource(@box_report, DELETE_BOX_REPORT)
   
-    @samples_report.destroy
+    @box_report.destroy
     
-    redirect_to samples_reports_path, notice: 'Box report was successfully deleted.'
+    redirect_to box_reports_path, notice: 'Box report was successfully deleted.'
   end
   
   def bulk_destroy
-    samples_reports_ids = params[:samples_report_ids]
+    box_reports_ids = params[:box_report_ids]
   
-    if samples_reports_ids.blank?
-      redirect_to samples_reports_path, notice: 'Select at least one box report to destroy.'
+    if box_reports_ids.blank?
+      redirect_to box_reports_path, notice: 'Select at least one box report to destroy.'
       return
     end
   
-    samples_reports = SamplesReport.where(id: samples_reports_ids)
-    return unless authorize_resources(samples_reports, DELETE_SAMPLES_REPORT)
+    box_reports = BoxReport.where(id: box_reports_ids)
+    return unless authorize_resources(box_reports, DELETE_BOX_REPORT)
   
-    samples_reports.destroy_all
+    box_reports.destroy_all
   
-    redirect_to samples_reports_path, notice: 'Box reports were successfully deleted.'
+    redirect_to box_reports_path, notice: 'Box reports were successfully deleted.'
   end
 
   def find_box
@@ -130,8 +130,8 @@ class SamplesReportsController < ApplicationController
 
   def update_threshold
     threshold = params[:threshold]
-    samples_report = SamplesReport.find(params[:samples_report_id])
-    confusion_matrix = confusion_matrix(samples_report.samples, threshold.to_f)
+    box_report = BoxReport.find(params[:box_report_id])
+    confusion_matrix = confusion_matrix(box_report.samples, threshold.to_f)
     render json: { threshold: threshold, confusion_matrix: confusion_matrix }
   end
 
@@ -153,12 +153,12 @@ class SamplesReportsController < ApplicationController
     end
   end
 
-  def measured_signal_data(samples_report)
+  def measured_signal_data(box_report)
     measurements = Hash.new { |hash, key| hash[key] = [] }
     truths = Hash.new { true }
-    purpose = samples_report.samples[0].box.purpose
+    purpose = box_report.samples[0].box.purpose
 
-    samples_report.samples.map do |s|
+    box_report.samples.map do |s|
       if s.measured_signal
         label = purpose == "LOD" ? s.concentration : s.batch_number + "-" + s.concentration.to_s
         measurements[label] << s.measured_signal

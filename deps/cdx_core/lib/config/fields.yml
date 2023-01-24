@@ -94,7 +94,7 @@ entities:
       lab_technician:
       old_batch_number:
         searchable: true
-  samples_report: &SAMPLES_REPORT
+  box_report: &BOX_REPORT
     fields:
       name:
         type: string

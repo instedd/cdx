@@ -37,10 +37,10 @@ namespace :policy do
     PoliciesMigrator.new.add_resource_to_existing_roles("box", ["institution:createBox"])
   end
 
-  desc "Add SamplesReport permissions to predefined roles (one time migration)"
-  task :add_samples_report_permissions => :environment do
+  desc "Add BoxReport permissions to predefined roles (one time migration)"
+  task :add_box_report_permissions => :environment do
     Policy.transaction do
-      PoliciesMigrator.new.add_resource_to_existing_roles("samplesReport", ["institution:createSamplesReport"])
+      PoliciesMigrator.new.add_resource_to_existing_roles("boxReport", ["institution:createBoxReport"])
     end
   end
 

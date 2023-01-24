@@ -4,22 +4,22 @@
       .row
         .col
           %h2
-            = link_to samples_reports_path, class: "side-link", title: "Back" do
+            = link_to box_reports_path, class: "side-link", title: "Back" do
               = image_tag "arrow-left.png"
-            = @samples_report.name
+            = @box_report.name
 
 .row
   .col
     .row
       .col.pe-4
-        .samples-report
+        .box-report
           .report-summary-content 
             .title
               Summary
             .subtitle 
               Samples
             .text 
-              = @samples_report.samples_report_samples.length
+              = @box_report.box_report_samples.length
               -if @samples_without_results_count > 0
                 (#{@samples_without_results_count} without results)
             .subtitle 
@@ -30,7 +30,7 @@
               .subtitle 
                 Computed ROC AUC
               .text 
-                = auc(roc_curve(@samples_report))
+                = auc(roc_curve(@box_report))
               .subtitle
                 Threshold's TPR
               .text{id: "computed-tpr"}
@@ -45,20 +45,20 @@
                   = icon_tag "barchart", class: "btn-icon icon-text-color"
                   Download charts as svg
             .action
-              =link_to samples_report_path(:samples_report_id => @samples_report.id, :display => :pdf), id: "print-pdf-link", target: "_blank" do
+              =link_to box_report_path(:box_report_id => @box_report.id, :display => :pdf), id: "print-pdf-link", target: "_blank" do
                 .subtitle{id:'print-as-pdf'}
                   = icon_tag "as-pdf", class: "btn-icon icon-text-color"
                   Download PDF
 
         - if @can_delete
           .report-summary-after
-            =link_to delete_samples_report_path, id: @samples_report.id, data: { method: "delete", confirm: "You're about to permanently this box report. This action CANNOT be undone. Are you sure you want to proceed?" } do
+            =link_to delete_box_report_path, id: @box_report.id, data: { method: "delete", confirm: "You're about to permanently this box report. This action CANNOT be undone. Are you sure you want to proceed?" } do
               .subtitle
                 = icon_tag "trash", class: "btn-icon icon-text-color"
                 Delete Report
               
       .col
-        .samples-report.hidden{id:'samples-report'}
+        .box-report.hidden{id:'box-report'}
           .report-content 
             - if @purpose == "Challenge"
               .title{id: "treshold-title"}
@@ -104,7 +104,7 @@
               .title
                 ROC Curve
               = react_component('BoxReportsRocChart',
-                data: roc_curve(@samples_report))
+                data: roc_curve(@box_report))
 
 :javascript
 
@@ -160,7 +160,7 @@
     var svgUrl = URL.createObjectURL(svgBlob);
     var downloadLink = document.createElement("a");
     downloadLink.href = svgUrl;
-    downloadLink.download = `#{@samples_report.name}_${chartName}.svg`;
+    downloadLink.download = `#{@box_report.name}_${chartName}.svg`;
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
@@ -194,7 +194,7 @@
     var threshold = document.getElementById("threshold").value;
     
     var context = getUrlParameter('context');
-    var url = '/samples_reports/update_threshold?context='+context+"&samples_report_id="+#{@samples_report.id}+"&threshold="+threshold;
+    var url = '/box_reports/update_threshold?context='+context+"&box_report_id="+#{@box_report.id}+"&threshold="+threshold;
     var ret = await fetch(url)
         .then((response) => response.json())
         .then((r) => {
@@ -255,7 +255,7 @@
 
   {
     updateThreshold().then(() => {
-      document.getElementById("samples-report").classList.remove("hidden");
+      document.getElementById("box-report").classList.remove("hidden");
     });
   }
   

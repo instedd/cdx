@@ -31,8 +31,8 @@
                 = link_to "Boxes", boxes_path
               %li{:class => params[:controller] == "transfer_packages" && "active"}
                 = link_to "Transfers", transfer_packages_path
-              %li{:class => params[:controller] == "samples_reports" && "active"}
-                = link_to "Box Reports", samples_reports_path
+              %li{:class => params[:controller] == "box_reports" && "active"}
+                = link_to "Box Reports", box_reports_path
         - if has_access_to_test_results_index?
           %li{:class => ["test_results", "encounters"].include?(params[:controller]) && "active"}
             = link_to "Tests", test_results_path
