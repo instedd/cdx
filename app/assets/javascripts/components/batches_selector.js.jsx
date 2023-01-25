@@ -225,6 +225,7 @@ var BatchesSelector = React.createClass({
   },
   addConcentration: function (event) {
     event.preventDefault();
+    document.getElementById("unconfirmed-copies-warning").classList.add("hidden");
     if (parseInt(this.state.replicate) >0 && parseInt(this.state.concentration) >0 ){
       this.state.batches[0].samples.push({ replicate: this.state.replicate, concentration: this.state.concentration });
       this.setState({concentration: null });
