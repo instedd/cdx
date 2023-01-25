@@ -117,6 +117,9 @@ var BatchesSelector = React.createClass({
                 </div>
               </div>
             </div>
+            <span className="warn hidden" id="unconfirmed-copies-warning">
+              To add the batch, you must confirm the replicates & concentrations above by pressing the blue check. If you don't want to add them, please erase the fields.
+            </span>
           </div>
         </div>
         <div className="col">
@@ -204,6 +207,11 @@ var BatchesSelector = React.createClass({
   },
   addList: function (event) {
     event.preventDefault();
+
+    if (parseInt(this.state.replicate) >0 || parseInt(this.state.concentration) >0 ){
+      document.getElementById("unconfirmed-copies-warning").classList.remove("hidden");
+      return 
+    }
     var list = this.state.list;
     var batches = this.state.batches;
     batches[0].samples = batches[0].samples.map( (sample) => {
