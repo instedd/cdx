@@ -259,7 +259,7 @@ Box.blueprint(:filled) do
   ] }
 end
 
-Box.blueprint(:without_measurements) do
+Box.blueprint(:filled_without_measurements) do
   samples { [
     Sample.make(:filled, box: object, institution: object.institution, site: object.site, measured_signal: nil),
     Sample.make(:filled, box: object, institution: object.institution, site: object.site, measured_signal: nil),

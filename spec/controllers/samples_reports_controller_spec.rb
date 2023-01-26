@@ -10,7 +10,7 @@ RSpec.describe SamplesReportsController, type: :controller do
 
     @box = Box.make!(:overfilled, institution: @institution, purpose: "LOD")
     @box2 = Box.make!(:filled, institution: @institution, purpose: "Challenge")
-    @box_without_measurements = Box.make!(:without_measurements, institution: @institution, purpose: "LOD")
+    @box_without_measurements = Box.make!(:filled_without_measurements, institution: @institution, purpose: "LOD")
 
     @samples_report = SamplesReport.create(institution: @institution, samples_report_samples: @box.samples.map{|s| SamplesReportSample.new(sample: s)}, name: "Test")
     @samples_report2 = SamplesReport.create(institution: @institution, samples_report_samples: @box2.samples.map{|s| SamplesReportSample.new(sample: s)}, name: "Test2")
