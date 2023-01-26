@@ -22,7 +22,8 @@ class BoxForm
     @params = params
     @option = params[:option]
     @media = params[:media].presence
-    @batch_uuids = params[:batches].presence.to_h.transform_values { |v| v[:batch_uuid] }
+    @batches_data = params[:batches].presence.to_h
+    @batch_uuids = @batches_data.transform_values { |v| v[:batch_uuid] }
     @sample_uuids = params[:sample_uuids].presence.to_h
   end
 
@@ -42,10 +43,32 @@ class BoxForm
     end.compact
   end
 
+  def batches_data
+    return [] if @batch_uuids.empty?
+
+    @batches_data.map do |key, data|
+      data[:batch_number] = @batches[key].batch_number
+      data[:concentrations] = data[:concentrations].to_h.values
+      data
+    end
+  end
+
+  def samples_data
+    # NOTE: duplicates the samples/autocomplete template (but returns an
+    # Array<Hash> instead of rendering to a JSON String)
+    samples.map do |sample|
+      {
+        uuid: sample.uuid,
+        batch_number: sample.batch_number,
+        concentration: sample.concentration,
+      }
+    end
+  end
+
   def build_samples
     case @option
-    when "add_batch"
-      @params[:batches].each do |batch_key, b|
+    when "add_batches"
+      @batches_data.each do |batch_key, b|
         next if b[:batch_uuid].blank?
 
         b[:concentrations].each do |_, c|
@@ -102,14 +125,14 @@ class BoxForm
 
   def validate_batches_or_samples_for_purpose
     case @option
-    when "add_batch"
+    when "add_batches"
       case @box.purpose
       when "LOD"
-        @box.errors.add(:lod, "A batch is required") unless unique_batch_count >= 1
+        @box.errors.add(:base, "A batch is required") unless unique_batch_count >= 1
       when "Variants"
         @box.errors.add(:base, "You must select at least two batches") unless unique_batch_count >= 2
       when "Challenge"
-        @box.errors.add(:virus, "A virus batch is required") unless have_virus_batch?
+        @box.errors.add(:base, "A virus batch is required") unless have_virus_batch?
         @box.errors.add(:base, "You must select at least one distractor batch") unless have_distractor_batch?
       when "Other"
         if @samples.empty?
@@ -134,13 +157,13 @@ class BoxForm
   end
 
   def have_virus_batch?
-    @params[:batches].any? do |_, b|
+    @batches_data.any? do |_, b|
       !ActiveModel::Type::Boolean.new.cast(b[:distractor])
     end
   end
 
   def have_distractor_batch?
-    @params[:batches].any? do |_, b|
+    @batches_data.any? do |_, b|
       ActiveModel::Type::Boolean.new.cast(b[:distractor])
     end
   end

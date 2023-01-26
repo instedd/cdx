@@ -1,6 +1,11 @@
 var BoxBatchesForm = React.createClass({
   getInitialState: function () {
+    var genRandomKey = this.__genRandomKey;
+
     var batches = this.props.batches || [];
+    batches.forEach(function (batch) {
+      batch.key = genRandomKey(batches);
+    });
 
     return {
       batches: batches,
@@ -26,14 +31,12 @@ var BoxBatchesForm = React.createClass({
         <div className="items-count">
           <div className="title">{batches.length}&nbsp;{batches.length == 1 ? "batch" : "batches"}</div>
         </div>
-        {batches.map(function (batch, index) {
+        {batches.map(function (batch) {
           return <BoxBatchForm
-            key={"box_batches_" + index}
-            index={index}
+            key={"box_batches_" + batch.key}
             batch={batch}
             onChange={onChange}
             onRemove={removeBatch}
-            /*onCancel={removeBatch}*/
           />
         })}
         {this.state.showBatchSelector ? this.renderBatchSelector() : this.renderAddBatchButton() }
@@ -80,8 +83,11 @@ var BoxBatchesForm = React.createClass({
     if (options.length == 0) return;
 
     var batches = this.state.batches;
+    var genRandomKey = this.__genRandomKey;
+
     var newBatches = options.map(function (option) {
       return {
+        key: genRandomKey(batches),
         uuid: option.value,
         batch_number: option.label,
         instruction: "",
@@ -89,18 +95,30 @@ var BoxBatchesForm = React.createClass({
         concentrations: [{}],
       };
     });
+
     this.setState({
       batches: batches.concat(newBatches),
       showBatchSelector: false,
     });
   },
 
-  removeBatch: function (index) {
+  __genRandomKey: function (batches) {
+    var keys = batches.map(function (batch) { return batch.key });
+    var key;
+    do {
+      key = "xxxxxxxxxxxxxxxx".replace(/[x]/g, function (c) {
+        const r = Math.floor(Math.random() * 16);
+        return r.toString(16);
+      });
+    } while (keys.indexOf(key) != -1);
+    return key;
+  },
+
+  removeBatch: function (key) {
     var batches = this.state.batches;
-    batches.splice(index, 1);
-    this.setState({
-      batches: batches,
-    });
+    var index = batches.findIndex(function (batch) { return batch.key == key; });
+    if (index >= 0) batches.splice(index, 1);
+    this.setState({ batches: batches });
   },
 
   prepareOptions: function (options) {
@@ -114,8 +132,9 @@ var BoxBatchesForm = React.createClass({
   },
 
   isValid() {
-    return this.state.batches.length > 0 &&
-      this.state.batches.reduce(function (a, e) { return a && e.isValid }, true);
+    var batches = this.state.batches;
+    return batches.length > 0 &&
+      batches.reduce(function (a, e) { return a && e.isValid }, true);
   },
 });
 
@@ -139,12 +158,12 @@ var BoxBatchForm = React.createClass({
 
   renderSummary: function () {
     var concentrations = this.state.batch.concentrations;
-    var total = concentrations.reduce(function (a, e) { return a + parseInt(e.replicate, 10) || 0; }, 0);
+    var total = concentrations.reduce(function (a, e) { return a + (parseInt(e.replicate, 10) || 0); }, 0);
     var unique = concentrations.reduce(function (a, e) { return e.concentration ? a.add(e.concentration) : a; }, new Set());
     var count = Array.from(unique).length;
 
     return (
-      <div className={"list-items " + (this.state.showForm ? "nodisplay" : "")}>
+      <div className={"list-items " + (this.state.showForm ? "nodisplay" : "") + " box-batch-summary"}>
         <div className="items-row">
           <div className="items-left">
             <div className="items-row-actions">
@@ -167,15 +186,21 @@ var BoxBatchForm = React.createClass({
   },
 
   renderForm: function () {
-    var batch = this.props.batch;
     var self = this;
+    var batch = this.props.batch;
+    var renderConcentrationForm = this.renderConcentrationForm;
 
     function setDistractor() {
       batch.distractor = event.target.checked;
       self.setState({ batch: batch });
     }
+    function setInstruction() {
+      batch.instruction = event.target.value;
+      self.setState({ batch: batch });
+    }
+
     return (
-      <div className={"list-items " + (this.state.showForm ? "" : "nodisplay")}>
+      <div className={"list-items " + (this.state.showForm ? "" : "nodisplay") + " box-batch-form"}>
         <input type="hidden" name={this.fieldFor("batch_uuid")} value={batch.uuid}/>
 
         <div className="items-cols">
@@ -198,15 +223,15 @@ var BoxBatchForm = React.createClass({
             </div>
 
             <div><label htmlFor={this.idFor("instruction")}>Instructions</label></div>
-            <input type="text" id={this.idFor("instruction")} name={this.fieldFor("instruction")} value={this.state.batch.instruction} className="full-input" />
+            <input type="text" id={this.idFor("instruction")} name={this.fieldFor("instruction")} value={this.state.batch.instruction} onChange={setInstruction} className="full-input" />
           </div>
 
           <div>
             <span className="subtitle">Accomplished Concentrations</span>
-            <div className="list-items">
+            <div className="list-items box-batch-form-concentrations">
               {this.state.batch.concentrations.map(function (item, index) {
-                return this.renderConcentrationForm(item, index)
-              }.bind(this))}
+                return renderConcentrationForm(item, index)
+              })}
             </div>
 
             <a href="#" className="add-items" onClick={this.addConcentration}>
@@ -260,28 +285,32 @@ var BoxBatchForm = React.createClass({
   },
 
   fieldFor: function () {
-    var name = "box[batches][" + this.props.index + "]";
+    var name = "box[batches][" + this.props.batch.key + "]";
     Array
       .from(arguments)
-      .forEach(function (key) { name += "[" + key + "]"; });
+      .forEach(function (attr) { name += "[" + attr + "]"; });
     return name;
   },
 
   idFor: function () {
-    var id = "box_batches_" + this.props.index + "_";
+    var id = "box_batches_" + this.props.batch.key + "_";
     Array
       .from(arguments)
-      .forEach(function (key) { id += "_" + key; });
+      .forEach(function (attr) { id += "_" + attr; });
     return id;
   },
 
   isValid: function (state) {
+    var isValidConcentration = this.isValidConcentration;
     var batch = (state || this.state).batch;
-    return batch.concentrations.some(this.isValidConcentration.bind(this));
+
+    return batch.concentrations.reduce(function (a, e) {
+      return a && isValidConcentration(e);
+    }, true);
   },
 
   isValidConcentration: function (c) {
-    return c.replicate && c.concentration;
+    return (parseInt(c.replicate, 10) > 0 && parseFloat(c.concentration, 10) > 0);
   },
 
   hideForm: function (event) {
@@ -317,7 +346,7 @@ var BoxBatchForm = React.createClass({
   onRemove: function (event) {
     event.preventDefault();
     if (this.props.onRemove) {
-      this.props.onRemove(this.props.index);
+      this.props.onRemove(this.props.batch.key);
     }
   },
 
@@ -325,7 +354,7 @@ var BoxBatchForm = React.createClass({
   //   event.preventDefault();
 
   //   if (this.props.onCancel) {
-  //     this.props.onCancel(this.props.index);
+  //     this.props.onCancel(this.props.batch.key);
   //   }
   // }
 });

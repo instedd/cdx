@@ -16,8 +16,8 @@
         .col.form-field__label
           %label Samples
         .col.radiotoggle
-          = f.radio_button :option, "add_batch"
-          = f.label :option, "Create new samples", value: "add_batch"
+          = f.radio_button :option, "add_batches"
+          = f.label :option, "Create new samples", value: "add_batches"
           = f.radio_button :option, "add_samples"
           = f.label :option, "Select samples from inventory", value: "add_samples"
 
@@ -25,14 +25,14 @@
         .col.form-field__label
           %label Contents
         .col
-          %fieldset#add_batch{ :disabled => "true", :style => "display: none" }
+          %fieldset#add_batches{ :disabled => @box_form.option != "add_batches", :style => (@box_form.option == "add_batches" ? "" : "display: none") }
             = react_component "BoxBatchesForm", { findBatchUrl: autocomplete_batches_path(format: "json", context: params[:context]),
-              batches: [] } # TODO: batches_data(params[:batches])
+              batches: @box_form.batches_data }
 
-          %fieldset#add_samples{ :disabled => "true", :style => "display: none" }
+          %fieldset#add_samples{ :disabled => @box_form.option != "add_samples", :style => (@box_form.option == "add_samples" ? "" : "display: none") }
             = react_component "SamplesSelector", { url: autocomplete_samples_path(format: "json", context: params[:context], qc: 0),
               name: "box[sample_uuids]", placeholder: "Enter sample id", className: "input-block",
-              samples: samples_data(@box_form.samples) }
+              samples: @box_form.samples_data }
 
   .row
     .col

@@ -1,6 +1,5 @@
 class BoxesController < ApplicationController
   before_action :load_box, except: %i[index new create bulk_destroy]
-  helper_method :samples_data
 
   def index
     @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_BOX)
@@ -144,18 +143,6 @@ class BoxesController < ApplicationController
         .permit(:purpose, :media, :blinded, :option, sample_uuids: [], batches: [
           :batch_uuid, :distractor, :instruction, concentrations: [:replicate, :concentration]
         ])
-    end
-  end
-
-  def samples_data(samples)
-    # NOTE: duplicates the samples/autocomplete template (but returns an
-    # Array<Hash> instead of rendering to a JSON String)
-    samples.map do |sample|
-      {
-        uuid: sample.uuid,
-        batch_number: sample.batch_number,
-        concentration: sample.concentration,
-      }
     end
   end
 end
