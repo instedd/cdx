@@ -47,9 +47,14 @@ class BoxForm
     return [] if @batch_uuids.empty?
 
     @batches_data.map do |key, data|
-      data[:batch_number] = @batches[key].batch_number
-      data[:concentrations] = data[:concentrations].to_h.values
-      data
+      batch = @batches[key]
+      {
+        uuid: batch.uuid,
+        batch_number: batch.batch_number,
+        distractor: ActiveModel::Type::Boolean.new.cast(data[:distractor]),
+        instruction: data[:instruction],
+        concentrations: data[:concentrations].to_h.values,
+      }
     end
   end
 

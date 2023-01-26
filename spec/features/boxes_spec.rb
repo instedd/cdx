@@ -205,12 +205,23 @@ describe "boxes" do
             summary = form.batch_summaries[0]
             expect(summary.batch_number).to have_text(distractor_1.batch_number)
             expect(summary.concentration).to have_text("1 in 1 different concentration")
-            # TODO: expect that sumary.distractor is checked
 
             summary = form.batch_summaries[1]
             expect(summary.batch_number).to have_text(distractor_2.batch_number)
             expect(summary.concentration).to have_text("3 in 2 different concentrations")
-            # TODO: expect that sumary.distractor is checked
+
+            # add the virus batch
+            form.add_batch(virus_1, concentrations: [[2, 4], [1, 5]])
+            form.submit
+          end
+
+          expect_page ListBoxesPage do |page|
+            expect(page.entries.size).to eq(1)
+            page.entries.last.uuid.click
+          end
+
+          expect_page ShowBoxPage do |page|
+            expect(page.samples.size).to eq(7)
           end
         end
       end

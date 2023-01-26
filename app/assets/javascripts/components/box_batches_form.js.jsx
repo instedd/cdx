@@ -214,7 +214,7 @@ var BoxBatchForm = React.createClass({
             <span className="subtitle">Batch</span>
             <div className="items-item">{batch.batch_number}</div>
             <div>
-              <input type="checkbox" id={this.idFor("distractor")} name={this.fieldFor("distractor")} value={this.state.batch.distractor} onChange={setDistractor}/>
+              <input type="checkbox" id={this.idFor("distractor")} name={this.fieldFor("distractor")} checked={this.state.batch.distractor} value="1" onChange={setDistractor}/>
               <label htmlFor={this.idFor("distractor")}>Distractor</label>
               <p className="distractor-description">
                 When enabled, the system will consider that the sample test result

@@ -62,9 +62,7 @@ class NewBoxPage < CdxPageBase
   end
 
   def add_batch(batch, distractor: false, instruction: nil, concentrations: [])
-    Capybara.using_wait_time(0) do
-      add_batch_button.click unless has_search_batch?
-    end
+    add_batch_button.click unless has_search_batch?(wait: 0)
     search_batch.type_and_select(batch.batch_number)
 
     batch_forms.last.tap do |form|
