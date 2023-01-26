@@ -11,7 +11,7 @@
           maxBoxes: 1,
           caller: "samples_reports",
           boxes: boxes_data(@boxes))
-        = f.field_errors :"samples_report_samples"
+        = f.field_errors :samples_report_samples
 
   = f.form_actions do
     = f.submit 'Generate Report', class: 'btn-primary'
