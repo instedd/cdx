@@ -46,7 +46,8 @@ class SamplesReport < ApplicationRecord
   private
 
   def there_are_samples
-    errors.add(:base, "Please select a box containing samples with results") if samples_report_samples.empty?
+    samples_with_results = samples_report_samples.select { |srs| !srs.sample.measured_signal.nil? }
+    errors.add(:base, "Please select a box containing samples with results") if samples_with_results.empty?
   end
 
 end
