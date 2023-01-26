@@ -127,19 +127,13 @@ class BoxForm
     case @option
     when "add_batches"
       case @box.purpose
-      when "LOD"
+      when "LOD", "Other"
         @box.errors.add(:base, "A batch is required") unless unique_batch_count >= 1
       when "Variants"
         @box.errors.add(:base, "You must select at least two batches") unless unique_batch_count >= 2
       when "Challenge"
         @box.errors.add(:base, "A virus batch is required") unless have_virus_batch?
         @box.errors.add(:base, "You must select at least one distractor batch") unless have_distractor_batch?
-      when "Other"
-        if @samples.empty?
-          @box.errors.add(:base, "You must select at least one sample")
-        elsif @samples.any? { |_, sample| sample.is_quality_control? }
-          @box.errors.add(:base, "You can't select a QC sample")
-        end
       end
     when "add_samples"
       if @samples.empty?

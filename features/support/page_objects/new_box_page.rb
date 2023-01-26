@@ -6,6 +6,13 @@ class NewBoxPage < CdxPageBase
     element :open_button, "a .icon-keyboard-arrow-down"
   end
 
+  class SampleSummary < SitePrism::Section
+    element :uuid, ".items-item span:first-child"
+    element :batch_number, ".items-item span:last-child"
+    element :concentration, ".items-concentration"
+    element :remove_button, "a[title='Remove this sample']"
+  end
+
   class BoxBatchForm < SitePrism::Section
     element :distractor, "label", text: "Distractor"
     element :instruction, "label", text: "Instruction"
@@ -33,8 +40,10 @@ class NewBoxPage < CdxPageBase
   sections :batch_forms, BoxBatchForm, ".box-batch-form"
 
   element :add_samples, "label[for='box_option_add_samples']"
+  element :add_sample_button, ".add-link", text: "ADD SAMPLE"
   element :samples_selector, ".samples-selector"
   section :search_sample, CdxSelect, ".samples-selector .Select"
+  sections :sample_summaries, SampleSummary, ".sample-summary"
 
   element :submit_button, :button, "Save"
 
@@ -72,7 +81,10 @@ class NewBoxPage < CdxPageBase
   end
 
   def add_sample(sample)
-    # TODO
+    Capybara.using_wait_time(0) do
+      add_sample_button.click unless has_search_sample?
+    end
+    search_sample.paste(sample.uuid)
   end
 
   def submit

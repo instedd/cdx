@@ -5,7 +5,7 @@ var SamplesSelector = React.createClass({
     };
   },
   reset: function() {
-    this.setState({ samples: [] });
+    this.setState({ samples: [{ uuid: "" }] });
   },
   render: function () {
     return (<div className="samples-selector">
@@ -40,7 +40,7 @@ var SamplesSelector = React.createClass({
       function removeSample(event) {
         this.removeSample(event, index);
       }
-      return (<div className="list-items" key={"samples-selector-" + index}>
+      return (<div className="list-items sample-summary" key={"samples-selector-" + index}>
         <div className="items-row">
           <div className="items-left">
             <div className="items-row-actions">
