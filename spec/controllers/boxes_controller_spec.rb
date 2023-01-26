@@ -268,7 +268,7 @@ RSpec.describe BoxesController, type: :controller do
     let :box_plan do
       {
         purpose: "LOD",
-        option: "add_batch",
+        option: "add_batches",
         batches: {
           "0" => {
             batch_uuid: batch.uuid,
@@ -387,7 +387,7 @@ RSpec.describe BoxesController, type: :controller do
           }
         }
         expect do
-          post :create, params: { box: box_plan.merge(option: "add_batch", batches: batches) }
+          post :create, params: { box: box_plan.merge(option: "add_batches", batches: batches) }
           expect(response).to redirect_to boxes_path
         end.to change(institution.boxes, :count).by(1)
 
