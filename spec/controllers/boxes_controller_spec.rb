@@ -195,7 +195,7 @@ RSpec.describe BoxesController, type: :controller do
     end
 
     it "blinds columns for Samples" do
-      box = Box.make! :filled, institution: institution, blinded: true
+      box = Box.make! :filled_without_measurements, institution: institution, blinded: true
 
       get :inventory, params: { id: box.id, format: "csv" }
       expect(response).to have_http_status(:ok)
@@ -205,6 +205,20 @@ RSpec.describe BoxesController, type: :controller do
         expect(row[4]).to eq("Blinded")
         expect(row[5]).to eq("Blinded")
         expect(row[6]).to eq("Blinded")
+      end
+    end
+
+    it "don't blind columns columns for samples with uploaded measurements" do
+      box = Box.make! :filled, institution: institution, blinded: true
+
+      get :inventory, params: { id: box.id, format: "csv" }
+      expect(response).to have_http_status(:ok)
+
+      CSV.parse(response.body).tap(&:shift).each do |row|
+        expect(row[3]).not_to eq("Blinded")
+        expect(row[4]).not_to eq("Blinded")
+        expect(row[5]).not_to eq("Blinded")
+        expect(row[6]).not_to eq("Blinded")
       end
     end
 

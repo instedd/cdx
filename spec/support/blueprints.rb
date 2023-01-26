@@ -176,6 +176,7 @@ Sample.blueprint(:filled) do
   isolate_name { Faker::Name.name }
   specimen_role { "p" }
   date_produced { Faker::Time.backward }
+  measured_signal { 10.0 }
 end
 
 Sample.blueprint(:batch) do
@@ -255,6 +256,13 @@ Box.blueprint(:filled) do
   samples { [
     Sample.make(:filled, box: object, institution: object.institution, site: object.site),
     Sample.make(:filled, box: object, institution: object.institution, site: object.site),
+  ] }
+end
+
+Box.blueprint(:filled_without_measurements) do
+  samples { [
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, measured_signal: nil),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, measured_signal: nil),
   ] }
 end
 

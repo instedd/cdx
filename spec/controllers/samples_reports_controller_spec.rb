@@ -9,8 +9,10 @@ RSpec.describe SamplesReportsController, type: :controller do
     @other_institution = Institution.make! user: @other_user
 
     @box = Box.make!(:overfilled, institution: @institution, purpose: "LOD")
-    @samples_report = SamplesReport.create(institution: @institution, samples_report_samples: @box.samples.map{|s| SamplesReportSample.new(sample: s)}, name: "Test")
     @box2 = Box.make!(:filled, institution: @institution, purpose: "Challenge")
+    @box_without_measurements = Box.make!(:filled_without_measurements, institution: @institution, purpose: "LOD")
+
+    @samples_report = SamplesReport.create(institution: @institution, samples_report_samples: @box.samples.map{|s| SamplesReportSample.new(sample: s)}, name: "Test")
     @samples_report2 = SamplesReport.create(institution: @institution, samples_report_samples: @box2.samples.map{|s| SamplesReportSample.new(sample: s)}, name: "Test2")
 
     grant @user, @other_user, @institution, READ_INSTITUTION
@@ -95,6 +97,17 @@ RSpec.describe SamplesReportsController, type: :controller do
         expect(response).to have_http_status(:forbidden)
       end.to change(institution.samples_reports, :count).by(0)
     end
+
+    it "should not create samples report if there is no measurements" do
+      sign_in other_user
+      
+      expect do
+        post :create, params: { samples_report: { name: "TestWithoutMeasurements", samples_report_samples_attributes: @box_without_measurements.samples.map{|s| {sample_id: s.id}} } }
+        expect(response).to have_http_status(:forbidden)
+      end.to change(institution.samples_reports, :count).by(0)
+    end
+
+    
   end
   
   describe "index" do
