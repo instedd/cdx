@@ -11,27 +11,28 @@ describe "performance", elasticsearch: true do
   before(:each) {
     device_spec_helper.import_sample_json device, 'genexpert_sample.json'
     device_spec_helper.import_sample_json device, 'genexpert_sample_qc.json'
-    sign_in(user)
+    # FIXME: for some reason tests will start failing if we don't go through the
+    #        login form to authenticate the user (?!)
+    sign_in(user, login_form: true)
   }
-
-  after(:each) { Timecop.return }
 
   it "should have 2 test results" do
     expect(device.test_results.count).to eq(2)
   end
 
   it "dashboard charts should hide qc tests" do
-    Timecop.travel(Time.utc(2015, 9, 1))
-    goto_page DashboardPage do |page|
-      expect(page.tests_run.pie_chart.total.text).to eq("1")
+    Timecop.travel(Time.utc(2015, 9, 1)) do
+      goto_page DashboardPage do |page|
+        expect(page.tests_run.pie_chart.total.text).to eq("1")
+      end
     end
   end
 
   it "device charts should hide qc tests" do
-    Timecop.travel(Time.utc(2015, 9, 1))
-    goto_page DevicePage, id: device.id do |page|
-      page.tab_header.performance.click # FIXME: this click shouldn't be needed
-      expect(page.tests_run.pie_chart.total.text).to eq("1")
+    Timecop.travel(Time.utc(2015, 9, 1)) do
+      goto_page DevicePage, id: device.id do |page|
+        expect(page.tests_run.pie_chart.total.text).to eq("1")
+      end
     end
   end
 end
