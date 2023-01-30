@@ -19,7 +19,6 @@ class BoxForm
 
   def initialize(box, params)
     @box = box
-    @params = params
     @option = params[:option]
     @media = params[:media].presence
     @batches_data = params[:batches].presence.to_h
