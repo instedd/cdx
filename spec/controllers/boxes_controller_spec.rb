@@ -268,8 +268,14 @@ RSpec.describe BoxesController, type: :controller do
     let :box_plan do
       {
         purpose: "LOD",
-        batch_uuids: { "lod" => batch.uuid },
-        blinded: true,
+        option: "add_batches",
+        batches: {
+          "0" => {
+            batch_uuid: batch.uuid,
+            concentrations: { "0" => { replicate: "1", concentration: "10" } },
+          },
+        },
+        blinded: false,
       }
     end
 
@@ -300,12 +306,7 @@ RSpec.describe BoxesController, type: :controller do
 
     it "should create box with optional params" do
       expect do
-        post :create, params: { box: box_plan.merge(
-                                  media: "Saliva", 
-                                  blinded: true,
-                                  samples: "add_batch",
-                                  batch_uuids: { "0" => batch.uuid },
-                                  concentrations: {"0" => { "0" => {"concentration"=>"1", "replicate"=>"2", "distractor"=>"", "instruction"=>""} } } ) }
+        post :create, params: { box: box_plan.merge(media: "Saliva", blinded: true) }
         expect(response).to redirect_to boxes_path
       end.to change(institution.boxes, :count).by(1)
 
@@ -349,7 +350,7 @@ RSpec.describe BoxesController, type: :controller do
       end
     end
 
-    describe "with new samples" do
+    describe "creates samples from batches" do
       let :virus_batch do
         Batch.make!(institution: institution, site: site)
       end
@@ -357,45 +358,48 @@ RSpec.describe BoxesController, type: :controller do
       let :distractor_batch do
         Batch.make!(institution: institution, site: site)
       end
-  
+
       let :box_plan do
         {
           purpose: "LOD",
-          batch_uuids: { "lod" => batch.uuid },
           blinded: true,
         }
       end
 
-      it "creates with with proper replicates and concentrations for virus and distractor samples" do
+      it "creates samples with proper replicate and concentration from virus and distractor batches" do
+        batches = {
+          "0" => {
+            batch_uuid: virus_batch.uuid,
+            distractor: false,
+            instruction: "",
+            concentrations: {
+              "0" => { concentration: "1", replicate: "2" },
+            }
+          },
+          "1" => {
+            batch_uuid: distractor_batch.uuid,
+            distractor: true,
+            instruction: "",
+            concentrations: {
+              "0" => { concentration: "3e4", replicate: "3" },
+              "1" => { concentration: "4e5", replicate: "2" },
+            }
+          }
+        }
         expect do
-          post :create, params: { box: box_plan.merge(
-                                    media: "Saliva", 
-                                    blinded: true,
-                                    samples: "add_batch",
-                                    batch_uuids: { "0" => virus_batch.uuid, "1" => distractor_batch.uuid },
-                                    concentrations: {"0" => { "0" => 
-                                                              {"concentration"=>"1", "replicate"=>"2", "distractor"=>"", "instruction"=>""} 
-                                                            },
-                                                     "1" => { "0" => 
-                                                              {"concentration"=>"4e5", "replicate"=>"2", "distractor"=>"on", "instruction"=>""}, 
-                                                              "1" => 
-                                                              {"concentration"=>"4e4", "replicate"=>"2", "distractor"=>"on", "instruction"=>""} 
-                                                            } 
-                                                    } ) }
+          post :create, params: { box: box_plan.merge(option: "add_batches", batches: batches) }
           expect(response).to redirect_to boxes_path
         end.to change(institution.boxes, :count).by(1)
-  
+
         box = assigns(:box_form).box.reload
-        expect(box.samples.count).to eq(6)
+        expect(box.samples.count).to eq(7)
         expect(box.samples.where(batch: virus_batch).count).to eq(2)
         expect(box.samples.where(batch: virus_batch).map(&:distractor).uniq).to eq([false])
         expect(box.samples.where(batch: virus_batch).map(&:concentration).uniq).to eq([1])
-        expect(box.samples.where(batch: distractor_batch).count).to eq(4)
+        expect(box.samples.where(batch: distractor_batch).count).to eq(5)
         expect(box.samples.where(batch: distractor_batch).map(&:distractor).uniq).to eq([true])
-        expect(box.samples.where(batch: distractor_batch).map(&:concentration).uniq.sort).to eq([40000,400000])
-        expect(box.blinded).to eq true
+        expect(box.samples.where(batch: distractor_batch).map(&:concentration).uniq.sort).to eq([30000,400000])
       end
-
     end
 
     describe "with existing samples" do
@@ -403,9 +407,9 @@ RSpec.describe BoxesController, type: :controller do
         samples = Sample.make! 2, :filled, institution: institution, specimen_role: "b"
 
         post :create, params: { box: box_plan.merge(
-                                    media: "Saliva", 
+                                    media: "Saliva",
                                     blinded: true,
-                                    samples: "add_samples",
+                                    option: "add_samples",
                                     sample_uuids: { "sample_0" => samples[0].uuid, "sample_1" => samples[1].uuid } ) }
 
         expect(Box.last.samples.map(&:uuid).sort).to eq(samples.map(&:uuid).sort)
@@ -420,9 +424,9 @@ RSpec.describe BoxesController, type: :controller do
         expect do
           expect do
             post :create, params: { box: box_plan.merge(
-                                    media: "Saliva", 
+                                    media: "Saliva",
                                     blinded: true,
-                                    samples: "add_samples",
+                                    option: "add_samples",
                                     sample_uuids: { "sample_0" => samples[0].uuid, "sample_1" => samples[1].uuid } ) }
             expect(response).to have_http_status(:unprocessable_entity)
           end.to change(institution.samples, :count).by(0)
@@ -432,7 +436,7 @@ RSpec.describe BoxesController, type: :controller do
       it "requires at least 1 sample" do
         expect do
           expect do
-            post :create, params: { box: { purpose: "Other", samples: "add_samples", sample_uuids: {}, blinded: false } }
+            post :create, params: { box: { purpose: "Other", option: "add_samples", sample_uuids: {}, blinded: false } }
             expect(response).to have_http_status(:unprocessable_entity)
           end.to change(institution.samples, :count).by(0)
         end.to change(institution.boxes, :count).by(0)

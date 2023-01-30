@@ -55,7 +55,7 @@
     .row
       .col
         - @samples.each do |sample|
-          .col.pe-7.list-items
+          .col.pe-7.list-items.box-sample-row
             .items-row
               .items-item= sample.uuid
               - unless sample.blinded_attribute?(:batch_number)

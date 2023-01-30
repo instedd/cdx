@@ -5,7 +5,7 @@ var SamplesSelector = React.createClass({
     };
   },
   reset: function() {
-    this.setState({ samples: [] });
+    this.setState({ samples: [{ uuid: "" }] });
   },
   render: function () {
     return (<div className="samples-selector">
@@ -40,7 +40,7 @@ var SamplesSelector = React.createClass({
       function removeSample(event) {
         this.removeSample(event, index);
       }
-      return (<div className="list-items" key={"samples-selector-" + index}>
+      return (<div className="list-items sample-summary" key={"samples-selector-" + index}>
         <div className="items-row">
           <div className="items-left">
             <div className="items-row-actions">
@@ -49,7 +49,7 @@ var SamplesSelector = React.createClass({
                 <i className="icon-delete icon-gray bigger"></i>
               </a>
             </div>
-            <div className="items-item">{sample.uuid} <span>{sample.batch_number}</span></div>
+            <div className="items-item">{sample.uuid}&nbsp;<span>{sample.batch_number}</span></div>
           </div>
           <div className="items-concentration">{sample.concentration} copies/ml</div>
         </div>
