@@ -7,7 +7,7 @@
   .samples-report{id:'samples-report'}
     .report-content 
       .report-header
-        = image_tag wicked_pdf_asset_base64('cdx-logo-bw.png')
+        = image_tag "cdx-logo-bw-.png"
         %span
           Box Report: #{@samples_report.name}
           %br
@@ -52,10 +52,8 @@
       %br
       = render 'confusion_matrix'
 
-      .pdf-page-break
-
       .report-header
-        = image_tag wicked_pdf_asset_base64('cdx-logo-bw.png')
+        = image_tag "cdx-logo-bw.png"
         %span
           Box Report: #{@samples_report.name}
           %br
@@ -77,7 +75,7 @@
       - if @purpose == "LOD"
         .pdf-page-break
         .report-header
-          = image_tag wicked_pdf_asset_base64('cdx-logo-bw.png')
+          = image_tag "cdx-logo-bw.png"
           %span
             Box Report: #{@samples_report.name}
             %br
@@ -99,7 +97,7 @@
       - if @purpose == "Challenge"
         .pdf-page-break
         .report-header
-          = image_tag wicked_pdf_asset_base64('cdx-logo-bw.png')
+          = image_tag "cdx-logo-bw.png"
           %span
             Box Report: #{@samples_report.name}
             %br
