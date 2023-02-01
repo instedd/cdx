@@ -88,7 +88,8 @@
                     fragment.querySelector(`.items-row-action`).classList.add(`ttip`,`input-required`)
                 }
                 else {
-                    fragment.querySelector(`.upload-icon`).classList.add(`icon-checkmark`)
+                    fragment.querySelector(`.upload-icon`).classList.add(`icon-check`)
+                    fragment.querySelector(`.ttext`).classList.remove(`not-found-uuids`)
                 }
                 fragment.querySelector(`.file-name`).textContent = `${f.name}`;
                 // if samples were not found add mouse behaviour to display tooltip
