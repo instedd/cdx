@@ -47,6 +47,12 @@ describe "boxes" do
           batch_form.remove_concentrations[1].click
           expect(batch_form.remove_concentrations.size).to eq(2)
 
+          # it kept the first & last concentrations:
+          expect(batch_form.replicate_fields[0].value).to eq("2")
+          expect(batch_form.concentration_fields[0].value).to eq("10")
+          expect(batch_form.replicate_fields[1].value).to eq("4")
+          expect(batch_form.concentration_fields[1].value).to eq("1000")
+
           # validates replicate field:
           field = batch_form.replicate_fields[0]
           field.set(0)

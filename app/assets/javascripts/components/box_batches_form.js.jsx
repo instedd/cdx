@@ -1,10 +1,9 @@
 var BoxBatchesForm = React.createClass({
   getInitialState: function () {
-    var genRandomKey = this.__genRandomKey;
-
     var batches = this.props.batches || [];
+
     batches.forEach(function (batch) {
-      batch.key = genRandomKey(batches);
+      batch.key = cdxGenRandomKey(batches);
     });
 
     return {
@@ -83,35 +82,22 @@ var BoxBatchesForm = React.createClass({
     if (options.length == 0) return;
 
     var batches = this.state.batches;
-    var genRandomKey = this.__genRandomKey;
 
-    var newBatches = options.map(function (option) {
-      return {
-        key: genRandomKey(batches),
+    options.forEach(function (option) {
+      batches.push({
+        key: cdxGenRandomKey(batches),
         uuid: option.value,
         batch_number: option.label,
         instruction: "",
         distractor: false,
         concentrations: [{}],
-      };
+      });
     });
 
     this.setState({
-      batches: batches.concat(newBatches),
+      batches: batches,
       showBatchSelector: false,
     });
-  },
-
-  __genRandomKey: function (batches) {
-    var keys = batches.map(function (batch) { return batch.key });
-    var key;
-    do {
-      key = "xxxxxxxxxxxxxxxx".replace(/[x]/g, function (c) {
-        const r = Math.floor(Math.random() * 16);
-        return r.toString(16);
-      });
-    } while (keys.indexOf(key) != -1);
-    return key;
   },
 
   removeBatch: function (key) {
@@ -143,6 +129,11 @@ var BoxBatchForm = React.createClass({
     var state = {
       batch: this.props.batch,
     };
+    state.batch.concentrations.forEach(function (item) {
+      if (!item.key) {
+        item.key = cdxGenRandomKey([]);
+      }
+    });
     state.showForm = !this.isValid(state);
     return state;
   },
@@ -229,8 +220,8 @@ var BoxBatchForm = React.createClass({
           <div>
             <span className="subtitle">Accomplished Concentrations</span>
             <div className="list-items box-batch-form-concentrations">
-              {this.state.batch.concentrations.map(function (item, index) {
-                return renderConcentrationForm(item, index)
+              {this.state.batch.concentrations.map(function (item) {
+                return renderConcentrationForm(item)
               })}
             </div>
 
@@ -249,7 +240,7 @@ var BoxBatchForm = React.createClass({
     );
   },
 
-  renderConcentrationForm: function (item, index) {
+  renderConcentrationForm: function (item) {
     var self = this;
 
     function set(key) {
@@ -264,20 +255,20 @@ var BoxBatchForm = React.createClass({
       };
     }
     return (
-      <div className="items-row" key={this.idFor("concentration", index)}>
+      <div className="items-row" key={this.idFor("concentration", item.key)}>
         <div className="items-left">
           <div className="items-row-actions">
-            <a href="#" onClick={this.removeConcentration} title="Remove this concentration" data-index={index}>
+            <a href="#" onClick={this.removeConcentration} title="Remove this concentration" data-key={item.key}>
               <i className="icon-delete icon-gray bigger"></i>
             </a>
           </div>
           <div className="items-item">
-            <input type="text" name={this.fieldFor("concentrations", index, "replicate")} value={item.replicate} onChange={set("replicate")}/>
+            <input type="text" name={this.fieldFor("concentrations", item.key, "replicate")} value={item.replicate} onChange={set("replicate")}/>
             replicates
           </div>
         </div>
         <div className="items-concentration">
-          <input type="text" name={this.fieldFor("concentrations", index , "concentration")} value={item.concentration} onChange={set("concentration")}/>
+          <input type="text" name={this.fieldFor("concentrations", item.key , "concentration")} value={item.concentration} onChange={set("concentration")}/>
           copies/ml
         </div>
       </div>
@@ -327,18 +318,22 @@ var BoxBatchForm = React.createClass({
     event.preventDefault();
 
     var batch = this.state.batch;
-    batch.concentrations.push({});
+    batch.concentrations.push({ key: cdxGenRandomKey(batch.concentrations) });
     this.setState({ batch: batch });
   },
 
   removeConcentration: function (event) {
     event.preventDefault();
 
+    var key = event.currentTarget.dataset.key;
     var batch = this.state.batch;
-    batch.concentrations.splice(event.target.dataset.index, 1);
+    var concentrations = batch.concentrations;
 
-    if (batch.concentrations.length < 1) {
-      batch.concentrations.push({});
+    var index = concentrations.findIndex(function (item) { return item.key == key; });
+    if (index >= 0) concentrations.splice(index, 1);
+
+    if (concentrations.length < 1) {
+      concentrations.push({ key: cdxGenRandomKey([]), });
     }
     this.setState({ batch: batch });
   },
