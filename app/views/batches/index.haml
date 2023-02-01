@@ -11,7 +11,7 @@
       =form_tag bulk_action_batches_path, :id => 'batches_form' , :method => :post do
         = cdx_table title: pluralize(@total, "batch") do |t|
           - t.actions do
-            =button_tag id: 'bulk_destroy', class: 'btn-link', name: 'bulk_action', value: 'destroy', data: { method: "delete", confirm: "You're about to permanently delete the selected batches. This action CANNOT be undone. Are you sure you want to proceed?" } do
+            =button_tag id: 'bulk_destroy', class: 'btn-link', name: 'bulk_action', value: 'destroy', data: { method: "delete", confirm: "You're about to permanently delete the selected #{controller_name.humanize(capitalize: false)}. This action CANNOT be undone. Are you sure you want to proceed?" } do
               = icon_tag "trash", class: "btn-icon"
           - t.columns do
             %col{:width => "5%"}
