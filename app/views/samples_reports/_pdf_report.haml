@@ -7,12 +7,11 @@
   .samples-report{id:'samples-report'}
     .report-content 
       .report-header
-        = image_tag "cdx-logo-bw-.png"
+        = image_tag "cdx-logo-bw.png"
         %span
           Box Report: #{@samples_report.name}
           %br
           Created at #{@samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
-      %br
       .title
         Summary
       %table
@@ -45,12 +44,12 @@
                 .subtitle
                   Threshold's FPR
                 .text{id: "computed-fpr"}
-        .separation 
       %br
       .title
         Confusion Matrix
-      %br
       = render 'confusion_matrix'
+
+      .pdf-page-break
 
       .report-header
         = image_tag "cdx-logo-bw.png"
@@ -71,6 +70,7 @@
                     errorBarsVariable: "errors",
                     y_label: 'Measured Signal', 
                     x_labels: @purpose == "Challenge" ? ["Virus", "Distractor"]:[])
+
 
       - if @purpose == "LOD"
         .pdf-page-break
@@ -202,6 +202,7 @@
         filename: gon.samples_report_name+'.pdf',
         pagebreak: { before: '.pdf-page-break' },
         jsPDF: { format: 'A4', orientation: 'landscape' },
+        html2canvas: { scale: 1.0 },
         margin: [15,15,15,15],
       };
       updateThreshold().then(() => html2pdf().set(opt).from(element).save().then(() => window.close()));
