@@ -58,8 +58,8 @@
                       confirmFunction: "confirmFunc", 
                       id: "my-confirmation-modal", 
                       colorClass: "red", 
-                      confirmMessage: "Skip invalid IDs", 
+                      confirmMessage: "Skip invalid/duplicated IDs", 
                       title: "Results Upload Error", 
-                      message: "Some IDs found on this CSV don't exist, please remove those rows and try again. ")
+                      message: "Some IDs found on this CSV are duplicated or don't exist, please remove those rows and try again. ")
 
 = render 'upload_results_js'
