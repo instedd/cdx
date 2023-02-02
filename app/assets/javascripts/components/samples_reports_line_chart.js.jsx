@@ -1,4 +1,4 @@
-var BoxReportsLineChart = React.createClass({
+var SamplesReportsLineChart = React.createClass({
     getDefaultProps: function() {
       return {
         margin: {top: 0, right: 50, bottom: 50, left: 50},

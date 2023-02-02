@@ -58,7 +58,7 @@ class SamplesReportsController < ApplicationController
     @samples_report.samples_report_samples = samples_report_samples
 
     if @samples_report.save
-      redirect_to samples_reports_path, notice: 'Box report was successfully created.'
+      redirect_to samples_reports_path, notice: 'Report was successfully created.'
     else
       render action: 'new'
     end
@@ -92,14 +92,14 @@ class SamplesReportsController < ApplicationController
   
     @samples_report.destroy
     
-    redirect_to samples_reports_path, notice: 'Box report was successfully deleted.'
+    redirect_to samples_reports_path, notice: 'Report was successfully deleted.'
   end
   
   def bulk_destroy
     samples_reports_ids = params[:samples_report_ids]
   
     if samples_reports_ids.blank?
-      redirect_to samples_reports_path, notice: 'Select at least one box report to destroy.'
+      redirect_to samples_reports_path, notice: 'Select at least one report to destroy.'
       return
     end
   
@@ -108,7 +108,7 @@ class SamplesReportsController < ApplicationController
   
     samples_reports.destroy_all
   
-    redirect_to samples_reports_path, notice: 'Box reports were successfully deleted.'
+    redirect_to samples_reports_path, notice: 'Reports were successfully deleted.'
   end
 
   def find_box

@@ -52,7 +52,7 @@
 
         - if @can_delete
           .report-summary-after
-            =link_to delete_samples_report_path, id: @samples_report.id, data: { method: "delete", confirm: "You're about to permanently delete this box report. This action CANNOT be undone. Are you sure you want to proceed?" } do
+            =link_to delete_samples_report_path, id: @samples_report.id, data: { method: "delete", confirm: "You're about to permanently delete this report. This action CANNOT be undone. Are you sure you want to proceed?" } do
               .subtitle
                 = icon_tag "trash", class: "btn-icon icon-text-color"
                 Delete Report
@@ -80,7 +80,7 @@
             .separation 
             .title
               Measured signal
-            = react_component('BoxReportsBarChart', 
+            = react_component('SamplesReportsBarChart', 
                         data: @reports_data, 
                         height: 300, 
                         barVariable: "average",
@@ -92,7 +92,7 @@
               .separation 
               .title
                 Limit of detection
-              = react_component('BoxReportsLineChart', 
+              = react_component('SamplesReportsLineChart', 
                           data: @reports_data, 
                           height: 300, 
                           dotsVariable: "measurements",
@@ -103,7 +103,7 @@
               .separation 
               .title
                 ROC Curve
-              = react_component('BoxReportsRocChart',
+              = react_component('SamplesReportsRocChart',
                 data: roc_curve(@samples_report))
 
 :javascript
