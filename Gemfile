@@ -74,8 +74,7 @@ gem 'geojson_import', git: 'https://github.com/instedd/geojson_import', branch: 
 # Services
 gem 'puma', '~> 3.0'
 gem 'sidekiq', '~> 4.2'
-gem 'sidekiq-cron', '~> 0.3' # TODO: not maintained, consider sidekiq-scheduler instead
-gem 'whenever', '~> 1.0' # TODO: replace with a sidekiq-cron job
+gem 'sidekiq-cron'
 
 # External services
 gem 'location_service', git: 'https://github.com/instedd/ruby-location_service.git', branch: 'master'

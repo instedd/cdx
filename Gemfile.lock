@@ -124,7 +124,6 @@ GEM
       capybara (>= 1.0, < 4)
       launchy
     childprocess (3.0.0)
-    chronic (0.10.2)
     chunky_png (1.4.0)
     climate_control (0.2.0)
     cocaine (0.5.8)
@@ -137,7 +136,7 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.12.2)
-    concurrent-ruby (1.1.10)
+    concurrent-ruby (1.2.0)
     config (1.7.2)
       activesupport (>= 3.0)
       deep_merge (~> 1.2, >= 1.2.1)
@@ -250,7 +249,7 @@ GEM
     ffi (1.15.5)
     filewatcher (0.3.6)
       trollop (~> 2.0)
-    fugit (1.8.0)
+    fugit (1.8.1)
       et-orbi (~> 1, >= 1.2.7)
       raabro (~> 1.4)
     gherkin (5.1.0)
@@ -482,8 +481,6 @@ GEM
     ruby_parser (3.19.2)
       sexp_processor (~> 4.16)
     rubyzip (2.3.2)
-    rufus-scheduler (3.8.2)
-      fugit (~> 1.1, >= 1.1.6)
     sass (3.7.4)
       sass-listen (~> 4.0.0)
     sass-listen (4.0.0)
@@ -506,8 +503,8 @@ GEM
       connection_pool (~> 2.2, >= 2.2.0)
       rack-protection (>= 1.5.0)
       redis (~> 3.2, >= 3.2.1)
-    sidekiq-cron (0.6.3)
-      rufus-scheduler (>= 3.3.0)
+    sidekiq-cron (1.2.0)
+      fugit (~> 1.1)
       sidekiq (>= 4.2.1)
     simplecov (0.18.5)
       docile (~> 1.1)
@@ -541,7 +538,7 @@ GEM
     ttfunk (1.6.2.1)
     turbolinks (2.5.4)
       coffee-rails
-    tzinfo (1.2.10)
+    tzinfo (1.2.11)
       thread_safe (~> 0.1)
     uglifier (2.7.2)
       execjs (>= 0.3.0)
@@ -563,8 +560,6 @@ GEM
     websocket-driver (0.6.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
-    whenever (1.0.0)
-      chronic (>= 0.6.3)
     xpath (3.2.0)
       nokogiri (~> 1.8)
 
@@ -645,7 +640,7 @@ DEPENDENCIES
   selenium-webdriver (< 4.0)
   sentry-raven (~> 2.13)
   sidekiq (~> 4.2)
-  sidekiq-cron (~> 0.3)
+  sidekiq-cron
   simplecov
   site_prism (~> 3.0)
   spring
@@ -659,7 +654,6 @@ DEPENDENCIES
   view_components!
   web-console (< 4.0)
   webmock (~> 2.3.1)
-  whenever (~> 1.0)
 
 BUNDLED WITH
    1.17.3
