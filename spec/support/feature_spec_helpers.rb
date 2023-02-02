@@ -1,3 +1,27 @@
+class TestsController < ActionController::Base
+  @@tokens = {}
+
+  def self.create_token_for(user)
+    token = SecureRandom.uuid
+    @@tokens[token] = user
+    token
+  end
+
+  def user_token_authentication
+    if user = @@tokens.delete(params.fetch(:token))
+      sign_in(user)
+      head :ok
+    else
+      handle_unverified_request
+      head :unauthorized
+    end
+  end
+end
+
+class UserTokenAuthenticationPage < SitePrism::Page
+  set_url "/tests/user_token_authentication{?query*}"
+end
+
 module FeatureSpecHelpers
   extend ActiveSupport::Concern
 
@@ -16,41 +40,35 @@ module FeatureSpecHelpers
     dm.test_results.first
   end
 
-  def sign_in(user)
-    if user.password.nil?
-      # change password of user
-      user.password = 'password'
-      user.password_confirmation = 'password'
-      user.save!
-    end
-
-    goto_page HomePage do |page|
-      unless page.has_form?
-        page.user_menu.icon.click
-        page.user_menu.logout.click
+  def sign_in(user, login_form: false)
+    if login_form
+      # slow: load the login form, fill the form, submit, get redirected to the
+      # dashboard page, wait for the page to be loaded...
+      if user.password.nil?
+        # change password of user
+        user.password = 'password'
+        user.password_confirmation = 'password'
+        user.save!
       end
-      page.form.user_name.set user.email
-      page.form.password.set user.password
-      page.form.login.click
+
+      goto_page HomePage do |page|
+        unless page.has_form?
+          page.user_menu.icon.click
+          page.user_menu.logout.click
+        end
+        page.form.user_name.set user.email
+        page.form.password.set user.password
+        page.form.login.click
+      end
+    else
+      # fast: single token request to immediately sign the user in:
+      goto_page(UserTokenAuthenticationPage, { query: { token: TestsController.create_token_for(user) } })
     end
   end
 
   def goto_page(klass, args = {})
     page = klass.new
-
-    attempts = 0
-    begin
-      page.load args
-    rescue Net::ReadTimeout
-      # Selenium and/or the browser may not be ready yet (especially on CI) so
-      # let's retry a few times...
-      if (attempts += 1) == 3
-        retry
-      else
-        raise
-      end
-    end
-
+    load_page_with_retries(page, args, attempts: 3)
     yield page if block_given?
   end
 
@@ -64,6 +82,22 @@ module FeatureSpecHelpers
 
   def snapshot
     screenshot_and_open_image
+  end
+
+  private
+
+  def load_page_with_retries(page, args, attempts: 3)
+    begin
+      page.load(args)
+    rescue Net::ReadTimeout
+      # Selenium and/or the browser may not be ready yet (especially on CI) so
+      # let's retry a few times...
+      if (attempts -= 1) < 0
+        raise
+      else
+        retry
+      end
+    end
   end
 end
 

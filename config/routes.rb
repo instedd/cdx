@@ -262,4 +262,8 @@ Rails.application.routes.draw do
   end
 
   get 'nndd' => 'application#nndd' if Rails.env.test?
+
+  if Rails.env.test?
+    get "/tests/user_token_authentication", to: "tests#user_token_authentication"
+  end
 end
