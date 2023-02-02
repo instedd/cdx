@@ -6,7 +6,7 @@
           %h1
             - if @can_create
               = link_to "+", new_samples_report_path, class: 'btn-add side-link fix', title: 'Add Report'
-            Reports
+            Samples Reports
 
       %form#filters-form{action: samples_reports_path, "data-auto-submit" => true}
         %input{type: "hidden", name: "page_size", value: @page_size}
