@@ -68,7 +68,7 @@ module FeatureSpecHelpers
 
   def goto_page(klass, args = {})
     page = klass.new
-    load_page_with_retries(page, args)
+    load_page_with_retries(page, args, attempts: 3)
     yield page if block_given?
   end
 
@@ -86,16 +86,16 @@ module FeatureSpecHelpers
 
   private
 
-  def load_page_with_retries(page, args, attempts: 0)
+  def load_page_with_retries(page, args, attempts: 3)
     begin
       page.load(args)
     rescue Net::ReadTimeout
       # Selenium and/or the browser may not be ready yet (especially on CI) so
       # let's retry a few times...
-      if (attempts += 1) == 3
-        retry
-      else
+      if (attempts -= 1) < 0
         raise
+      else
+        retry
       end
     end
   end
