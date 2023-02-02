@@ -1,12 +1,6 @@
 function cdxGenRandomKey(items) {
-  var keys;
+  var keys = (items || []).map(function (item) { return item.key; });
   var key;
-
-  if (items) {
-    keys = items.map(function (item) { return item.key });
-  } else {
-    keys = [];
-  }
 
   do {
     key = "xxxxxxxxxxxxxxxx".replace(/[x]/g, function (c) {
