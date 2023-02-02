@@ -9,7 +9,7 @@
       .report-header
         = image_tag "cdx-logo-bw-.png"
         %span
-          Box Report: #{@samples_report.name}
+          Report: #{@samples_report.name}
           %br
           Created at #{@samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
       %br
@@ -55,7 +55,7 @@
       .report-header
         = image_tag "cdx-logo-bw.png"
         %span
-          Box Report: #{@samples_report.name}
+          Report: #{@samples_report.name}
           %br
           Created at #{@samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
       .title
@@ -64,7 +64,7 @@
       %br
       %br
       %div
-        = react_component('BoxReportsBarChart', 
+        = react_component('SamplesReportsBarChart', 
                     data: @reports_data, 
                     height: 300, 
                     barVariable: "average",
@@ -77,7 +77,7 @@
         .report-header
           = image_tag "cdx-logo-bw.png"
           %span
-            Box Report: #{@samples_report.name}
+            Report: #{@samples_report.name}
             %br
             Created at #{@samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
         
@@ -87,7 +87,7 @@
         %br
         %br
         %div
-          = react_component('BoxReportsLineChart', 
+          = react_component('SamplesReportsLineChart', 
                       data: @reports_data, 
                       height: 400, 
                       width: 600, 
@@ -99,7 +99,7 @@
         .report-header
           = image_tag "cdx-logo-bw.png"
           %span
-            Box Report: #{@samples_report.name}
+            Report: #{@samples_report.name}
             %br
             Created at #{@samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
         
@@ -109,7 +109,7 @@
         %br
         %br
         %div
-        = react_component('BoxReportsRocChart',
+        = react_component('SamplesReportsRocChart',
           data: roc_curve(@samples_report))
 
 :javascript
