@@ -177,6 +177,7 @@ Sample.blueprint(:filled) do
   specimen_role { "p" }
   date_produced { Faker::Time.backward }
   measured_signal { 10.0 }
+  batch { object.encounter.try(:batch) || Batch.make! }
 end
 
 Sample.blueprint(:batch) do

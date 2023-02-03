@@ -267,10 +267,14 @@ describe "boxes" do
     end
 
     describe "add_samples" do
+      let(:v_1) { Batch.make!(institution: institution, batch_number: "VIRUS-1") }
+      let(:v_2) { Batch.make!(institution: institution, batch_number: "VIRUS-2") }
+      let(:d_1) { Batch.make!(institution: institution, batch_number: "DISTRACTOR-1") }
+
       let(:purpose) { Box.purposes.sample }
-      let(:sample_1) { Sample.make!(:filled, institution: institution, batch: Batch.make!(institution: institution, batch_number: "VIRUS-1") ) }
-      let(:sample_2) { Sample.make!(:filled, institution: institution, batch: Batch.make!(institution: institution, batch_number: "VIRUS-2") ) }
-      let(:sample_3) { Sample.make!(:filled, institution: institution, distractor: true) }
+      let(:sample_1) { Sample.make!(:filled, institution: institution, batch: v_1) }
+      let(:sample_2) { Sample.make!(:filled, institution: institution, batch: v_2) }
+      let(:sample_3) { Sample.make!(:filled, institution: institution, batch: d_1, distractor: true) }
       let(:sample_qc) { Sample.make!(:filled, institution: institution, specimen_role: "q") }
       
       it "adds and removes samples" do
