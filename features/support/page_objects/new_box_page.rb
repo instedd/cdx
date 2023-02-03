@@ -79,9 +79,7 @@ class NewBoxPage < CdxPageBase
   end
 
   def add_sample(sample)
-    Capybara.using_wait_time(0) do
-      add_sample_button.click unless has_search_sample?
-    end
+    add_sample_button.click unless has_search_sample?(wait: 0)
     search_sample.paste(sample.uuid)
   end
 

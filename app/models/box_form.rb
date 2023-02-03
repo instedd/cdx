@@ -144,6 +144,14 @@ class BoxForm
         @box.errors.add(:base, "You must select at least one sample")
       elsif @samples.any? { |_, sample| sample.is_quality_control? }
         @box.errors.add(:base, "You can't select a QC sample")
+      else
+        case @box.purpose
+        when "Variants"
+          @box.errors.add(:base, "You must select samples coming from at least two batches") unless samples_unique_batch_count >= 2
+        when "Challenge"
+          @box.errors.add(:base, "You must select at least one non-distractor sample") unless have_virus_sample?
+          @box.errors.add(:base, "You must select at least one distractor sample") unless have_distractor_sample?
+        end
       end
     end
   end
@@ -164,5 +172,17 @@ class BoxForm
     @batches_data.any? do |_, b|
       ActiveModel::Type::Boolean.new.cast(b[:distractor])
     end
+  end
+
+  def samples_unique_batch_count
+    @samples.map { |_, s| s.try(&:batch) }.uniq.size
+  end
+
+  def have_virus_sample?
+    @samples.any? { |_, sample| !sample.distractor }
+  end
+
+  def have_distractor_sample?
+    @samples.any? { |_, sample| sample.distractor }
   end
 end
