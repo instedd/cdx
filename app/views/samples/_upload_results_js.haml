@@ -58,10 +58,11 @@
                 var samples = [] // samples uuids
                 var duplicates = false
                 lines.forEach(function(line) { 
-                    if (line != '' && isUUID(line.split(',')[0])){
-                        if (samples.indexOf(line.split(',')[0]) == -1){
-                            samples_param.push( 'uuids[]=' + line.split(',')[0] );
-                            samples.push( line.split(',')[0] );
+                    var row = line.split(',');
+                    if (line != '' && isUUID(row[0])){
+                        if (samples.indexOf(row[0]) == -1){
+                            samples_param.push( 'uuids[]=' + row[0] );
+                            samples.push( row[0] );
                         }
                         else {
                             duplicates = true;
