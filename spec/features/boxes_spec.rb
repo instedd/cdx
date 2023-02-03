@@ -267,12 +267,16 @@ describe "boxes" do
     end
 
     describe "add_samples" do
-      let(:purpose) { Box.purposes.sample }
-      let(:sample_1) { Sample.make!(:filled, institution: institution) }
-      let(:sample_2) { Sample.make!(:filled, institution: institution) }
-      let(:sample_3) { Sample.make!(:filled, institution: institution) }
-      let(:sample_qc) { Sample.make!(:filled, institution: institution, specimen_role: "q") }
+      let(:v_1) { Batch.make!(institution: institution, batch_number: "VIRUS-1") }
+      let(:v_2) { Batch.make!(institution: institution, batch_number: "VIRUS-2") }
+      let(:d_1) { Batch.make!(institution: institution, batch_number: "DISTRACTOR-1") }
 
+      let(:purpose) { Box.purposes.sample }
+      let(:sample_1) { Sample.make!(:filled, institution: institution, batch: v_1) }
+      let(:sample_2) { Sample.make!(:filled, institution: institution, batch: v_2) }
+      let(:sample_3) { Sample.make!(:filled, institution: institution, batch: d_1, distractor: true) }
+      let(:sample_qc) { Sample.make!(:filled, institution: institution, specimen_role: "q") }
+      
       it "adds and removes samples" do
         goto_page NewBoxPage do |form|
           form.fill(option: "add_samples")
@@ -333,6 +337,49 @@ describe "boxes" do
           expect(form.sample_summaries.size).to eq(0)
         end
       end
+
+      it "can't create Challenge box without virus sample" do
+        goto_page NewBoxPage do |form|
+          form.fill(purpose: "Challenge", media: media, option: "add_samples")
+          form.add_sample(sample_1)
+          form.submit
+        end
+
+        expect_page CreateBoxPage do |form|
+          expect(form.errors).to have_text("You must select at least one distractor sample")
+          expect(form.purpose_field.value).to eq("Challenge")
+          expect(form.media_field.value).to eq(media)
+        end
+      end
+
+      it "can't create Challenge box without distractor sample" do
+        goto_page NewBoxPage do |form|
+          form.fill(purpose: "Challenge", media: media, option: "add_samples")
+          form.add_sample(sample_3)
+          form.submit
+        end
+
+        expect_page CreateBoxPage do |form|
+          expect(form.errors).to have_text("You must select at least one non-distractor sample")
+          expect(form.purpose_field.value).to eq("Challenge")
+          expect(form.media_field.value).to eq(media)
+        end
+      end
+
+      it "can't create Variants box without samples from two batches" do
+        goto_page NewBoxPage do |form|
+          form.fill(purpose: "Variants", media: media, option: "add_samples")
+          form.add_sample(sample_1)
+          form.submit
+        end
+
+        expect_page CreateBoxPage do |form|
+          expect(form.errors).to have_text("You must select samples coming from at least two batches")
+          expect(form.purpose_field.value).to eq("Variants")
+          expect(form.media_field.value).to eq(media)
+        end
+      end
+
     end
   end
 end

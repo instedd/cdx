@@ -235,6 +235,8 @@ class SamplesController < ApplicationController
       :concentration,
       :replicate,
       :media,
+      :distractor,
+      :instruction,
       :measured_signal,
       assay_attachments_attributes: [:id, :loinc_code_id, :result, :assay_file_id, :_destroy],
       notes_attributes: [:id, :description, :updated_at, :user_id, :_destroy],
