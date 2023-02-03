@@ -17,13 +17,14 @@ describe "boxes" do
     let!(:user) { institution.user }
     let(:media) { Sample.media.sample }
 
+    let(:virus_1) { Batch.make!(institution: institution, batch_number: "VIRUS-1") }
+    let(:virus_2) { Batch.make!(institution: institution, batch_number: "VIRUS-2") }
+    let(:distractor_1) { Batch.make!(institution: institution, batch_number: "DISTRACTOR-1") }
+    let(:distractor_2) { Batch.make!(institution: institution, batch_number: "DISTRACTOR-2") }
+
     before { sign_in(user) }
 
     describe "add_batches" do
-      let(:virus_1) { Batch.make!(institution: institution, batch_number: "VIRUS-1") }
-      let(:virus_2) { Batch.make!(institution: institution, batch_number: "VIRUS-2") }
-      let(:distractor_1) { Batch.make!(institution: institution, batch_number: "DISTRACTOR-1") }
-      let(:distractor_2) { Batch.make!(institution: institution, batch_number: "DISTRACTOR-2") }
 
       it "adds and removes batches and concentrations" do
         goto_page NewBoxPage do |form|
@@ -267,16 +268,12 @@ describe "boxes" do
     end
 
     describe "add_samples" do
-      let(:v_1) { Batch.make!(institution: institution, batch_number: "VIRUS-1") }
-      let(:v_2) { Batch.make!(institution: institution, batch_number: "VIRUS-2") }
-      let(:d_1) { Batch.make!(institution: institution, batch_number: "DISTRACTOR-1") }
-
       let(:purpose) { Box.purposes.sample }
-      let(:sample_1) { Sample.make!(:filled, institution: institution, batch: v_1) }
-      let(:sample_2) { Sample.make!(:filled, institution: institution, batch: v_2) }
-      let(:sample_3) { Sample.make!(:filled, institution: institution, batch: d_1, distractor: true) }
+      let(:sample_1) { Sample.make!(:filled, institution: institution, batch: virus_1) }
+      let(:sample_2) { Sample.make!(:filled, institution: institution, batch: virus_2) }
+      let(:sample_3) { Sample.make!(:filled, institution: institution, batch: distractor_1, distractor: true) }
       let(:sample_qc) { Sample.make!(:filled, institution: institution, specimen_role: "q") }
-      
+
       it "adds and removes samples" do
         goto_page NewBoxPage do |form|
           form.fill(option: "add_samples")
@@ -298,9 +295,9 @@ describe "boxes" do
         end
       end
 
-      it "creates the box (for any purpose)" do
+      it "creates an Other box" do
         goto_page NewBoxPage do |form|
-          form.fill(purpose: purpose, media: media, option: "add_samples")
+          form.fill(purpose: "Other", media: media, option: "add_samples")
           form.add_sample(sample_1)
           expect(form.sample_summaries.size).to eq(1)
           form.submit
@@ -342,6 +339,7 @@ describe "boxes" do
         goto_page NewBoxPage do |form|
           form.fill(purpose: "Challenge", media: media, option: "add_samples")
           form.add_sample(sample_1)
+          expect(form.sample_summaries.size).to eq(1)
           form.submit
         end
 
@@ -356,6 +354,7 @@ describe "boxes" do
         goto_page NewBoxPage do |form|
           form.fill(purpose: "Challenge", media: media, option: "add_samples")
           form.add_sample(sample_3)
+          expect(form.sample_summaries.size).to eq(1)
           form.submit
         end
 
@@ -370,6 +369,7 @@ describe "boxes" do
         goto_page NewBoxPage do |form|
           form.fill(purpose: "Variants", media: media, option: "add_samples")
           form.add_sample(sample_1)
+          expect(form.sample_summaries.size).to eq(1)
           form.submit
         end
 
@@ -379,7 +379,6 @@ describe "boxes" do
           expect(form.media_field.value).to eq(media)
         end
       end
-
     end
   end
 end
