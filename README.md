@@ -248,13 +248,12 @@ $ geckodriver --host 0.0.0.0
 $ chromedriver --allowed-ips 0.0.0.0
 ```
 
-Then export environment variables before running tests. For example (make sure
-to replace `your.host.ip` with an actual IP on your host:
+Then export environment variables before running tests:
 
 ```console
 $ docker compose run --rm web bash
 > export HEADLESS=false
-> export SELENIUM_URL=http://your.host.ip:4444/
+> export SELENIUM_URL=http://host.docker.internal:4444/
 > rspec spec/features/*
 > cucumber
 ```
@@ -276,7 +275,7 @@ services:
   web:
     environment:
       HEADLESS: "false"
-      SELENIUM_URL: "http://<your.host.ip>:4444/"
+      SELENIUM_URL: "http://host.docker.internal:4444/"
       BROWSER: "chrome" # or "firefox"
 ```
 
