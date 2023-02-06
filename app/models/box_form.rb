@@ -134,9 +134,9 @@ class BoxForm
       when "LOD", "Other"
         @box.errors.add(:base, "A batch is required") unless unique_batch_count >= 1
       when "Variants"
-        @box.errors.add(:base, "You must select at least two batches") unless unique_batch_count >= 2
+        @box.errors.add(:base, "You must select at least two different batches") unless unique_batch_count >= 2
       when "Challenge"
-        @box.errors.add(:base, "A virus batch is required") unless have_virus_batch?
+        @box.errors.add(:base, "You must select at least one non-distractor batch") unless have_virus_batch?
         @box.errors.add(:base, "You must select at least one distractor batch") unless have_distractor_batch?
       end
     when "add_samples"
@@ -147,7 +147,7 @@ class BoxForm
       else
         case @box.purpose
         when "Variants"
-          @box.errors.add(:base, "You must select samples coming from at least two batches") unless samples_unique_batch_count >= 2
+          @box.errors.add(:base, "You must select samples coming from at least two different batches") unless samples_unique_batch_count >= 2
         when "Challenge"
           @box.errors.add(:base, "You must select at least one non-distractor sample") unless have_virus_sample?
           @box.errors.add(:base, "You must select at least one distractor sample") unless have_distractor_sample?
