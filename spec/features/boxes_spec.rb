@@ -136,7 +136,7 @@ describe "boxes" do
           end
 
           expect_page CreateBoxPage do |form|
-            expect(form.errors).to have_text("You must select at least two batches")
+            expect(form.errors).to have_text("You must select at least two different batches")
             expect(form.purpose_field.value).to eq("Variants")
             expect(form.media_field.value).to eq(media)
             expect(form.batch_summaries.size).to eq(2)
@@ -205,7 +205,7 @@ describe "boxes" do
           end
 
           expect_page CreateBoxPage do |form|
-            expect(form.errors).to have_text("A virus batch is required")
+            expect(form.errors).to have_text("You must select at least one non-distractor batch")
             expect(form.purpose_field.value).to eq("Challenge")
             expect(form.batch_summaries.size).to eq(2)
 
@@ -374,7 +374,7 @@ describe "boxes" do
         end
 
         expect_page CreateBoxPage do |form|
-          expect(form.errors).to have_text("You must select samples coming from at least two batches")
+          expect(form.errors).to have_text("You must select samples coming from at least two different batches")
           expect(form.purpose_field.value).to eq("Variants")
           expect(form.media_field.value).to eq(media)
         end
