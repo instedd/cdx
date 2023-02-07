@@ -379,6 +379,27 @@ describe "boxes" do
           expect(form.media_field.value).to eq(media)
         end
       end
+
+      let(:distractor) { Batch.make!(institution: institution, batch_number: "DISTRACTOR") }
+
+      it "can create a from a CSV file" do
+        goto_page NewBoxPage do |form|
+          form.fill(purpose: "LOD", media: media, option: "add_csv")
+          form.add_csv_file('/src/spec/fixtures/csvs/csv_box_1.csv')
+          form.submit
+          puts form.errors.text
+        end
+
+        expect_page ListBoxesPage do |page|
+          expect(page.entries.size).to eq(1)
+          page.entries.last.uuid.click
+        end
+
+        expect_page ShowBoxPage do |page|
+          expect(page.samples.size).to eq(1)
+          expect(page.samples[0]).to have_text(sample_1.uuid)
+        end
+      end
     end
   end
 end

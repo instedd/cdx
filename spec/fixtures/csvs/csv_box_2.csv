@@ -1,0 +1,7 @@
+Batch,Concentration,Distractor,Instructions
+VIRUS,10,no,Add 10ml
+VIRUS,10,no,Add 10ml
+DISTRACTOR,10,yes,Add 10ml
+DISTRACTOR,10,yes,Add 10ml
+DISTRACTOR,20,yes,Add 10ml
+DISTRACTOR,20,yes,Add 10ml
