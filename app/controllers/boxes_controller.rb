@@ -133,14 +133,14 @@ class BoxesController < ApplicationController
 
   def box_params
     if Rails::VERSION::MAJOR == 5 && Rails::VERSION::MINOR == 0
-      params.require(:box).permit(:purpose, :media, :blinded, :option).tap do |allowed|
+      params.require(:box).permit(:purpose, :media, :blinded, :option, :csv_box).tap do |allowed|
         allowed[:batches] = params[:box][:batches].try(&:permit!)
         allowed[:sample_uuids] = params[:box][:sample_uuids].try(&:permit!)
         allowed[:concentrations] = params[:box][:concentrations].try(&:permit!)
       end
     else
       params.require(:box)
-        .permit(:purpose, :media, :blinded, :option, sample_uuids: [], batches: [
+        .permit(:purpose, :media, :blinded, :option, :csv_box, sample_uuids: [], batches: [
           :batch_uuid, :distractor, :instruction, concentrations: [:replicate, :concentration]
         ])
     end

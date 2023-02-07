@@ -1,0 +1,146 @@
+
+%template{:id => "csvFileRow"}
+  .list-items.upload_info
+    .items-row
+      .items-item.gap-5
+        .icon-circle-minus.icon-gray.remove_file
+        .file-name
+      .items-row-action.gap-5.not_found_message
+        .uploaded-samples-count
+        .upload-icon.bigger
+        .ttext.not-found-uuids.hidden
+        
+%template{:id => "csvInputFile"}
+  = file_field_tag "box[csv_box]", hidden: true, class: "csv_file", accept: "text/csv"
+
+:javascript
+  var getUrlParameter = function getUrlParameter(sParam) {
+      var sPageURL = window.location.search.substring(1),
+          sURLVariables = sPageURL.split('&'),
+          sParameterName,
+          i;
+
+      for (i = 0; i < sURLVariables.length; i++) {
+          sParameterName = sURLVariables[i].split('=');
+
+          if (sParameterName[0] === sParam) {
+              return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+          }
+      }
+      return false;
+  };
+
+  var context = getUrlParameter('context');
+  var isUUID = function(str) {
+    const regexExp = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/gi;
+    return regexExp.test(str);
+  };
+
+  var showToolTip = function(evt) {
+    var tooltip = evt.currentTarget.tooltip
+    if (tooltip.classList.contains("hidden")) {
+        tooltip.classList.remove("hidden")
+        setTimeout(() => tooltip.classList.add("hidden"), 5000)
+    }
+    else {
+        tooltip.classList.toggle("hidden")
+    }
+  }
+
+  // Add file button behaviour
+  function handleFileSelect(change_event) {
+    // We use the 1st file from the FileList list
+    let f = change_event.target.files[0];
+    let reader = new FileReader();
+
+    // Closure to capture the file information.
+    reader.onload = (function(f) {
+      return async(load_event) => {
+        // Parse the input file
+        var text =  load_event.target.result
+        var lines = text.split(/\r\n|\r|\n/); // tolerate both Windows and Unix linebreaks
+        
+        var fieldNames = ['Batch','Concentration','Distractor','Instructions']
+        var samples = []
+        var startParsing = false;
+        
+        var found_batches = new Set()
+        var not_found_batches = new Set()
+        
+        for (const line of lines) {
+          var fields = line.split(',')
+          if (startParsing && fields.length >= fieldNames.length) {
+            var sample = {}
+            fieldNames.forEach( async field => { sample[field] = fieldNames.indexOf(field) })
+            if (!found_batches.has(fields[0])) {
+              // Check if the batch number exists
+              var found = await fetch('/batches/existing_batch_number?context='+context+"&batch_number="+fields[0])
+                .then((response) => response.json())
+                .then((r) => { return r.message; })
+              
+              found.length > 0 ? found_batches.add(fields[0]) : not_found_batches.add(fields[0])
+            }
+            if (not_found_batches.has(fields[0])) continue;
+            samples.push(sample);
+          }
+          if ( !startParsing && _.isEqual(fields, fieldNames) ) startParsing = true;
+        }
+        
+        if (samples.length == 0) {
+          document.getElementById(`csv-file-error`).classList.remove(`hidden`);
+        } 
+        else {
+          // Create row from template with filename and upload info
+          var template = document.getElementById(`csvFileRow`).content;
+          var fragment = template.cloneNode(true);
+
+          fragment.querySelector(`.uploaded-samples-count`).textContent = `${samples.length} Samples ` ;
+          fragment.querySelector(`.upload-icon`).classList.add(`icon-checkmark`)
+          fragment.querySelector(`.file-name`).textContent = `${f.name}`;
+          
+          // Bind click event to remove button
+          var removeFileRow = function(evt) {
+              evt.currentTarget.upload_info.remove();
+              change_event.target.remove();
+              document.getElementById(`add-box-file`).style.display = 'block';
+          }
+          fragment.querySelector(".remove_file").upload_info = fragment.querySelector(`.upload_info`)
+          fragment.querySelector(".remove_file").addEventListener('click', removeFileRow, false)
+
+          // Add tooltip to display not found batches
+          if (not_found_batches.size > 0) {
+            fragment.querySelector(`.uploaded-samples-count`).innerHTML += `(<span class="dashed-underline">${(not_found_batches.size)} batch${(not_found_batches.size>1?'es':'')}</span> not found) `
+            fragment.querySelector(`.upload-icon`).classList.add(`icon-alert`,`icon-red`)
+            fragment.querySelector(`.items-row-action`).classList.add(`ttip`,`input-required`)
+
+            // Add mouse behaviour to display tooltip
+            var ttext = fragment.querySelector(".ttext")
+            ttext.innerHTML = Array.from(not_found_batches).slice(0,5).join("<br>")
+
+            fragment.querySelector(".not_found_message").tooltip = ttext
+            fragment.querySelector(".not_found_message").addEventListener('click', showToolTip, false )
+          } else {
+            fragment.querySelector(`.upload-icon`).classList.add(`icon-check`)
+            fragment.querySelector(`.ttext`).remove()
+          }
+
+          document.getElementById(`uploaded-files`).append(fragment);
+          document.getElementById(`add-box-file`).style.display = 'none';
+          document.getElementById(`csv-file-error`).classList.add(`hidden`);
+        }
+        
+      }
+    })(f);
+    reader.readAsText(f);
+  }
+
+  // Upon pressing the "Add file" button we will create a file input and click it
+  document.getElementById(`add-box-file`).addEventListener('click', function (e) {
+    var template = document.getElementById(`csvInputFile`).content;
+    var fragment = template.cloneNode(true);
+    var fileInput = fragment.querySelector('.csv_file');
+    document.getElementById(`uploaded-files`).append(fragment)
+    
+    fileInput.addEventListener('change', handleFileSelect, false);
+    fileInput.click();
+  })

@@ -22,6 +22,8 @@ class BoxForm
     @option = params[:option]
     @media = params[:media].presence
     @batches_data = params[:batches].presence.to_h
+    @csv_box = params[:csv_box].presence
+    initialize_csv_box if @csv_box
     @batch_uuids = @batches_data.transform_values { |v| v[:batch_uuid] }
     @sample_uuids = params[:sample_uuids].presence.to_h
   end
@@ -71,7 +73,7 @@ class BoxForm
 
   def build_samples
     case @option
-    when "add_batches"
+    when "add_batches", "add_csv"
       @batches_data.each do |batch_key, b|
         next if b[:batch_uuid].blank?
 
@@ -139,6 +141,16 @@ class BoxForm
         @box.errors.add(:base, "A virus batch is required") unless have_virus_batch?
         @box.errors.add(:base, "You must select at least one distractor batch") unless have_distractor_batch?
       end
+    when "add_csv"
+      case @box.purpose
+      when "LOD", "Other"
+        @box.errors.add(:base, "You must include at least one sample") unless unique_batch_count >= 1
+      when "Variants"
+        @box.errors.add(:base, "You must include samples from at least two different batches") unless unique_batch_count >= 2
+      when "Challenge"
+        @box.errors.add(:base, "You must include at least one non-distractor sample") unless have_virus_batch?
+        @box.errors.add(:base, "You must include at least one distractor sample") unless have_distractor_batch?
+      end
     when "add_samples"
       if @samples.empty?
         @box.errors.add(:base, "You must select at least one sample")
@@ -184,5 +196,26 @@ class BoxForm
 
   def have_distractor_sample?
     @samples.any? { |_, sample| sample.distractor }
+  end
+
+  def initialize_csv_box
+    CSV.open(@csv_box.path) do |csv_stream|
+      i = 0
+      csv_stream.each do |row|
+        batch_number, concentration, distractor, instruction = row[0..3]
+        batch_uuid = Batch.find_by(batch_number: batch_number)&.uuid
+        next if batch_uuid.blank?
+        @batches_data[i] = {
+          batch_uuid: batch_uuid,
+          distractor: distractor.downcase == "yes",
+          instruction: instruction,
+          concentrations: {i: {
+            replicate: 1,
+            concentration: Integer(Float(concentration)),
+          }},
+        }
+        i += 1
+      end
+    end
   end
 end
