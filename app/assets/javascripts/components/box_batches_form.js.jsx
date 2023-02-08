@@ -301,7 +301,7 @@ var BoxBatchForm = React.createClass({
   },
 
   isValidConcentration: function (c) {
-    return (parseInt(c.replicate, 10) > 0 && parseFloat(c.concentration, 10) > 0);
+    return (parseInt(c.replicate, 10) > 0 && parseFloat(c.concentration, 10) >= 0);
   },
 
   hideForm: function (event) {
