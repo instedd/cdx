@@ -64,8 +64,11 @@ describe "boxes" do
 
           # validates concentration field:
           field = batch_form.concentration_fields[0]
-          field.set(0)
+          field.set(-1)
           expect(batch_form.ok.disabled?).to be(true)
+
+          field.set(0)
+          expect(batch_form.ok.disabled?).to be(false)
 
           field.set(2)
           expect(batch_form.ok.disabled?).to be(false)
