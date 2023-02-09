@@ -442,6 +442,13 @@ RSpec.describe BoxesController, type: :controller do
         end.to change(institution.boxes, :count).by(0)
       end
     end
+
+    it "validates option" do
+      expect do
+        post :create, params: { box: { purpose: "Other", option: "" } }
+        expect(response).to have_http_status(:unprocessable_entity)
+      end.to change(institution.boxes, :count).by(0)
+    end
   end
 
   describe "destroy" do

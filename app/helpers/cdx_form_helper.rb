@@ -123,9 +123,9 @@ class FormFieldBuilder < ActionView::Helpers::FormBuilder
     end
 
     Rails.logger.info "Unhandled form errors in #{@object.model_name}: #{unhandled_errors}"
-    Raven.capture_message("Unhandled form errors",
+    Raven.capture_message("Unhandled form errors", extra: {
       form: @object.model_name,
       errors: unhandled_errors,
-    )
+    })
   end
 end
