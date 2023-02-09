@@ -170,13 +170,9 @@
   display: flex;
   align-items: center;
   margin-left: auto;
-  
-  .icon-check {
-    width: 24px;
-    height: 24px;
-    margin-left: 10px;
-    background-size: 100%;
-    cursor: pointer;
+
+  >input{
+    width: 80px;
   }
 }
 
