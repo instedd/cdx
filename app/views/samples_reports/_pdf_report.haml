@@ -3,114 +3,117 @@
 = javascript_include_tag "application"
 = csrf_meta_tags
 
-%div{:hidden => true}
+%div
   .samples-report{id:'samples-report'}
     .report-content 
-      .report-header
-        = image_tag "cdx-logo-bw.png"
-        %span
-          Report: #{@samples_report.name}
-          %br
-          Created at #{@samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
-      .title
-        Summary
-      %table
-        %td{width: "200px"}
-          .subtitle 
-            Samples
-          .text 
-            = @samples_report.samples_report_samples.length
-            -if @samples_without_results_count > 0
-              (#{@samples_without_results_count} without results)
-          .subtitle 
-            Box Purpose
-          .text 
-            = @purpose
-        - if @purpose == "Challenge"
+      .report-page
+        .report-header
+          = image_tag "cdx-logo-bw.png"
+          %span
+            Report: #{@samples_report.name}
+            %br
+            Created at #{@samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
+        .title
+          Summary
+        %table
           %td{width: "200px"}
             .subtitle 
-              Threshold
+              Samples
             .text 
-              = params["threshold"].to_f
-            -if @purpose == "Challenge"
+              = @samples_report.samples_report_samples.length
+              -if @samples_without_results_count > 0
+                (#{@samples_without_results_count} without results)
+            .subtitle 
+              Box Purpose
+            .text 
+              = @purpose
+          - if @purpose == "Challenge"
+            %td{width: "200px"}
               .subtitle 
-                Computed ROC AUC
+                Threshold
               .text 
-                = auc(roc_curve(@samples_report))
-              %td{width: "200px"}
-                .subtitle
-                  Threshold's TPR
-                .text{id: "computed-tpr"}
-                .subtitle
-                  Threshold's FPR
-                .text{id: "computed-fpr"}
-      %br
-      .title
-        Confusion Matrix
-      = render 'confusion_matrix'
+                = params["threshold"].to_f
+              -if @purpose == "Challenge"
+                .subtitle 
+                  Computed ROC AUC
+                .text 
+                  = auc(roc_curve(@samples_report))
+                %td{width: "200px"}
+                  .subtitle
+                    Threshold's TPR
+                  .text{id: "computed-tpr"}
+                  .subtitle
+                    Threshold's FPR
+                  .text{id: "computed-fpr"}
+        %br
+        .title
+          Confusion Matrix
+        = render 'confusion_matrix'
 
       .pdf-page-break
-
-      .report-header
-        = image_tag "cdx-logo-bw.png"
-        %span
-          Report: #{@samples_report.name}
-          %br
-          Created at #{@samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
-      .title
-        Measured signal
-      %br
-      %br
-      %br
-      %div
-        = react_component('SamplesReportsBarChart', 
-                    data: @reports_data, 
-                    height: 300, 
-                    barVariable: "average",
-                    errorBarsVariable: "errors",
-                    y_label: 'Measured Signal', 
-                    x_labels: @purpose == "Challenge" ? ["Virus", "Distractor"]:[])
+      .report-page
+        .report-header
+          = image_tag "cdx-logo-bw.png"
+          %span
+            Report: #{@samples_report.name}
+            %br
+            Created at #{@samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
+        .title
+          Measured signal
+        %br
+        %br
+        %br
+        %div
+          = react_component('SamplesReportsBarChart', 
+                      data: @reports_data, 
+                      height: 300, 
+                      barVariable: "average",
+                      errorBarsVariable: "errors",
+                      y_label: 'Measured Signal', 
+                      x_labels: @purpose == "Challenge" ? ["Virus", "Distractor"]:[])
 
 
       - if @purpose == "LOD"
         .pdf-page-break
-        .report-header
-          = image_tag "cdx-logo-bw.png"
-          %span
-            Report: #{@samples_report.name}
-            %br
-            Created at #{@samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
-        
-        .title
-          Limit of detection
-        %br
-        %br
-        %br
-        %div
-          = react_component('SamplesReportsLineChart', 
-                      data: @reports_data, 
-                      height: 400, 
-                      width: 600, 
-                      dotsVariable: "measurements",
-                      y_label: 'Measured Signal', 
-                      x_labels: [])
+        .report-page
+          .report-header
+            = image_tag "cdx-logo-bw.png"
+            %span
+              Report: #{@samples_report.name}
+              %br
+              Created at #{@samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
+          
+          .title
+            Limit of detection
+          %br
+          %br
+          %br
+          %div
+            = react_component('SamplesReportsLineChart', 
+                        data: @reports_data, 
+                        height: 400, 
+                        width: 600, 
+                        dotsVariable: "measurements",
+                        y_label: 'Measured Signal', 
+                        x_labels: [])
       - if @purpose == "Challenge"
         .pdf-page-break
-        .report-header
-          = image_tag "cdx-logo-bw.png"
-          %span
-            Report: #{@samples_report.name}
-            %br
-            Created at #{@samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
-        
-        .title
-          ROC Curve
-        %br
-        %br
-        %br
-        %div
-        = react_component('SamplesReportsRocChart',
-          data: roc_curve(@samples_report))
+        .report-page
+          .report-header
+            = image_tag "cdx-logo-bw.png"
+            %span
+              Report: #{@samples_report.name}
+              %br
+              Created at #{@samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
+          
+          .title
+            ROC Curve
+          %br
+          %br
+          %br
+          %div
+          = react_component('SamplesReportsRocChart',
+            data: roc_curve(@samples_report))
 
 :javascript
   
@@ -193,9 +196,19 @@
   }
 
   addScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js');
-      
+
+  async function onclone() {
+    const svgElements = document.body.getElementsByClassName("samples-report")[0].getElementsByTagName("svg");
+    Array.from(svgElements).forEach((svgElement) => {
+        const bBox = svgElement.getBBox();
+        svgElement.setAttribute("width", bBox.width);
+        svgElement.setAttribute("height", bBox.height);
+    });
+  }
+
   window.onload =
     function() {
+
       var element = document.getElementById('samples-report');
       
       var opt = {
@@ -203,8 +216,14 @@
         pagebreak: { before: '.pdf-page-break' },
         jsPDF: { format: 'A4', orientation: 'landscape' },
         html2canvas: { scale: 1.0 },
-        margin: [15,15,15,15],
+        //margin: [15,15,15,15],
       };
-      updateThreshold().then(() => html2pdf().set(opt).from(element).save().then(() => window.close()));
+
+      onclone().then(() => 
+        updateThreshold().then(() => 
+          html2pdf().set(opt).from(element).save()
+            .then(() => window.close())
+        )
+      );
     }
   

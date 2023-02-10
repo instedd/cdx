@@ -2,6 +2,10 @@
   @include flexbox();
   @include flex-direction(column);
   
+  .report-page {
+    margin:15px 15px 30px 30px;
+  }
+
   .report-summary-content {
     background: $gray1;
     border-radius: 3px;
