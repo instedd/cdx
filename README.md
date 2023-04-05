@@ -18,7 +18,7 @@ Reference implementation for the Connected Diagnostics API (http://dxapi.org/)
 
 4. Setup development db, test db and elasticsearch index template:
 	```
-	$ docker-compose run --rm web rake db:setup db:test:prepare elasticsearch:setup
+	$ docker-compose run --rm web bundle exec rake db:setup db:test:prepare elasticsearch:setup
 	```
 
 ### Additionally setup for importing Loinc Codes
