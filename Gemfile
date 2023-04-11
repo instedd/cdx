@@ -53,7 +53,7 @@ gem 'dotiw', '~> 3.0'
 gem 'faker', '< 1.9.2' # NOTE: kept until we upgrade to ruby 2.5+ then we can upgrade to ffaker 2.20 to replace Faker::Number
 gem 'ffaker', '< 2.12.0'
 gem 'guid', '~> 0.1'
-gem 'nokogiri', '~> 1.6', '< 1.11.0' # last version to support ruby 2.4
+gem 'nokogiri', '~> 1.14' # last version to support ruby 2.4
 gem 'oj', '~> 2.12', '< 2.17.3' # NOTE: 2.17.3 will stringify Time as a Float then load a BigDecimal...
 gem 'rails-i18n', '~> 5.0'
 gem 'rchardet', '~> 1.6'
