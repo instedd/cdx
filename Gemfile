@@ -110,6 +110,7 @@ group :development do
   gem 'spring-commands-rspec'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'web-console', '< 4.0' # last version to support ruby 2.4 / rails 5
+  gem 'brakeman-lib'
 end
 
 group :development, :test do
