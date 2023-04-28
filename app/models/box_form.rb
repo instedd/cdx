@@ -209,7 +209,7 @@ class BoxForm
           batch_uuid: batch_uuid,
           distractor: distractor.downcase == "yes",
           instruction: instruction,
-          concentrations: {i: {
+          concentrations: {"0" => {
             replicate: 1,
             concentration: Integer(Float(concentration)),
           }},

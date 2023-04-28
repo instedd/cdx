@@ -9,7 +9,7 @@
         .uploaded-samples-count
         .upload-icon.bigger
         .ttext.not-found-uuids.hidden
-        
+
 %template{:id => "csvInputFile"}
   = file_field_tag "box[csv_box]", hidden: true, class: "csv_file", accept: "text/csv"
 
@@ -48,99 +48,80 @@
   }
 
   // Add file button behaviour
-  function handleFileSelect(change_event) {
-    // We use the 1st file from the FileList list
-    let f = change_event.target.files[0];
-    let reader = new FileReader();
+  async function handleFileSelect(evt) {
+    const file = evt.files[0];
+    if (!file) return;
 
-    // Closure to capture the file information.
-    reader.onload = (function(f) {
-      return async(load_event) => {
-        // Parse the input file
-        var text =  load_event.target.result
-        var lines = text.split(/\r\n|\r|\n/); // tolerate both Windows and Unix linebreaks
-        
-        var fieldNames = ['Batch','Concentration','Distractor','Instructions']
-        var samples = []
-        var startParsing = false;
-        
-        var found_batches = new Set()
-        var not_found_batches = new Set()
-        
-        for (const line of lines) {
-          var fields = line.split(',')
-          if (startParsing && fields.length >= fieldNames.length) {
-            var sample = {}
-            fieldNames.forEach( async field => { sample[field] = fieldNames.indexOf(field) })
-            if (!found_batches.has(fields[0])) {
-              // Check if the batch number exists
-              var found = await fetch('/batches/existing_batch_number?context='+context+"&batch_number="+fields[0])
-                .then((response) => response.json())
-                .then((r) => { return r.message; })
-              
-              found.length > 0 ? found_batches.add(fields[0]) : not_found_batches.add(fields[0])
-            }
-            if (not_found_batches.has(fields[0])) continue;
-            samples.push(sample);
-          }
-          if ( !startParsing && _.isEqual(fields, fieldNames) ) startParsing = true;
-        }
-        
-        if (samples.length == 0) {
-          document.getElementById(`csv-file-error`).classList.remove(`hidden`);
-        } 
-        else {
-          // Create row from template with filename and upload info
-          var template = document.getElementById(`csvFileRow`).content;
-          var fragment = template.cloneNode(true);
+    const formData = new FormData();
+    formData.append("csv_file", file);
 
-          fragment.querySelector(`.uploaded-samples-count`).textContent = `${samples.length} Samples ` ;
-          fragment.querySelector(`.upload-icon`).classList.add(`icon-checkmark`)
-          fragment.querySelector(`.file-name`).textContent = `${f.name}`;
-          
-          // Bind click event to remove button
-          var removeFileRow = function(evt) {
-              evt.currentTarget.upload_info.remove();
-              change_event.target.remove();
-              document.getElementById(`add-box-file`).style.display = 'block';
-          }
-          fragment.querySelector(".remove_file").upload_info = fragment.querySelector(`.upload_info`)
-          fragment.querySelector(".remove_file").addEventListener('click', removeFileRow, false)
+    document.querySelector("#validating-spinner").classList.remove("hidden");
+    document.querySelector("#csv-file-error").classList.add("hidden");
 
-          // Add tooltip to display not found batches
-          if (not_found_batches.size > 0) {
-            fragment.querySelector(`.uploaded-samples-count`).innerHTML += `(<span class="dashed-underline">${(not_found_batches.size)} batch${(not_found_batches.size>1?'es':'')}</span> not found) `
-            fragment.querySelector(`.upload-icon`).classList.add(`icon-alert`,`icon-red`)
-            fragment.querySelector(`.items-row-action`).classList.add(`ttip`,`input-required`)
+    try {
+      const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
+      const response = await fetch("#{csv_validation_path(@navigation_context.uuid)}", {
+        method: "POST",
+        headers: {
+          "X-CSRF-Token": csrfToken
+        },
+        body: formData
+      });
 
-            // Add mouse behaviour to display tooltip
-            var ttext = fragment.querySelector(".ttext")
-            ttext.innerHTML = Array.from(not_found_batches).slice(0,5).join("<br>")
+      if (response.ok) {
+      const response_json = (await response.json())
+      const found_batches = response_json.found_batches;
+      const not_found_batches = response_json.not_found_batches;
+      const batches_nbr = response_json.batches_nbr;
 
-            fragment.querySelector(".not_found_message").tooltip = ttext
-            fragment.querySelector(".not_found_message").addEventListener('click', showToolTip, false )
-          } else {
-            fragment.querySelector(`.upload-icon`).classList.add(`icon-check`)
-            fragment.querySelector(`.ttext`).remove()
-          }
+      // Create row from template with filename and upload info
+      var template = document.getElementById(`csvFileRow`).content;
+      var fragment = template.cloneNode(true);
 
-          document.getElementById(`uploaded-files`).append(fragment);
-          document.getElementById(`add-box-file`).style.display = 'none';
-          document.getElementById(`csv-file-error`).classList.add(`hidden`);
-        }
-        
+      fragment.querySelector(`.uploaded-samples-count`).textContent = `${batches_nbr} Samples ` ;
+      fragment.querySelector(`.upload-icon`).classList.add(`icon-checkmark`)
+      fragment.querySelector(`.file-name`).textContent = `${file.name}`;
+
+      // Bind click event to remove button
+      var removeFileRow = function(evt) {
+          evt.currentTarget.upload_info.remove();
+          document.getElementById(`add-box-file`).style.display = 'block';
       }
-    })(f);
-    reader.readAsText(f);
-  }
+      fragment.querySelector(".remove_file").upload_info = fragment.querySelector(`.upload_info`)
+      fragment.querySelector(".remove_file").addEventListener('click', removeFileRow, false)
 
-  // Upon pressing the "Add file" button we will create a file input and click it
-  document.getElementById(`add-box-file`).addEventListener('click', function (e) {
-    var template = document.getElementById(`csvInputFile`).content;
-    var fragment = template.cloneNode(true);
-    var fileInput = fragment.querySelector('.csv_file');
-    document.getElementById(`uploaded-files`).append(fragment)
-    
-    fileInput.addEventListener('change', handleFileSelect, false);
-    fileInput.click();
-  })
+      // Add tooltip to display not found batches
+      if (not_found_batches.length > 0) {
+        fragment.querySelector(`.uploaded-samples-count`).innerHTML += `(<span class="dashed-underline">${(not_found_batches.length)} batch${(not_found_batches.length>1?'es':'')}</span> not found) `
+        fragment.querySelector(`.upload-icon`).classList.add(`icon-alert`,`icon-red`)
+        fragment.querySelector(`.items-row-action`).classList.add(`ttip`,`input-required`)
+
+        // Add mouse behaviour to display tooltip
+        var ttext = fragment.querySelector(".ttext")
+        ttext.innerHTML = Array.from(not_found_batches).slice(0,5).join("<br>")
+
+        fragment.querySelector(".not_found_message").tooltip = ttext
+        fragment.querySelector(".not_found_message").addEventListener('click', showToolTip, false )
+      } else {
+        fragment.querySelector(`.upload-icon`).classList.add(`icon-check`)
+        fragment.querySelector(`.ttext`).remove()
+      }
+
+      document.getElementById(`uploaded-files`).append(fragment);
+      document.getElementById(`add-box-file`).style.display = 'none';
+      document.getElementById(`csv-file-error`).classList.add(`hidden`);
+
+      } else {
+      console.log("error")
+        document.querySelector("#csv-file-error").classList.remove("hidden");
+        document.querySelector("#csv-file-error").innerHTML = validationMessage;
+      }
+    } catch (error) {
+    console.log(error)
+      // Handle network or server error
+      console.error("An error occurred during the transaction");
+    } finally {
+      // Hide spinner
+      document.querySelector("#validating-spinner").classList.add("hidden");
+    }
+  }

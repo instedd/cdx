@@ -35,7 +35,7 @@
             = react_component "SamplesSelector", { url: autocomplete_samples_path(format: "json", context: params[:context], qc: 0),
               name: "box[sample_uuids]", placeholder: "Enter sample id", className: "input-block",
               samples: @box_form.samples_data }
-          
+
           %fieldset#add_csv{ :disabled => @box_form.option != "add_csv", :style => (@box_form.option == "add_csv" ? "" : "display: none") }
             #uploaded-files
 
@@ -43,17 +43,21 @@
               = button_tag id: 'add-box-file', class: 'btn-link', type: "button" do
                 .icon-circle-plus.icon-blue.icon-margin
                 %span.btn-upload
-                  Add file
+                  = file_field_tag "box[csv_box]", class: "csv_file", accept: "text/csv", onchange: "handleFileSelect(this)"
+            .row
+              #validating-spinner.hidden
+                .spinner
+          .spinner
             .row
               =link_to '/templates/upload_box.csv', class: 'btn-link', target: "_blank" do
                 .icon-download.icon-gray
                 %span.btn-download
                   CSV template
             .row.errors.hidden#csv-file-error
-              No samples were found in the CSV file or it has an invalid format. 
+              No samples were found in the CSV file or it has an invalid format.
               %br
               Please check the template and try again.
-              
+
   .row
     .col
       = f.check_box :blinded
