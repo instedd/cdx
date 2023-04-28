@@ -41,3 +41,5 @@ Procfile.local
 
 # Artefacts
 /coverage
+
+.overcommit.yml
