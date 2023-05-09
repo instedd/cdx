@@ -6,7 +6,7 @@ class CsvValidationsController < ApplicationController
       institution = @navigation_context.institution
       csv_table = CSV.parse(csv_text, headers: true)
       batch_values = csv_table.map { |row| row["Batch"] }
-      found_batches = institution.batches.where(batch_number: batch_values).pluck(:uuid)
+      found_batches = institution.batches.where(batch_number: batch_values).pluck(:batch_values)
       not_found_batches = (batch_values - found_batches).uniq
 
       render json: { found_batches: found_batches,
