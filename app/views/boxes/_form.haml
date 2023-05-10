@@ -7,6 +7,7 @@
         .col
           = cdx_select form: f, name: :purpose, searchable: false, :class => 'input-large' do |select|
             - select.items Box.purposes
+          = f.field_errors :purpose
 
       = f.form_field :media do
         = cdx_select form: f, name: :media, searchable: false, class: "input-large" do |select|

@@ -449,12 +449,12 @@ RSpec.describe BoxesController, type: :controller do
         file_path = File.join(Rails.root, 'spec', 'fixtures', 'csvs', 'csv_box_1.csv')
         file = fixture_file_upload(file_path, 'text/csv')
         expect do
-          post :create, params: { box: { purpose: "LOD", 
-                                       media: "Saliva", 
-                                       option: "add_csv", 
+          post :create, params: { box: { purpose: "LOD",
+                                       media: "Saliva",
+                                       option: "add_csv",
                                        csv_box: file,
                                        blinded: false } }
-        
+
           expect(response).to redirect_to boxes_path
         end.to change(institution.boxes, :count).by(1)
         expect(Box.last.samples.count).to eq(4)
@@ -464,12 +464,12 @@ RSpec.describe BoxesController, type: :controller do
         file_path = File.join(Rails.root, 'spec', 'fixtures', 'csvs', 'samples_results_1.csv')
         file = fixture_file_upload(file_path, 'text/csv')
         expect do
-          post :create, params: { box: { purpose: "LOD", 
-                                       media: "Saliva", 
-                                       option: "add_csv", 
+          post :create, params: { box: { purpose: "LOD",
+                                       media: "Saliva",
+                                       option: "add_csv",
                                        csv_box: file,
                                        blinded: false } }
-        
+
           expect(response).to have_http_status(:unprocessable_entity)
         end.to change(institution.boxes, :count).by(0)
       end
@@ -480,9 +480,9 @@ RSpec.describe BoxesController, type: :controller do
         file_path = File.join(Rails.root, 'spec', 'fixtures', 'csvs', 'csv_box_2.csv')
         file = fixture_file_upload(file_path, 'text/csv')
         expect do
-          post :create, params: { box: { purpose: "Challenge", 
-                                       media: "Saliva", 
-                                       option: "add_csv", 
+          post :create, params: { box: { purpose: "Challenge",
+                                       media: "Saliva",
+                                       option: "add_csv",
                                        csv_box: file,
                                        blinded: false } }
         end.to change(institution.boxes, :count).by(1)
@@ -494,12 +494,12 @@ RSpec.describe BoxesController, type: :controller do
         file_path = File.join(Rails.root, 'spec', 'fixtures', 'csvs', 'csv_box_1.csv')
         file = fixture_file_upload(file_path, 'text/csv')
         expect do
-          post :create, params: { box: { purpose: "Challenge", 
-                                       media: "Saliva", 
-                                       option: "add_csv", 
+          post :create, params: { box: { purpose: "Challenge",
+                                       media: "Saliva",
+                                       option: "add_csv",
                                        csv_box: file,
                                        blinded: false } }
-        
+
           expect(response).to have_http_status(:unprocessable_entity)
         end.to change(institution.boxes, :count).by(0)
       end
@@ -510,9 +510,9 @@ RSpec.describe BoxesController, type: :controller do
         file_path = File.join(Rails.root, 'spec', 'fixtures', 'csvs', 'csv_box_2.csv')
         file = fixture_file_upload(file_path, 'text/csv')
         expect do
-          post :create, params: { box: { purpose: "Variants", 
-                                       media: "Saliva", 
-                                       option: "add_csv", 
+          post :create, params: { box: { purpose: "Variants",
+                                       media: "Saliva",
+                                       option: "add_csv",
                                        csv_box: file,
                                        blinded: false } }
         end.to change(institution.boxes, :count).by(1)
@@ -524,12 +524,12 @@ RSpec.describe BoxesController, type: :controller do
         file_path = File.join(Rails.root, 'spec', 'fixtures', 'csvs', 'csv_box_1.csv')
         file = fixture_file_upload(file_path, 'text/csv')
         expect do
-          post :create, params: { box: { purpose: "Variants", 
-                                       media: "Saliva", 
-                                       option: "add_csv", 
+          post :create, params: { box: { purpose: "Variants",
+                                       media: "Saliva",
+                                       option: "add_csv",
                                        csv_box: file,
                                        blinded: false } }
-        
+
           expect(response).to have_http_status(:unprocessable_entity)
         end.to change(institution.boxes, :count).by(0)
       end
