@@ -47,8 +47,9 @@ class NewBoxPage < CdxPageBase
 
   element :add_csv, "label[for='box_option_add_csv']"
   element :add_csv_button, ".add-link", text: "ADD CSV"
-  element :add_file_button, ".btn-upload", text: "ADD FILE"
-  element :csv_box, ".csv_file", visible: false
+#  element :add_file_button, ".btn-upload", text: "ADD FILE"
+element :csv_box, :field, 'box[csv_box]'
+
 
   element :submit_button, :button, "Save"
 
@@ -65,7 +66,7 @@ class NewBoxPage < CdxPageBase
       wait_until_samples_selector_visible
     when "add_csv"
       add_csv.click
-      wait_until_add_file_button_visible
+      wait_until_csv_box_visible
     end
   end
 
@@ -91,11 +92,11 @@ class NewBoxPage < CdxPageBase
     search_sample.paste(sample.uuid)
   end
 
-  def add_csv_file(csv_path)
-    add_file_button.click 
+  def add_csv_file(csv_filename)
     wait_until_csv_box_visible
-    attach_file(csv_box, File.absolute_path(csv_path)) unless has_csv_box?(wait: 0)
+    attach_file('box[csv_box]', Rails.root.join('spec/fixtures/csvs', csv_filename), make_visible: true)
   end
+
 
   def submit
     submit_button.click

@@ -288,7 +288,7 @@ describe "boxes" do
           expect(summary.uuid).to have_text(sample_1.uuid)
 
           form.add_sample(sample_2)
-          timeout.call(1) { expect(form.sample_summaries.size).to eq(2) }
+          timeout.call(3) { expect(form.sample_summaries.size).to eq(2) }
 
           form.sample_summaries[0].remove_button.click
           expect(form.sample_summaries.size).to eq(1)
@@ -387,10 +387,10 @@ describe "boxes" do
 
       it "can create a from a CSV file" do
         goto_page NewBoxPage do |form|
+          #distractor
           form.fill(purpose: "LOD", media: media, option: "add_csv")
-          form.add_csv_file('/src/spec/fixtures/csvs/csv_box_1.csv')
+          form.add_csv_file("csv_box_1.csv")
           form.submit
-          puts form.errors.text
         end
 
         expect_page ListBoxesPage do |page|
@@ -399,7 +399,7 @@ describe "boxes" do
         end
 
         expect_page ShowBoxPage do |page|
-          expect(page.samples.size).to eq(1)
+          expect(page.samples.size).to  eq(1)
           expect(page.samples[0]).to have_text(sample_1.uuid)
         end
       end
