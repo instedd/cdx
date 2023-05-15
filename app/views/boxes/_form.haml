@@ -5,7 +5,7 @@
         .col.form-field__label
           %label Purpose
         .col
-          = cdx_select form: f, name: :purpose, searchable: false, :class => 'input-large' do |select|
+          = cdx_select form: f, name: :purpose, searchable: false, :class => 'input-large', required: true do |select|
             - select.items Box.purposes
           = f.field_errors :purpose
 
@@ -17,7 +17,7 @@
         .col.form-field__label
           %label Samples
         .col.radiotoggle
-          = f.radio_button :option, "add_batches"
+          = f.radio_button :option, "add_batches",  required: true
           = f.label :option, "Create new samples", value: "add_batches"
           = f.radio_button :option, "add_samples"
           = f.label :option, "Select samples from inventory", value: "add_samples"
@@ -44,7 +44,7 @@
               = button_tag id: 'add-box-file', class: 'btn-link', type: "button" do
                 .icon-circle-plus.icon-blue.icon-margin
                 %span.btn-upload
-                  = file_field_tag "box[csv_box]", class: "csv_file", accept: "text/csv", onchange: "handleFileSelect(this)"
+                  = file_field_tag "box[csv_box]", class: "csv_file", accept: "text/csv"
             .row
               #validating-spinner.hidden
                 .spinner

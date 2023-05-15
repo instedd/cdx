@@ -51,21 +51,16 @@ class BoxesController < ApplicationController
 
   def create
     return unless authorize_resource(@navigation_context.institution, CREATE_INSTITUTION_BOX)
+
     @box_form = BoxForm.build(@navigation_context, box_params)
-
     @box_form.batches = check_access(load_batches, READ_BATCH)
-    @box_form.samples = check_access(load_samples, READ_SAMPLE)
 
-    if @box_form.valid?
+    if @box_form.save
       @box_form.build_samples
-
-      if @box_form.save
-        redirect_to boxes_path, notice: "Box was successfully created."
-        return
-      end
+      redirect_to boxes_path, notice: "Box was successfully created."
+    else
+      render :new, status: :unprocessable_entity
     end
-
-    render :new, status: :unprocessable_entity
   end
 
   def destroy

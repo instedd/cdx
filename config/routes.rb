@@ -171,7 +171,6 @@ Rails.application.routes.draw do
       post 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
     end
   end
-    post '/csv_validation/:context', to: 'csv_validations#create', as: 'csv_validation'
 
   resources :qc_infos
   resources :test_results , only: [:index, :show]

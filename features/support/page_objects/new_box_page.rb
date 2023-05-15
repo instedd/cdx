@@ -47,8 +47,7 @@ class NewBoxPage < CdxPageBase
 
   element :add_csv, "label[for='box_option_add_csv']"
   element :add_csv_button, ".add-link", text: "ADD CSV"
-#  element :add_file_button, ".btn-upload", text: "ADD FILE"
-element :csv_box, :field, 'box[csv_box]'
+  element :csv_box, :field, 'box[csv_box]'
 
 
   element :submit_button, :button, "Save"
