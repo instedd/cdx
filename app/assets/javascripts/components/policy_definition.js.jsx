@@ -178,7 +178,7 @@ var PolicyDefinition = React.createClass({
         <PolicyDefinitionField name="role[definition]" statements={this.state.statements} />
         <div className="row items-editor">
           <div className="col px-4">
-            <div className="fix">
+            <div>
               <ul>
                 {this.state.statements.map(function(statement, index){
                   var selectedClass = this.state.activeTab == index ? "selected" : "";
