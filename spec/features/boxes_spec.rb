@@ -382,14 +382,16 @@ describe "boxes" do
           expect(form.media_field.value).to eq(media)
         end
       end
+    end
 
-      let(:distractor) { Batch.make!(institution: institution, batch_number: "DISTRACTOR") }
+    describe "add_csv" do
+      let!(:virus) { Batch.make!(institution: institution, batch_number: "VIRUS") }
+      let!(:distractor) { Batch.make!(institution: institution, batch_number: "DISTRACTOR") }
 
-      it "can create a from a CSV file" do
+      it "creates samples as defined by the CSV" do
         goto_page NewBoxPage do |form|
-          #distractor
           form.fill(purpose: "LOD", media: media, option: "add_csv")
-          form.add_csv_file("csv_box_1.csv")
+          form.add_csv_file("csv_box_2.csv")
           form.submit
         end
 
@@ -399,9 +401,12 @@ describe "boxes" do
         end
 
         expect_page ShowBoxPage do |page|
-          expect(page.samples.size).to  eq(1)
-          expect(page.samples[0]).to have_text(sample_1.uuid)
+          expect(page.samples.size).to eq(6)
         end
+      end
+
+      xit "fails to create from invalid CSV" do
+        # e.g. batch doesn't exist
       end
     end
   end
