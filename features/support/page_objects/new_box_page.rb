@@ -96,7 +96,6 @@ class NewBoxPage < CdxPageBase
     attach_file('box[csv_box]', Rails.root.join('spec/fixtures/csvs', csv_filename), make_visible: true)
   end
 
-
   def submit
     submit_button.click
   end
