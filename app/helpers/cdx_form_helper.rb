@@ -102,7 +102,7 @@ class FormFieldBuilder < ActionView::Helpers::FormBuilder
 
   # Returns `true` if the object has any errors.
   def has_errors?
-    !object_errors.empty?
+    !@object.errors.empty?
   end
 
   protected
