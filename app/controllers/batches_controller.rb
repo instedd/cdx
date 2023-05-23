@@ -28,6 +28,11 @@ class BatchesController < ApplicationController
     @batches = check_access(batches, READ_BATCH).pluck(:uuid, :batch_number)
   end
 
+  def existing_batch_number
+    uuids = Batch.where(institution: @navigation_context.institution, batch_number: params[:batch_number]).pluck(:uuid)
+    render json: { status: :ok, message: uuids }
+  end
+
   def edit_or_show
     batch = Batch.find(params[:id])
 

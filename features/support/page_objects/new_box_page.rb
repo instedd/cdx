@@ -45,6 +45,11 @@ class NewBoxPage < CdxPageBase
   section :search_sample, CdxSelect, ".samples-selector .Select"
   sections :sample_summaries, SampleSummary, ".sample-summary"
 
+  element :add_csv, "label[for='box_option_add_csv']"
+  element :add_csv_button, ".add-link", text: "ADD CSV"
+  element :csv_box, :field, 'box[csv_box]'
+
+
   element :submit_button, :button, "Save"
 
   def fill(purpose: nil, media: nil, option: nil)
@@ -58,6 +63,9 @@ class NewBoxPage < CdxPageBase
     when "add_samples"
       add_samples.click
       wait_until_samples_selector_visible
+    when "add_csv"
+      add_csv.click
+      wait_until_csv_box_visible
     end
   end
 
@@ -81,6 +89,11 @@ class NewBoxPage < CdxPageBase
   def add_sample(sample)
     add_sample_button.click unless has_search_sample?(wait: 0)
     search_sample.paste(sample.uuid)
+  end
+
+  def add_csv_file(csv_filename)
+    wait_until_csv_box_visible
+    attach_file('box[csv_box]', Rails.root.join('spec/fixtures/csvs', csv_filename), make_visible: true)
   end
 
   def submit

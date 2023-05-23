@@ -156,6 +156,7 @@ Rails.application.routes.draw do
     end
     collection do
       get 'autocomplete'
+      get 'existing_batch_number'
       post 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
     end
   end
@@ -170,6 +171,7 @@ Rails.application.routes.draw do
       post 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
     end
   end
+
   resources :qc_infos
   resources :test_results , only: [:index, :show]
   resources :filters, format: 'html'

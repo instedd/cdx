@@ -1,11 +1,11 @@
-= cdx_form_for(@box_form) do |f|
+= cdx_form_for(@box_form, html: { multipart: true }) do |f|
   .row
     .col
       .row.form-field
         .col.form-field__label
           %label Purpose
         .col
-          = cdx_select form: f, name: :purpose, searchable: false, :class => 'input-large' do |select|
+          = cdx_select form: f, name: :purpose, searchable: false, :class => 'input-large', required: true do |select|
             - select.items Box.purposes
           = f.field_errors :purpose
 
@@ -17,10 +17,12 @@
         .col.form-field__label
           %label Samples
         .col.radiotoggle
-          = f.radio_button :option, "add_batches"
+          = f.radio_button :option, "add_batches",  required: true
           = f.label :option, "Create new samples", value: "add_batches"
           = f.radio_button :option, "add_samples"
           = f.label :option, "Select samples from inventory", value: "add_samples"
+          = f.radio_button :option, "add_csv"
+          = f.label :option, "Create from CSV file", value: "add_csv"
 
       .row.form-field
         .col.form-field__label
@@ -34,6 +36,28 @@
             = react_component "SamplesSelector", { url: autocomplete_samples_path(format: "json", context: params[:context], qc: 0),
               name: "box[sample_uuids]", placeholder: "Enter sample id", className: "input-block",
               samples: @box_form.samples_data }
+
+          %fieldset#add_csv{ :disabled => @box_form.option != "add_csv", :style => (@box_form.option == "add_csv" ? "" : "display: none") }
+            #uploaded-files
+
+            .row
+              = button_tag id: 'add-box-file', class: 'btn-link', type: "button" do
+                .icon-circle-plus.icon-blue.icon-margin
+                %span.btn-upload
+                  = file_field_tag "box[csv_box]", class: "csv_file", accept: "text/csv"
+            .row
+              #validating-spinner.hidden
+                .spinner
+          .spinner
+            .row
+              =link_to '/templates/upload_box.csv', class: 'btn-link', target: "_blank" do
+                .icon-download.icon-gray
+                %span.btn-download
+                  CSV template
+            .row.errors.hidden#csv-file-error
+              No samples were found in the CSV file or it has an invalid format.
+              %br
+              Please check the template and try again.
 
   .row
     .col
@@ -55,6 +79,8 @@
                       title: "Warning",
                       message: "If you change the sample source, the box contents will be emptied. ")
 
+= render 'upload_csv_box'
+
 :javascript
   var sourcesRadio = document.querySelectorAll(".radiotoggle input");
   var oldSource = null;
@@ -74,6 +100,10 @@
     // Clear the selectors contents
     document.querySelector(".clear-batches").click()
     document.querySelector(".clear-samples").click()
+    // Clear the CSV file and re-enable the add button
+    document.getElementById("uploaded-files").innerHTML = "";
+    document.getElementById(`add-box-file`).style.display = 'block';
+    document.querySelector(".csv_file").value = '';
   }
 
   function showConfirmModal() {
