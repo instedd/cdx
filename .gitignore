@@ -38,5 +38,7 @@ config/settings/*.local.yml
 public/system
 examples.txt
 Procfile.local
+.overcommit.yml
+
 # Artefacts
 /coverage
