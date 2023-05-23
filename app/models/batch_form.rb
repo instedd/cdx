@@ -12,7 +12,11 @@ class BatchForm
       :isolate_name,
       :inactivation_method,
       :volume,
-      :virus_lineage ]
+      :virus_lineage,
+      :reference_gene,
+      :target_organism_taxonomy_id,
+      :pango_lineage,
+      :who_label ]
   end
 
   def self.model_name
@@ -105,6 +109,7 @@ class BatchForm
 
     # validate/save. All done if succeeded
     batch.save
+    save_autocomplete_values
   end
 
   def creating_batch?
@@ -112,6 +117,17 @@ class BatchForm
   end
 
   private
+
+  def save_autocomplete_values
+    institution = batch.institution
+    ["reference_gene", "target_organism_taxonomy_id", "pango_lineage", "who_label"].each do |field_name|
+      autocomplete_value = institution.autocomplete_values.find_or_initialize_by(
+        field_name: field_name,
+        value: batch.send(field_name)
+      )
+      autocomplete_value.save
+    end
+  end
 
   def self.assign_attributes(target, source)
     shared_attributes.each do |attr|

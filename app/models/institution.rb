@@ -20,6 +20,7 @@ class Institution < ApplicationRecord
   has_many :test_results, dependent: :destroy
   has_many :roles, dependent: :destroy
   has_many :alerts
+  has_many :autocomplete_values, dependent: :destroy
 
   validates_uniqueness_of :name, :case_sensitive => false
   validates_presence_of :name
@@ -56,6 +57,10 @@ class Institution < ApplicationRecord
     define_method "kind_#{kind}?" do
       self.kind.try(:to_s) == kind
     end
+  end
+
+  def autocomplete_values_for(field_name)
+    autocomplete_values.where(field_name: field_name).distinct.pluck(:value).to_json
   end
 
   private

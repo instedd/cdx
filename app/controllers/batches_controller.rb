@@ -18,44 +18,9 @@ class BatchesController < ApplicationController
     @batches = perform_pagination(@batches)
   end
 
-  def autocomplete
-    batches = Batch
-      .where(institution: @navigation_context.institution)
-      .within(@navigation_context.entity, @navigation_context.exclude_subsites)
-      .autocomplete(params[:query])
-      .limit(10)
-
-    @batches = check_access(batches, READ_BATCH).pluck(:uuid, :batch_number)
-  end
-
-  def existing_batch_number
-    uuids = Batch.where(institution: @navigation_context.institution, batch_number: params[:batch_number]).pluck(:uuid)
-    render json: { status: :ok, message: uuids }
-  end
-
-  def edit_or_show
-    batch = Batch.find(params[:id])
-
-    if has_access?(batch, UPDATE_BATCH)
-      redirect_to edit_batch_path(batch)
-    else
-      redirect_to batch_path(batch)
-    end
-  end
-
-  def show
-    batch = Batch.find(params[:id])
-    @batch_form = BatchForm.for(batch)
-    return unless authorize_resource(batch, READ_BATCH)
-
-    @can_edit_sample_quantity = false
-    @can_delete = false
-    @can_update = false
-
-    render action: 'edit'
-  end
-
   def new
+    @institution = @navigation_context.institution
+
     batch = Batch.new({
       institution: @navigation_context.institution,
       site: @navigation_context.site
@@ -76,6 +41,7 @@ class BatchesController < ApplicationController
       institution: institution,
       site: @navigation_context.site
     }))
+
     @batch_form = BatchForm.for(batch)
     @batch_form.samples_quantity = batch_samples_quantity_params
 
@@ -86,6 +52,18 @@ class BatchesController < ApplicationController
       @can_edit_sample_quantity = true
       render action: 'new'
     end
+  end
+
+  def show
+    batch = Batch.find(params[:id])
+    @batch_form = BatchForm.for(batch)
+    return unless authorize_resource(batch, READ_BATCH)
+
+    @can_edit_sample_quantity = false
+    @can_delete = false
+    @can_update = false
+
+    render action: 'edit'
   end
 
   def edit
@@ -118,6 +96,32 @@ class BatchesController < ApplicationController
     @batch.destroy
 
     redirect_to batches_path, notice: 'Batch was successfully deleted.'
+  end
+
+  ## NO  CRUD METHODS
+  def autocomplete
+    batches = Batch
+      .where(institution: @navigation_context.institution)
+      .within(@navigation_context.entity, @navigation_context.exclude_subsites)
+      .autocomplete(params[:query])
+      .limit(10)
+
+    @batches = check_access(batches, READ_BATCH).pluck(:uuid, :batch_number)
+  end
+
+  def existing_batch_number
+    uuids = Batch.where(institution: @navigation_context.institution, batch_number: params[:batch_number]).pluck(:uuid)
+    render json: { status: :ok, message: uuids }
+  end
+
+  def edit_or_show
+    batch = Batch.find(params[:id])
+
+    if has_access?(batch, UPDATE_BATCH)
+      redirect_to edit_batch_path(batch)
+    else
+      redirect_to batch_path(batch)
+    end
   end
 
   def bulk_destroy
@@ -157,7 +161,11 @@ class BatchesController < ApplicationController
       :isolate_name,
       :inactivation_method,
       :volume,
-      :virus_lineage
+      :virus_lineage,
+      :reference_gene,
+      :target_organism_taxonomy_id,
+      :pango_lineage,
+      :who_label
     )
   end
 

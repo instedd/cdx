@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20221223203602) do
+ActiveRecord::Schema.define(version: 20230523193518) do
 
   create_table "alert_condition_results", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci" do |t|
     t.string  "result"
@@ -128,20 +128,34 @@ ActiveRecord::Schema.define(version: 20221223203602) do
     t.index ["assay_attachment_id"], name: "index_assay_files_on_assay_attachment_id", using: :btree
   end
 
+  create_table "autocomplete_values", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci" do |t|
+    t.string   "field_name"
+    t.string   "value"
+    t.integer  "institution_id", null: false
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+    t.index ["field_name", "value", "institution_id"], name: "autocomplete_index", unique: true, using: :btree
+    t.index ["institution_id"], name: "index_autocomplete_values_on_institution_id", using: :btree
+  end
+
   create_table "batches", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci" do |t|
     t.string   "uuid"
-    t.text     "core_fields",    limit: 16777215
-    t.text     "custom_fields",  limit: 16777215
-    t.binary   "sensitive_data", limit: 65535
+    t.text     "core_fields",                 limit: 16777215
+    t.text     "custom_fields",               limit: 16777215
+    t.binary   "sensitive_data",              limit: 65535
     t.datetime "deleted_at"
     t.integer  "institution_id"
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
     t.string   "isolate_name"
     t.string   "batch_number"
     t.integer  "site_id"
     t.string   "site_prefix"
     t.datetime "date_produced"
+    t.string   "reference_gene"
+    t.integer  "target_organism_taxonomy_id"
+    t.string   "pango_lineage"
+    t.string   "who_label"
     t.index ["date_produced"], name: "index_batches_on_date_produced", using: :btree
     t.index ["deleted_at"], name: "index_batches_on_deleted_at", using: :btree
     t.index ["institution_id"], name: "index_batches_on_institution_id", using: :btree
@@ -745,6 +759,7 @@ ActiveRecord::Schema.define(version: 20221223203602) do
   add_foreign_key "assay_attachments", "assay_files"
   add_foreign_key "assay_attachments", "loinc_codes"
   add_foreign_key "assay_attachments", "samples"
+  add_foreign_key "autocomplete_values", "institutions"
   add_foreign_key "batches", "sites"
   add_foreign_key "box_transfers", "boxes"
   add_foreign_key "box_transfers", "transfer_packages"
