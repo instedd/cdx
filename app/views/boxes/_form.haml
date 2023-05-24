@@ -44,7 +44,7 @@
               = button_tag id: 'add-box-file', class: 'btn-link', type: "button" do
                 .icon-circle-plus.icon-blue.icon-margin
                 %span.btn-upload
-                  = file_field_tag "box[csv_box]", class: "csv_file", accept: "text/csv"
+                  = react_component "UploadCsvBox", { name: "box[csv_box]", context: @navigation_context.uuid, csrf_token: form_authenticity_token}
             .row
               #validating-spinner.hidden
                 .spinner
