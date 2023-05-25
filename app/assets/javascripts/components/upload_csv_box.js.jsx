@@ -4,11 +4,14 @@ var UploadCsvBox = React.createClass({
       csrfToken: this.props.csrf_token,
       url: "/csv_validation/" + this.props.context,
       fieldName: this.props.name, // Initial fieldName value
-      uploadRows: [] // Array to store upload rows
+      uploadRows: [], // Array to store upload rows
+      hideListItems: "hidden",
+       fileValue: ''
     };
   },
 
   handleChange: function(event) {
+        this.setState({ fileValue: event.target.value });
     const file = event.target.files[0];
     const formData = new FormData();
     formData.append('csv_file', file);
@@ -31,7 +34,6 @@ var UploadCsvBox = React.createClass({
         const found_batches = responseJson.found_batches;
         const not_found_batches = responseJson.not_found_batches;
         const batches_nbr = responseJson.batches_nbr;
-        console.log(not_found_batches.map(batch => batch.uuid))
 
         // Create row from template with filename and upload info
         const filename = file.name;
@@ -44,6 +46,8 @@ var UploadCsvBox = React.createClass({
         this.setState(prevState => ({
           uploadRows: [...prevState.uploadRows, {filename, uploadInfo, showTooltip: false}]
         }));
+
+        this.setState({ hideListItems: "" });
 
       })
       .catch(error => {
@@ -71,17 +75,14 @@ var UploadCsvBox = React.createClass({
     }
   },
   handleRemove: function(index) {
-    // Remove the row from the state
-    this.setState(prevState => {
+    this.setState(function(prevState) {
       const newRows = [...prevState.uploadRows];
       newRows.splice(index, 1);
-      return {uploadRows: newRows};
+      const hideListItems = newRows.length === 0 ? "hidden" : "";
+      return { uploadRows: newRows, hideListItems: hideListItems,  fileValue: ''  };
     });
-
-    // Display the add-box-file element
-    // Note: This assumes that there's a corresponding element in the render method with the id 'add-box-file'
-    this.setState({displayAddBoxFile: true});
   },
+
 
   renderUploadRow: function(rowData, index) {
   const { filename, uploadInfo, showTooltip } = rowData;
@@ -120,17 +121,32 @@ var UploadCsvBox = React.createClass({
 },
 
   render: function() {
-    return (
-    <span className="btn-upload">
-        <input
-          type="file"
-          name="box[csv_box]"
-          className="csv_file"
-          accept="text/csv"
-          onChange={this.handleChange}
-        />
-        {this.state.uploadRows.map(this.renderUploadRow)}
-        </span>
+        const { hideListItems, uploadRows, fileValue } = this.state;
+    this.aRef = null; // Define the ref variable
+       const setRef = element => {
+         this.aRef = element;
+       };
+     return (
+      <div>
+      <div className="items-count">
+          <div className="icon-circle-plus icon-blue icon-margin"></div>
+          <span className="btn-upload title">
+            <input
+              type="file"
+              name="box[csv_box]"
+              className="csv_file"
+              accept="text/csv"
+              onChange={this.handleChange}
+              value={fileValue}
+             ref={input => (this.fileInput = input)} // Assign a ref to the file input
+            />
+          </span>
+          </div>
+          <div className={`list-items upload_info ${hideListItems ? 'hidden' : ''}`}>
+           {uploadRows.map(this.renderUploadRow)}
+         </div>
+        </div>
     );
   }
+
 });
