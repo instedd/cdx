@@ -46,10 +46,6 @@
                 %span.btn-upload
                   = file_field_tag "box[csv_box]", class: "csv_file", accept: "text/csv"
             .row
-              #validating-spinner.hidden
-                .spinner
-          .spinner
-            .row
               =link_to '/templates/upload_box.csv', class: 'btn-link', target: "_blank" do
                 .icon-download.icon-gray
                 %span.btn-download
