@@ -1,0 +1,9 @@
+Batch,Concentration,Distractor,Instructions
+batch1,100,no,Add 175 ml of media
+batch1,100,no,Add 175 ml of media
+batch1,1000,no,Add 175 ml of media
+batch1,1000,no,Add 175 ml of media
+batch2,2,yes,Add 250 ml of media
+batch2,2,yes,Add 250 ml of media
+batch2,200,yes,Add 100 ml of media
+batch2,200,yes,Add 100 ml of media

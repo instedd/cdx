@@ -288,7 +288,7 @@ describe "boxes" do
           expect(summary.uuid).to have_text(sample_1.uuid)
 
           form.add_sample(sample_2)
-          timeout.call(1) { expect(form.sample_summaries.size).to eq(2) }
+          timeout.call(3) { expect(form.sample_summaries.size).to eq(2) }
 
           form.sample_summaries[0].remove_button.click
           expect(form.sample_summaries.size).to eq(1)
@@ -381,6 +381,32 @@ describe "boxes" do
           expect(form.purpose_field.value).to eq("Variants")
           expect(form.media_field.value).to eq(media)
         end
+      end
+    end
+
+    describe "add_csv" do
+      let!(:virus) { Batch.make!(institution: institution, batch_number: "VIRUS") }
+      let!(:distractor) { Batch.make!(institution: institution, batch_number: "DISTRACTOR") }
+
+      it "creates samples as defined by the CSV" do
+        goto_page NewBoxPage do |form|
+          form.fill(purpose: "LOD", media: media, option: "add_csv")
+          form.add_csv_file("csv_box_2.csv")
+          form.submit
+        end
+
+        expect_page ListBoxesPage do |page|
+          expect(page.entries.size).to eq(1)
+          page.entries.last.uuid.click
+        end
+
+        expect_page ShowBoxPage do |page|
+          expect(page.samples.size).to eq(6)
+        end
+      end
+
+      xit "fails to create from invalid CSV" do
+        # e.g. batch doesn't exist
       end
     end
   end

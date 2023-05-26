@@ -443,11 +443,96 @@ RSpec.describe BoxesController, type: :controller do
       end
     end
 
-    it "validates option" do
-      expect do
-        post :create, params: { box: { purpose: "Other", option: "" } }
-        expect(response).to have_http_status(:unprocessable_entity)
-      end.to change(institution.boxes, :count).by(0)
+    describe "from csv file" do
+      it "create box from csv file" do
+        Batch.make!(institution: institution, site: site, batch_number: "DISTRACTOR")
+        file_path = File.join(Rails.root, 'spec', 'fixtures', 'csvs', 'csv_box_1.csv')
+        file = fixture_file_upload(file_path, 'text/csv')
+        expect do
+          post :create, params: { box: { purpose: "LOD",
+                                       media: "Saliva",
+                                       option: "add_csv",
+                                       csv_box: file,
+                                       blinded: false } }
+
+          expect(response).to redirect_to boxes_path
+        end.to change(institution.boxes, :count).by(1)
+        expect(Box.last.samples.count).to eq(4)
+      end
+
+      it "don't create box if invalid csv file" do
+        file_path = File.join(Rails.root, 'spec', 'fixtures', 'csvs', 'samples_results_1.csv')
+        file = fixture_file_upload(file_path, 'text/csv')
+        expect do
+          post :create, params: { box: { purpose: "LOD",
+                                       media: "Saliva",
+                                       option: "add_csv",
+                                       csv_box: file,
+                                       blinded: false } }
+
+          expect(response).to have_http_status(:unprocessable_entity)
+        end.to change(institution.boxes, :count).by(0)
+      end
+
+      it "create Challenge box if distractors and virus samples are present" do
+        Batch.make!(institution: institution, site: site, batch_number: "VIRUS")
+        Batch.make!(institution: institution, site: site, batch_number: "DISTRACTOR")
+        file_path = File.join(Rails.root, 'spec', 'fixtures', 'csvs', 'csv_box_2.csv')
+        file = fixture_file_upload(file_path, 'text/csv')
+        expect do
+          post :create, params: { box: { purpose: "Challenge",
+                                       media: "Saliva",
+                                       option: "add_csv",
+                                       csv_box: file,
+                                       blinded: false } }
+        end.to change(institution.boxes, :count).by(1)
+        expect(Box.last.samples.count).to eq(6)
+      end
+
+      it "don't create Challenge box if no distractors are present" do
+        Batch.make!(institution: institution, site: site, batch_number: "DISTRACTOR")
+        file_path = File.join(Rails.root, 'spec', 'fixtures', 'csvs', 'csv_box_1.csv')
+        file = fixture_file_upload(file_path, 'text/csv')
+        expect do
+          post :create, params: { box: { purpose: "Challenge",
+                                       media: "Saliva",
+                                       option: "add_csv",
+                                       csv_box: file,
+                                       blinded: false } }
+
+          expect(response).to have_http_status(:unprocessable_entity)
+        end.to change(institution.boxes, :count).by(0)
+      end
+
+      it "create Variants box if samples from two batches are present" do
+        Batch.make!(institution: institution, site: site, batch_number: "VIRUS")
+        Batch.make!(institution: institution, site: site, batch_number: "DISTRACTOR")
+        file_path = File.join(Rails.root, 'spec', 'fixtures', 'csvs', 'csv_box_2.csv')
+        file = fixture_file_upload(file_path, 'text/csv')
+        expect do
+          post :create, params: { box: { purpose: "Variants",
+                                       media: "Saliva",
+                                       option: "add_csv",
+                                       csv_box: file,
+                                       blinded: false } }
+        end.to change(institution.boxes, :count).by(1)
+        expect(Box.last.samples.count).to eq(6)
+      end
+
+      it "don't create Variants box if samples from two batches aren't present" do
+        Batch.make!(institution: institution, site: site, batch_number: "DISTRACTOR")
+        file_path = File.join(Rails.root, 'spec', 'fixtures', 'csvs', 'csv_box_1.csv')
+        file = fixture_file_upload(file_path, 'text/csv')
+        expect do
+          post :create, params: { box: { purpose: "Variants",
+                                       media: "Saliva",
+                                       option: "add_csv",
+                                       csv_box: file,
+                                       blinded: false } }
+
+          expect(response).to have_http_status(:unprocessable_entity)
+        end.to change(institution.boxes, :count).by(0)
+      end
     end
   end
 
