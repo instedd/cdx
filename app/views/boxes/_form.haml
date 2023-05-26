@@ -41,7 +41,8 @@
             #uploaded-files
 
             .row
-              = react_component "UploadCsvBox", { name: "box[csv_box]", context: @navigation_context.uuid, csrf_token: form_authenticity_token}
+              .col
+                = react_component "UploadCsvBox", { name: "box[csv_box]", context: @navigation_context.uuid, csrf_token: form_authenticity_token}
             .row
               #validating-spinner.hidden
                 .spinner

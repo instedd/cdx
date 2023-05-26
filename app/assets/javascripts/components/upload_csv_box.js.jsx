@@ -83,7 +83,6 @@ var UploadCsvBox = React.createClass({
     });
   },
 
-
   renderUploadRow: function(rowData, index) {
   const { filename, uploadInfo, showTooltip } = rowData;
   const { uploadedSamplesCount, notFoundUuids } = uploadInfo;
@@ -102,7 +101,7 @@ var UploadCsvBox = React.createClass({
       <div className={`items-row-action gap-5 not_found_message ${batchesNotFound > 0 ? 'ttip input-required' : ''}`}
            onClick={() => this.handleClick(index)}>
         <div className="uploaded-samples-count">
-          {uploadedSamplesCount} {samplesText}
+          {uploadedSamplesCount} Samples
           {batchesNotFound > 0 && (
             <span className="dashed-underline">
               {" ("}{batchesNotFound} {batchesText} not found{")"}
@@ -120,33 +119,36 @@ var UploadCsvBox = React.createClass({
   );
 },
 
-  render: function() {
-        const { hideListItems, uploadRows, fileValue } = this.state;
-    this.aRef = null; // Define the ref variable
-       const setRef = element => {
-         this.aRef = element;
-       };
-     return (
-      <div>
-      <div className="items-count">
-          <div className="icon-circle-plus icon-blue icon-margin"></div>
-          <span className="btn-upload title">
-            <input
-              type="file"
-              name="box[csv_box]"
-              className="csv_file"
-              accept="text/csv"
-              onChange={this.handleChange}
-              value={fileValue}
-             ref={input => (this.fileInput = input)} // Assign a ref to the file input
-            />
-          </span>
-          </div>
-          <div className={`list-items upload_info ${hideListItems ? 'hidden' : ''}`}>
-           {uploadRows.map(this.renderUploadRow)}
-         </div>
-        </div>
-    );
-  }
+handleFileSelect: function(index) {
+  this.aRef.click(); // Trigger file input click event
+},
 
+render() {
+  const { hideListItems, uploadRows, fileValue } = this.state;
+
+  return (
+    <div>
+     <div className="items-count">
+       <label htmlFor="csv-file" className="btn-link">
+         <div className="icon-circle-plus icon-blue icon-margin"></div>
+         <span className="btn-upload">
+           Add file
+         </span>
+       </label>
+       <input
+         type="file"
+         id="csv-file"
+         name="box[csv_box]"
+         className="csv_file hidden"
+         accept="text/csv"
+         onChange={this.handleChange}
+         value={fileValue}
+       />
+     </div>
+     <div className={`list-items upload_info ${hideListItems ? 'hidden' : ''}`}>
+       {uploadRows.map(this.renderUploadRow)}
+     </div>
+   </div>
+  );
+}
 });
