@@ -65,7 +65,6 @@ class NewBoxPage < CdxPageBase
       wait_until_samples_selector_visible
     when "add_csv"
       add_csv.click
-      wait_until_csv_box_visible
     end
   end
 
@@ -92,7 +91,7 @@ class NewBoxPage < CdxPageBase
   end
 
   def add_csv_file(csv_filename)
-    wait_until_csv_box_visible
+    #wait_until_csv_box_visible
     attach_file('box[csv_box]', Rails.root.join('spec/fixtures/csvs', csv_filename), make_visible: true)
   end
 

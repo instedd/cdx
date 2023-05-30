@@ -6,12 +6,14 @@ var UploadCsvBox = React.createClass({
       fieldName: this.props.name, // Initial fieldName value
       uploadRows: [], // Array to store upload rows
       hideListItems: "hidden",
+      hideErrorMessage: "hidden",
+      errorMessage:'',
        fileValue: ''
     };
   },
 
   handleChange: function(event) {
-        this.setState({ fileValue: event.target.value });
+    this.setState({ fileValue: event.target.value });
     const file = event.target.files[0];
     const formData = new FormData();
     formData.append('csv_file', file);
@@ -51,11 +53,13 @@ var UploadCsvBox = React.createClass({
 
       })
       .catch(error => {
-        console.log("Error:", error);
+        this.setState({ errorMessage: error });
       });
   },
 
   handleClick: function(index) {
+    this.setState({ hideErrorMessage: "hidden" });
+
     // Toggle the showTooltip state
     this.setState(prevState => {
       const newRows = [...prevState.uploadRows];
@@ -119,21 +123,24 @@ var UploadCsvBox = React.createClass({
   );
 },
 
-handleFileSelect: function(index) {
-  this.aRef.click(); // Trigger file input click event
-},
+  handleFileSelect: function(index) {
+    this.aRef.click(); // Trigger file input click event
+  },
 
 render() {
-  const { hideListItems, uploadRows, fileValue } = this.state;
-
+  const { hideListItems, uploadRows, fileValue, errorMessage, hideErrorMessage } = this.state;
   return (
     <div>
+      <div className={`csv-file-error row errors  ${hideErrorMessage ? 'hidden' : ''}`}>
+        {errorMessage}
+      </div>
+     <div className={`list-items upload_info add-file-btn ${hideListItems ? 'hidden' : ''}`}>
+       {uploadRows.map(this.renderUploadRow)}
+     </div>
      <div className="items-count">
        <label htmlFor="csv-file" className="btn-link">
          <div className="icon-circle-plus icon-blue icon-margin"></div>
-         <span className="btn-upload">
-           Add file
-         </span>
+         <span className="btn-upload"> Add file</span>
        </label>
        <input
          type="file"
@@ -144,9 +151,6 @@ render() {
          onChange={this.handleChange}
          value={fileValue}
        />
-     </div>
-     <div className={`list-items upload_info ${hideListItems ? 'hidden' : ''}`}>
-       {uploadRows.map(this.renderUploadRow)}
      </div>
    </div>
   );
