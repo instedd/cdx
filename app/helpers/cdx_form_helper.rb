@@ -5,8 +5,6 @@ module CdxFormHelper
     form_for(record_or_name_or_array, *(args << options.merge(builder: FormFieldBuilder))) do |form|
       yield form
 
-      # `form_errors` could be called in the block, but that doesn't matter because a
-      # second call is a no-op.
       concat form.form_errors
     end
   end
@@ -55,6 +53,9 @@ class FormFieldBuilder < ActionView::Helpers::FormBuilder
 
   # Renders form errors for fields that have not been handled by a dedicated
   # `#field` errors.
+  #
+  # This method is called in `cdx_form_for` and should not be called explicitly
+  # in the form body.
   def form_errors(options = {})
     rendered = @template.render partial: "form_builder/form_errors", locals: {
       form: self,
@@ -97,6 +98,11 @@ class FormFieldBuilder < ActionView::Helpers::FormBuilder
 
   def has_error?(attr_name)
     errors_to_show.include?(attr_name.to_sym)
+  end
+
+  # Returns `true` if the object has any errors.
+  def has_errors?
+    !@object.errors.empty?
   end
 
   protected

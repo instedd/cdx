@@ -58,18 +58,6 @@ RSpec.describe CdxFormHelper, type: :helper do
       end
     end
 
-    it "renders errors only once" do
-      model = FooModel.new(foo: "bar")
-      model.errors.add(:foo, "has an error")
-      cdx_form_for(model, url: "") do |form|
-        rendered = form.form_errors(ignore_unhandled: true)
-        expect(rendered).to include("Foo has an error")
-
-        rendered = form.form_errors
-        expect(rendered).to be_blank
-      end
-    end
-
     it "renders errors implicitly" do
       model = FooModel.new(foo: "bar")
       model.errors.add(:base, "Has an error")

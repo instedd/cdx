@@ -512,10 +512,6 @@ form {
     input, textarea {
       border-color: $red;
     }
-
-    label {
-      color: $red;
-    }
   }
 
   > .form-field__label {
@@ -536,7 +532,7 @@ form {
 
 .form-errors {
   margin: 10px;
-  border-bottom: 1px solid $red;
+  color: $red;
 }
 
 .copy-content {

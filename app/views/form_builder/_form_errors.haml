@@ -1,7 +1,13 @@
-- unless messages.empty?
+- if form.has_errors?
   .row.form-errors
+    .col{style: "flex-grow: 0; padding-right: 0;"}
+      %span.icon.icon-alert.icon-red
     .col
-      %ul.errors
-        - messages.each do |message|
-          %li
-            = message
+      %strong
+        The form contains errors. Try to fix them and submit again.
+
+      - unless messages.empty?
+        %ul.errors
+          - messages.each do |message|
+            %li
+              = message
