@@ -33,14 +33,13 @@ var UploadCsvBox = React.createClass({
         }
       })
       .then(responseJson => {
-        const found_batches = responseJson.found_batches;
         const not_found_batches = responseJson.not_found_batches;
-        const batches_nbr = responseJson.batches_nbr;
-
+        const samples_nbr = responseJson.samples_nbr;
+        
         // Create row from template with filename and upload info
         const filename = file.name;
         const uploadInfo = {
-          uploadedSamplesCount: found_batches.length,
+          uploadedSamplesCount: samples_nbr,
           notFoundUuids: not_found_batches
         };
 
@@ -91,10 +90,10 @@ var UploadCsvBox = React.createClass({
   const { filename, uploadInfo, showTooltip } = rowData;
   const { uploadedSamplesCount, notFoundUuids } = uploadInfo;
   const batchesNotFound = notFoundUuids.length;
-  const batchesText = batchesNotFound > 1 ? 'batches' : 'batch';
-  const samplesText = uploadedSamplesCount > 1 ? 'samples' : 'sample';
+  const batchesText = batchesNotFound == 1 ? 'batch' : 'batches';
+  const samplesText = uploadedSamplesCount == 1 ? 'sample' : 'samples';
 
-  const tooltipText = notFoundUuids.slice(0, 5).join("<br>");
+  const tooltipText = notFoundUuids.slice(0, 5).map((batch_number) => <div>{batch_number}</div>);
 
   return (
     <div className="items-row" key={filename}>
@@ -105,7 +104,7 @@ var UploadCsvBox = React.createClass({
       <div className={`items-row-action gap-5 not_found_message ${batchesNotFound > 0 ? 'ttip input-required' : ''}`}
            onClick={() => this.handleClick(index)}>
         <div className="uploaded-samples-count">
-          {uploadedSamplesCount} Samples
+          {uploadedSamplesCount} {samplesText}
           {batchesNotFound > 0 && (
             <span className="dashed-underline">
               {" ("}{batchesNotFound} {batchesText} not found{")"}

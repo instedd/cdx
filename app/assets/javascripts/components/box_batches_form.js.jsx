@@ -2,6 +2,9 @@ var BoxBatchesForm = React.createClass({
   getInitialState: function () {
     var batches = this.props.batches || [];
 
+    // filter nil batches
+    batches = batches.filter((batch) => batch != null);
+
     batches.forEach(function (batch) {
       batch.key = cdxGenRandomKey(batches);
     });
@@ -56,6 +59,7 @@ var BoxBatchesForm = React.createClass({
             prepareOptions={this.prepareOptions}
             autoselect={true}
             onSelect={this.selectBatch}
+            autoselect={true}
           />
         </div>
       </div>

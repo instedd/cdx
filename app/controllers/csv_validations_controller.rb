@@ -11,7 +11,7 @@ class CsvValidationsController < ApplicationController
 
       render json: { found_batches: found_batches,
                      not_found_batches: not_found_batches,
-                     batches_nbr: batch_values.size }
+                     samples_nbr: csv_table.size }
     else
       render json: { error: "Invalid file format. Please upload a CSV file." }, status: :unprocessable_entity
     end

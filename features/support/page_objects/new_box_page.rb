@@ -91,7 +91,6 @@ class NewBoxPage < CdxPageBase
   end
 
   def add_csv_file(csv_filename)
-    #wait_until_csv_box_visible
     attach_file('box[csv_box]', Rails.root.join('spec/fixtures/csvs', csv_filename), make_visible: true)
   end
 
