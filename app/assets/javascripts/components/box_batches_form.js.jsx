@@ -56,6 +56,7 @@ var BoxBatchesForm = React.createClass({
             prepareOptions={this.prepareOptions}
             autoselect={true}
             onSelect={this.selectBatch}
+            autoselect={true}
           />
         </div>
       </div>
