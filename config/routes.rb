@@ -172,6 +172,8 @@ Rails.application.routes.draw do
     end
   end
 
+  post '/csv_validation/:context', to: 'csv_validations#create', as: 'csv_validation'
+
   resources :qc_infos
   resources :test_results , only: [:index, :show]
   resources :filters, format: 'html'

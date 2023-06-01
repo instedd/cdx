@@ -41,10 +41,8 @@
             #uploaded-files
 
             .row
-              = button_tag id: 'add-box-file', class: 'btn-link', type: "button" do
-                .icon-circle-plus.icon-blue.icon-margin
-                %span.btn-upload
-                  = file_field_tag "box[csv_box]", class: "csv_file", accept: "text/csv"
+              .col
+                = react_component "UploadCsvBox", { name: "box[csv_box]", context: @navigation_context.uuid, csrf_token: form_authenticity_token}
             .row
               =link_to '/templates/upload_box.csv', class: 'btn-link', target: "_blank" do
                 .icon-download.icon-gray
@@ -98,7 +96,6 @@
     document.querySelector(".clear-samples").click()
     // Clear the CSV file and re-enable the add button
     document.getElementById("uploaded-files").innerHTML = "";
-    document.getElementById(`add-box-file`).style.display = 'block';
     document.querySelector(".csv_file").value = '';
   }
 

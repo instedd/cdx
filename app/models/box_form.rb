@@ -49,13 +49,15 @@ class BoxForm
 
     @batches_data.map do |key, data|
       batch = @batches[key]
-      {
-        uuid: batch.uuid,
-        batch_number: batch.batch_number,
-        distractor: ActiveModel::Type::Boolean.new.cast(data[:distractor]),
-        instruction: data[:instruction],
-        concentrations: data[:concentrations].to_h.values,
-      }
+      if batch
+        {
+          uuid: batch.uuid,
+          batch_number: batch.batch_number,
+          distractor: ActiveModel::Type::Boolean.new.cast(data[:distractor]),
+          instruction: data[:instruction],
+          concentrations: data[:concentrations].to_h.values,
+        }
+      end
     end
   end
 
@@ -116,7 +118,8 @@ class BoxForm
   def validate_existence_of_batches
     @batch_uuids.each do |key, batch_uuid|
       unless batch_uuid.blank? || @batches[key]
-        @box.errors.add(key, "Batch doesn't exist")
+        @box.errors.add(:base, "An inputed batch doesn't exist")
+        break
       end
     end
   end
@@ -124,7 +127,8 @@ class BoxForm
   def validate_existence_of_samples
     @sample_uuids.each do |key, sample_uuid|
       unless sample_uuid.blank? || @samples[key]
-        @box.errors.add(key, "Sample doesn't exist")
+        @box.errors.add(:base, "An inputed sample doesn't exist")
+        break
       end
     end
   end
