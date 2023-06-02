@@ -31,7 +31,6 @@ class CsvValidationsController < ApplicationController
                    not_found_batches: [],
                    samples_nbr: 0, 
                    error_message: "Invalid file format." }
-
   end
 
 end
