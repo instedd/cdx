@@ -37,7 +37,9 @@ class BoxesController < ApplicationController
   def print
     return unless authorize_resource(@box, READ_BOX)
 
-    send_data BoxLabelPdf.render(@box, @box.samples.preload(:batch, :sample_identifiers)),
+    @samples = load_box_samples
+
+    send_data BoxLabelPdf.render(@box, @samples),
       filename: "cdx_box_#{@box.uuid}",
       type: "application/pdf",
       disposition: "inline"
