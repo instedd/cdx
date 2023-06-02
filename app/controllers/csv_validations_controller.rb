@@ -7,10 +7,7 @@ class CsvValidationsController < ApplicationController
       csv_table = CSV.parse(csv_text, headers: true)
 
       unless csv_table.headers == ["Batch", "Concentration", "Distractor", "Instructions"]
-        render json: { found_batches: [],
-                       not_found_batches: [],
-                       samples_nbr: 0, 
-                       error_message: "Invalid file format." }
+        render_invalid_format
         return
       end
 
@@ -23,12 +20,18 @@ class CsvValidationsController < ApplicationController
                      samples_nbr: csv_table.size,
                      error_message: "" }
     else
-      unless csv_table.headers == ["Batch", "Concentration", "Distractor", "Instructions"]
-        render json: { found_batches: [],
-                       not_found_batches: [],
-                       samples_nbr: 0, 
-                       error_message: "Invalid file format." }
-      end
+      render_invalid_format
     end
   end
+
+  private
+
+  def render_invalid_format
+    render json: { found_batches: [],
+                   not_found_batches: [],
+                   samples_nbr: 0, 
+                   error_message: "Invalid file format." }
+
+  end
+
 end
