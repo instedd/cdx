@@ -27,6 +27,8 @@ cdxapi/ebin
 cdxapi/log
 VERSION
 
+.overcommit.yml
+
 /etc/shapes/*
 /public/polygons/*
 /public/nndd

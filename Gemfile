@@ -113,6 +113,7 @@ group :development do
   gem "standard", require: false
   gem "rubocop-rails", require: false
   gem "rubocop-rspec", require: false
+  gem 'brakeman-lib'
 end
 
 group :development, :test do

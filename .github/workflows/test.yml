@@ -105,3 +105,14 @@ jobs:
 
       - name: Lint Ruby files
         run: docker compose run --rm --no-deps web bundle exec rubocop --parallel
+
+  brakeman:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - uses: actions/checkout@v3
+      - run: docker compose build web
+      - uses: ./.github/actions/gems-cache
+
+      - name: Security audit application code
+        run: docker compose run --rm --
