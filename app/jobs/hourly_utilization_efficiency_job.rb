@@ -20,11 +20,11 @@ class HourlyUtilizationEfficiencyJob
         #convert the aggregation [days or hours] into hours for calculations
         hours_per_day = 24
         if alert.aggregation_frequency == "month"
-          utilization_efficiency_hours = amount * hours_per_day * 30 
+          utilization_efficiency_hours = amount * hours_per_day * 30
         elsif alert.aggregation_frequency == "week"
-          utilization_efficiency_hours = amount * hours_per_day * 7 
+          utilization_efficiency_hours = amount * hours_per_day * 7
         elsif alert.aggregation_frequency == "day"
-          utilization_efficiency_hours = amount * hours_per_day 
+          utilization_efficiency_hours = amount * hours_per_day
         else
           utilization_efficiency_hours = amount
         end
@@ -51,10 +51,3 @@ class HourlyUtilizationEfficiencyJob
     end
   end
 end
-
-#run every 30 mins to give more accuracy, +/- 30 mins
-Sidekiq::Cron::Job.create(name: 'Alert Utilization Efficiency - hourly', cron: '*/30 * * * *', klass: 'HourlyUtilizationEfficiencyJob')
-
-
-#every 2 minsutes for testing
-#Sidekiq::Cron::Job.create(name: 'Alert Utilization Efficiency - hourly', cron: '*/2 * * * *', klass: 'HourlyUtilizationEfficiencyJob')
