@@ -39,7 +39,7 @@ gem 'prawn-svg'
 gem 'devise', '~> 4.0.0'
 gem 'devise-security', '< 0.15.0' # last version to support ruby 2.4
 gem 'devise_invitable', '~> 1.5'
-gem 'doorkeeper', '~> 4.2.0'
+gem 'doorkeeper', '~> 5.6.6'
 gem 'omniauth', '~> 1.2'
 gem 'omniauth-google-oauth2', '~> 0.2'
 gem 'recaptcha', '~> 4.9'
