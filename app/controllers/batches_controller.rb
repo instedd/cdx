@@ -18,86 +18,6 @@ class BatchesController < ApplicationController
     @batches = perform_pagination(@batches)
   end
 
-  def new
-    @institution = @navigation_context.institution
-
-    batch = Batch.new({
-      institution: @navigation_context.institution,
-      site: @navigation_context.site
-    })
-
-    @batch_form = BatchForm.for(batch)
-    prepare_for_institution_and_authorize(@batch_form, CREATE_INSTITUTION_BATCH)
-
-    @can_edit_sample_quantity = true
-    @can_update = true
-  end
-
-  def create
-    institution = @navigation_context.institution
-    return unless authorize_resource(institution, CREATE_INSTITUTION_BATCH)
-
-    batch = Batch.new(batch_params.merge({
-      institution: institution,
-      site: @navigation_context.site
-    }))
-
-    @batch_form = BatchForm.for(batch)
-    @batch_form.samples_quantity = batch_samples_quantity_params
-
-    if @batch_form.create
-      redirect_to batches_path, notice: 'Batch was successfully created.'
-    else
-      @can_update = true
-      @can_edit_sample_quantity = true
-      render action: 'new'
-    end
-  end
-
-  def show
-    batch = Batch.find(params[:id])
-    @batch_form = BatchForm.for(batch)
-    return unless authorize_resource(batch, READ_BATCH)
-
-    @can_edit_sample_quantity = false
-    @can_delete = false
-    @can_update = false
-
-    render action: 'edit'
-  end
-
-  def edit
-    batch = Batch.find(params[:id])
-    @batch_form = BatchForm.for(batch)
-    return unless authorize_resource(batch, UPDATE_BATCH)
-
-    @can_edit_sample_quantity = false
-    @can_delete = has_access?(batch, DELETE_BATCH)
-    @can_update = true
-  end
-
-  def update
-    batch = Batch.find(params[:id])
-    @batch_form = BatchForm.for(batch)
-    return unless authorize_resource(batch, UPDATE_BATCH)
-    if @batch_form.update(batch_params, remove_samples_params)
-      redirect_to batches_path, notice: 'Batch was successfully updated.'
-    else
-      @can_update = true
-      render action: 'edit'
-    end
-  end
-
-  def destroy
-    @batch = Batch.find(params[:id])
-    return unless authorize_resource(@batch, DELETE_BATCH)
-
-    @batch.destroy
-
-    redirect_to batches_path, notice: 'Batch was successfully deleted.'
-  end
-
-  ## NO  CRUD METHODS
   def autocomplete
     batches = Batch
       .where(institution: @navigation_context.institution)
@@ -121,6 +41,83 @@ class BatchesController < ApplicationController
     else
       redirect_to batch_path(batch)
     end
+  end
+
+  def show
+    batch = Batch.find(params[:id])
+    @batch_form = BatchForm.for(batch)
+    return unless authorize_resource(batch, READ_BATCH)
+
+    @can_edit_sample_quantity = false
+    @can_delete = false
+    @can_update = false
+
+    render action: 'edit'
+  end
+
+  def new
+    batch = Batch.new({
+      institution: @navigation_context.institution,
+      site: @navigation_context.site
+    })
+
+    @batch_form = BatchForm.for(batch)
+    prepare_for_institution_and_authorize(@batch_form, CREATE_INSTITUTION_BATCH)
+
+    @can_edit_sample_quantity = true
+    @can_update = true
+  end
+
+  def create
+    institution = @navigation_context.institution
+    return unless authorize_resource(institution, CREATE_INSTITUTION_BATCH)
+
+    batch = Batch.new(batch_params.merge({
+      institution: institution,
+      site: @navigation_context.site
+    }))
+    @batch_form = BatchForm.for(batch)
+    @batch_form.samples_quantity = batch_samples_quantity_params
+
+    if @batch_form.create
+      redirect_to batches_path, notice: 'Batch was successfully created.'
+    else
+      @can_update = true
+      @can_edit_sample_quantity = true
+      render action: 'new'
+    end
+  end
+
+  def edit
+    batch = Batch.find(params[:id])
+    @batch_form = BatchForm.for(batch)
+    return unless authorize_resource(batch, UPDATE_BATCH)
+
+    @can_edit_sample_quantity = false
+    @can_delete = has_access?(batch, DELETE_BATCH)
+    @can_update = true
+  end
+
+  def update
+    batch = Batch.find(params[:id])
+    @batch_form = BatchForm.for(batch)
+    return unless authorize_resource(batch, UPDATE_BATCH)
+
+    if @batch_form.update(batch_params, remove_samples_params)
+      redirect_to batches_path, notice: 'Batch was successfully updated.'
+    else
+      @can_update = true
+      render action: 'edit'
+    end
+  end
+
+  def destroy
+    @batch = Batch.find(params[:id])
+    return unless authorize_resource(@batch, DELETE_BATCH)
+
+    @batch.destroy
+
+    redirect_to batches_path, notice: 'Batch was successfully deleted.'
   end
 
   def bulk_destroy

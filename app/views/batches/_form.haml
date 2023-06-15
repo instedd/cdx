@@ -52,21 +52,6 @@
         = f.form_field :samples do
           = render (@can_update ? 'samples' : 'show_samples')
 
-      = f.form_field :reference_gene do
-        = react_component "Autocomplete", { name: "batch[reference_gene]", placeholder: "Enter reference_gene", className: "input-block",
-          data: @navigation_context.institution.autocomplete_values_for("reference_gene") }
-
-      = f.form_field :target_organism_taxonomy_id do
-        = react_component "Autocomplete", { name: "batch[target_organism_taxonomy_id]", placeholder: "Enter target_organism_taxonomy_id", className: "input-x-large",
-        data: @navigation_context.institution.autocomplete_values_for("target_organism_taxonomy_id") }
-
-      = f.form_field :pango_lineage do
-        = react_component "Autocomplete", { name: "batch[pango_lineage]", placeholder: "Enter pango_lineage", className: "input-x-large", data: @navigation_context.institution.autocomplete_values_for("pango_lineage") }
-
-      = f.form_field :who_label do
-        = react_component "Autocomplete", { name: "batch[who_label]", placeholder: "Enter who_label", className: "input-x-large",
-      data: @navigation_context.institution.autocomplete_values_for("who_label") }
-
   - if @can_update
     = f.form_actions do
       = f.submit 'Save', class: 'btn-primary'
