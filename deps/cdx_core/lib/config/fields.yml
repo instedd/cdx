@@ -94,6 +94,14 @@ entities:
       lab_technician:
       old_batch_number:
         searchable: true
+      reference_gene:
+        type: string
+      target_organism_taxonomy_id:
+        type: string
+      pango_lineage:
+        type: string
+      who_label:
+        type: string
   samples_report: &SAMPLES_REPORT
     fields:
       name:
@@ -136,6 +144,15 @@ entities:
         searchable: true
       virus_lineage:
         type: string
+      reference_gene:
+        type: string
+      target_organism_taxonomy_id:
+        type: string
+      pango_lineage:
+        type: string
+      who_label:
+        type:
+          String
   box: &BOX
     allows_custom: true
     fields:
