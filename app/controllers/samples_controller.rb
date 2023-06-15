@@ -238,6 +238,10 @@ class SamplesController < ApplicationController
       :distractor,
       :instruction,
       :measured_signal,
+      :reference_gene,
+      :target_organism_taxonomy_id,
+      :pango_lineage,
+      :who_label,
       assay_attachments_attributes: [:id, :loinc_code_id, :result, :assay_file_id, :_destroy],
       notes_attributes: [:id, :description, :updated_at, :user_id, :_destroy],
     )

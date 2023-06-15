@@ -16,7 +16,7 @@ class BatchForm
       :reference_gene,
       :target_organism_taxonomy_id,
       :pango_lineage,
-      :who_label ]
+      :who_label]
   end
 
   def self.model_name

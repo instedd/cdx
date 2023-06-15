@@ -80,7 +80,6 @@ class BatchesController < ApplicationController
     batch = Batch.find(params[:id])
     @batch_form = BatchForm.for(batch)
     return unless authorize_resource(batch, UPDATE_BATCH)
-
     if @batch_form.update(batch_params, remove_samples_params)
       redirect_to batches_path, notice: 'Batch was successfully updated.'
     else

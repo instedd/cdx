@@ -62,6 +62,7 @@ Rails.application.routes.draw do
       get :no_data_allowed
       get :new_from_invite_data
     end
+    get 'autocompletes/:field_name/', to: 'autocompletes#index', as: 'autocomplete'
   end
 
   resources :encounters, only: [:new, :create, :edit, :update, :show] do

@@ -13,6 +13,15 @@
         %button.btn-copy.ttip
           = icon_tag "copy", class: "btn-icon"
 
+      = f.form_field :reference_gene do
+        = react_component "CdxSelectAutocomplete", { name: "sample[reference_gene]", value: f.object.reference_gene, url: institution_autocomplete_path(institution_id: @navigation_context.institution.id, field_name: "reference_gene") }
+      = f.form_field :target_organism_taxonomy do
+        = react_component "CdxSelectAutocomplete", { name: "sample[target_organism_taxonomy_id]", value: f.object.target_organism_taxonomy_id, url: institution_autocomplete_path(institution_id: @navigation_context.institution.id, field_name: "target_organism_taxonomy_id") }
+      = f.form_field :pango_lineage do
+        = react_component "CdxSelectAutocomplete", { name: "sample[pango_lineage]", value: f.object.pango_lineage, url: institution_autocomplete_path(institution_id: @navigation_context.institution.id, field_name: "pango_lineage") }
+      = f.form_field :who_label do
+        = react_component "CdxSelectAutocomplete", { name: "sample[who_label]", value: f.object.who_label, url: institution_autocomplete_path(institution_id: @navigation_context.institution.id, field_name: "who_label") }
+
       - if f.object.batch_number
         = f.form_field :batch_id, value: @sample_form.batch_number
 

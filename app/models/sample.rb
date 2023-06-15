@@ -57,7 +57,11 @@ class Sample < ApplicationRecord
                   :concentration,
                   :replicate,
                   :media,
-                  :measured_signal
+                  :measured_signal,
+                  :reference_gene,
+                  :target_organism_taxonomy_id,
+                  :pango_lineage,
+                  :who_label
 
   def self.find_by_entity_id(entity_id, opts)
     query = joins(:sample_identifiers).where(sample_identifiers: {entity_id: entity_id.to_s}, institution_id: opts.fetch(:institution_id))

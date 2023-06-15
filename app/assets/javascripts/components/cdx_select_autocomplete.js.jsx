@@ -5,6 +5,16 @@ var CdxSelectAutocomplete = React.createClass({
     };
   },
 
+  // Since <Select> uses a different INPUT we must copy the value when the
+  // user is typing from the visible to the hidden INPUT, otherwise when the
+  // user enters free-text of validates with an invalid value, the backend won't
+  // know about the value and silently skip it.
+  copyValue: function (newValue) {
+    // we can't use setValue() because it has too many side effects, we only
+    // want to set the hidden input's value:
+    this.selectRef.setState({ value: newValue });
+  },
+
   render: function () {
     return (<Select
       ref={this.setSelectRef}
@@ -17,6 +27,7 @@ var CdxSelectAutocomplete = React.createClass({
       asyncOptions={this.asyncOptions}
       value={this.props.value || ""}
       onChange={this.onChange}
+      onInputChange={this.copyValue}
     />);
   },
 
