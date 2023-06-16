@@ -60,6 +60,7 @@ gem 'rchardet', '~> 1.6'
 gem 'rest-client', '~> 2.1' # NOTE: only used for a single HTTP call + Nuntium (SMS) + LocationService
 gem 'rubyzip', '>= 1.0.0'
 gem 'rqrcode', '~> 0.10' # required by Barby::QRCode
+gem 'rumale'
 
 gem 'cdx', path: '.'
 gem 'cdx-api-elasticsearch', path: '.'
