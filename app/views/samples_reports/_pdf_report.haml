@@ -27,14 +27,15 @@
           .text
             = @purpose
           -if @purpose == "LOD"
-            .subtitle
-              Limit of blank
-            .text
-              = @samples_report.lob
-            .subtitle
-              Limit of Detection
-            .text
-              = @samples_report.lod
+            %td{width: "200px"}
+              .subtitle
+                Limit of blank
+              .text
+                = @samples_report.lob
+              .subtitle
+                Limit of Detection
+              .text
+                = @samples_report.lod
         - if @purpose == "Challenge"
           %td{width: "200px"}
             .subtitle
