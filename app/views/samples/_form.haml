@@ -63,13 +63,13 @@
           = f.number_field :volume, min: 0, step: :any, :class => "input-small", readonly: !@can_update
           .span.unit (μl)
       = f.form_field :reference_gene do
-        = autocomplete_field(f, "sample[reference_gene]")
+        = autocomplete_field(f, "sample[reference_gene]", @navigation_context.institution)
       = f.form_field :target_organism_taxonomy do
-        = autocomplete_field(f, "sample[target_organism_taxonomy_id]")
+        = autocomplete_field(f, "sample[target_organism_taxonomy_id]", @navigation_context.institution)
       = f.form_field :pango_lineage do
-        = autocomplete_field(f, "sample[pango_lineage]")
+        = autocomplete_field(f, "sample[pango_lineage]", @navigation_context.institution)
       = f.form_field :who_label do
-        = autocomplete_field(f, "sample[who_label]")
+        = autocomplete_field(f, "sample[who_label]", @navigation_context.institution)
       = f.form_field :concentration do
         - @sample_form.blinded_attribute(:concentration) do
           .row.input-unit
