@@ -139,6 +139,7 @@ class SamplesReportsController < ApplicationController
 
   def download_nih_tables
     samples_report = SamplesReport.find(params[:samples_report_id])
+    return unless authorize_resource(samples_report, READ_SAMPLES_REPORT)
     purpose = samples_report.samples[0].box.purpose
 
     # Create a zip file contaning /template/Instructions.txt
