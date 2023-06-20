@@ -1,3 +1,5 @@
+require 'zip'
+
 class SamplesReportsController < ApplicationController
   include SamplesReportsHelper
 
@@ -133,6 +135,28 @@ class SamplesReportsController < ApplicationController
     samples_report = SamplesReport.find(params[:samples_report_id])
     confusion_matrix = confusion_matrix(samples_report.samples, threshold.to_f)
     render json: { threshold: threshold, confusion_matrix: confusion_matrix }
+  end
+
+  def download_nih_tables
+    samples_report = SamplesReport.find(params[:samples_report_id])
+    purpose = samples_report.samples[0].box.purpose
+
+    # Create a zip file contaning /template/Instructions.txt
+    zip_file = Tempfile.new(samples_report.name+"_nih_tables.zip")
+    Zip::File.open(zip_file.path, Zip::File::CREATE) do |zip|
+      zip.add("Instructions.txt", File.join(Rails.root, 'public', 'templates', 'Instructions.txt'))
+    end
+
+    if purpose == "LOD"
+      # TODO: Add the LOD table to the zip file
+    elsif purpose == "Challenge"
+      # TODO: Add the Challenge table to the zip file
+    end
+
+    zip_file.close
+    
+    # Download the zip file
+    send_file zip_file.path, type: 'application/zip', filename: samples_report.name+"_nih_tables.zip"
   end
 
   private
