@@ -1,4 +1,8 @@
 var CdxSelectAutocomplete = React.createClass({
+  componentWillMount: function () {
+    this.asyncOptions = _.debounce(this.asyncOptions.bind(this), 100, { maxWait: 250 });
+  },
+
   getInitialState: function () {
     return {
       options: null,
