@@ -27,7 +27,7 @@ var CdxSelectAutocomplete = React.createClass({
       asyncOptions={this.asyncOptions}
       value={this.props.value || ""}
       onChange={this.onChange}
-      onInputChange={this.copyValue}
+      onInputChange={this.props.combobox && this.copyValue}
     />);
   },
 
