@@ -145,7 +145,7 @@ class SamplesReportsController < ApplicationController
     # Create a zip file contaning /template/Instructions.txt
     zip_file = Tempfile.new(samples_report.name+"_nih_tables.zip")
     Zip::File.open(zip_file.path, Zip::File::CREATE) do |zip|
-      zip.add("Instructions.txt", File.join(Rails.root, 'public', 'templates', 'Instructions.txt'))
+      zip.add("Instructions.txt", Rails.root.join('public/templates/Instructions.txt'))
     end
 
     if purpose == "LOD"
