@@ -9,6 +9,14 @@ RSpec.describe SamplesReportsController, type: :controller do
     @other_institution = Institution.make! user: @other_user
 
     @box = Box.make!(:overfilled, institution: @institution, purpose: "LOD")
+
+
+    concentrations = @box.samples.map(&:concentration)
+    signals = Numo::DFloat[*@box.samples.map(&:measured_signal)]
+
+    puts concentrations.inspect
+    puts signals.inspect
+
     @box2 = Box.make!(:filled, institution: @institution, purpose: "Challenge")
     @box_without_measurements = Box.make!(:filled_without_measurements, institution: @institution, purpose: "LOD")
 
@@ -21,7 +29,7 @@ RSpec.describe SamplesReportsController, type: :controller do
   let(:default_params) do
     { context: institution.uuid }
   end
-  
+
   before(:each) do
     sign_in user
   end
@@ -47,7 +55,7 @@ RSpec.describe SamplesReportsController, type: :controller do
       expect(response).to have_http_status(:forbidden)
     end
   end
-  
+
   describe "new" do
     it "should be accessible to institution owner" do
       get :new
@@ -91,7 +99,7 @@ RSpec.describe SamplesReportsController, type: :controller do
 
     it "should not create samples report if not allowed" do
       sign_in other_user
-      
+
       expect do
         post :create, params: { samples_report: { name: "Test", samples_report_samples_attributes: @box.samples.map{|s| {sample_id: s.id}} } }
         expect(response).to have_http_status(:forbidden)
@@ -100,16 +108,16 @@ RSpec.describe SamplesReportsController, type: :controller do
 
     it "should not create samples report if there is no measurements" do
       sign_in other_user
-      
+
       expect do
         post :create, params: { samples_report: { name: "TestWithoutMeasurements", samples_report_samples_attributes: @box_without_measurements.samples.map{|s| {sample_id: s.id}} } }
         expect(response).to have_http_status(:forbidden)
       end.to change(institution.samples_reports, :count).by(0)
     end
 
-    
+
   end
-  
+
   describe "index" do
     it "should be accessible by institution owner" do
       get :index

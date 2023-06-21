@@ -283,6 +283,20 @@ Box.blueprint(:overfilled) do
   ] }
 end
 
+Box.blueprint(:lob_lod) do
+  @batch_one = Batch.make!
+  @batch_two = Batch.make!
+
+  samples { [
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_one, concentration: 0, replicate: 1, measured_signal: 10),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_two, concentration: 10, replicate: 2, measured_signal:100.12),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_one, concentration: 10, replicate: 3, measured_signal:193.5),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_two, concentration: 10, replicate: 4, measured_signal:100.12),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_one, concentration: 20, replicate: 5, measured_signal:193.5),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_two, concentration: 0, replicate: 6, measured_signal:3.3),
+  ] }
+end
+
 Box.blueprint(:blinded) do
   samples { [
     Sample.make(:filled, box: object, institution: object.institution, site: object.site),

@@ -45,10 +45,26 @@ class SamplesReport < ApplicationRecord
   }
 
   def calculate_lod_and_lob
-    concentrations = samples.map(&:concentration)
-    signals = Numo::DFloat[*samples.map(&:measured_signal)]
-    self.lod, _, self.lob, _ = calculate_lod(concentrations, signals)
-    self.save
+  concentrations = samples.map(&:concentration)
+  signals = Numo::DFloat[*samples.map(&:measured_signal)]
+  concentrations_matrix = Numo::DFloat[*concentrations.map { |c| [c] }]
+  lr = Rumale::LinearModel::LinearRegression.new(fit_bias: true)
+  lr.fit(concentrations_matrix, signals)
+
+  lod = lr.bias_term
+  blank_samples = signals[Numo::DFloat.cast(concentrations).eq(0)]
+  if blank_samples.size > 0
+    blank_samples_mean = blank_samples.mean
+    blank_samples_sd = blank_samples.stddev
+    lod = [lod, 3 * blank_samples_sd].max
+    lob = blank_samples_mean + 1.645 * blank_samples_sd
+  else
+    lob = nil
+  end
+
+  self.lod = lod.try(:round, 3)
+  self.lob = lob.try(:round, 3)
+  self.save
   end
 
   private
@@ -56,29 +72,5 @@ class SamplesReport < ApplicationRecord
   def there_are_samples
     samples_with_measurements = samples_report_samples.select { |srs| !srs.sample.measured_signal.nil? }
     errors.add(:base, "The selected box should contain samples with uploaded measurements") if samples_with_measurements.empty?
-  end
-
-  def calculate_lod(concentrations, signals)
-    concentrations_matrix = Numo::DFloat[*concentrations.map { |c| [c] }]
-    lr = Rumale::LinearModel::LinearRegression.new(fit_bias: true)
-    lr.fit(concentrations_matrix, signals)
-
-    lod = lr.bias_term
-    predictions = lr.predict(concentrations_matrix)
-    residuals = signals - predictions
-    rmse = Math.sqrt((residuals**2).sum / residuals.size)
-
-    blank_samples = signals[Numo::DFloat.cast(concentrations).eq(0)]
-    if blank_samples.size > 0
-      blank_samples_mean = blank_samples.mean
-      blank_samples_sd = blank_samples.stddev
-      lod = [lod, 3 * blank_samples_sd].max
-      lob = blank_samples_mean + 1.645 * blank_samples_sd
-    else
-      lob = nil
-    end
-
-    gray_zone = lob.nil? ? nil : (lob..lod)
-    return lod.try(:round, 3), rmse, lob.try(:round, 3), gray_zone
   end
 end
