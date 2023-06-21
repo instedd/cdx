@@ -25,7 +25,8 @@ class SamplesReport < ApplicationRecord
   }
 
   scope :partial_sample_uuid, ->(sample_uuid) {
-    joins(samples: :sample_identifiers).where("sample_identifiers.uuid LIKE ?", "%#{sanitize_sql_like(sample_uuid)}%") unless sample_uuid.blank?
+    joins(samples: :sample_identifiers)
+      .where("sample_identifiers.uuid LIKE ?", "%#{sanitize_sql_like(sample_uuid)}%") unless sample_uuid.blank?
   }
 
   scope :partial_box_uuid, ->(box_uuid) {
@@ -45,26 +46,26 @@ class SamplesReport < ApplicationRecord
   }
 
   def calculate_lod_and_lob
-  concentrations = samples.map(&:concentration)
-  signals = Numo::DFloat[*samples.map(&:measured_signal)]
-  concentrations_matrix = Numo::DFloat[*concentrations.map { |c| [c] }]
-  lr = Rumale::LinearModel::LinearRegression.new(fit_bias: true)
-  lr.fit(concentrations_matrix, signals)
+    concentrations = samples.map(&:concentration)
+    signals = Numo::DFloat[*samples.select { |sample| sample.measured_signal.present? }.map(&:measured_signal)]
+    concentrations_matrix = Numo::DFloat[*concentrations.map { |c| [c] }]
+    lr = Rumale::LinearModel::LinearRegression.new(fit_bias: true)
+    lr.fit(concentrations_matrix, signals)
 
-  lod = lr.bias_term
-  blank_samples = signals[Numo::DFloat.cast(concentrations).eq(0)]
-  if blank_samples.size > 0
-    blank_samples_mean = blank_samples.mean
-    blank_samples_sd = blank_samples.stddev
-    lod = [lod, 3 * blank_samples_sd].max
-    lob = blank_samples_mean + 1.645 * blank_samples_sd
-  else
-    lob = nil
-  end
+    lod = lr.bias_term
+    blank_samples = signals[Numo::DFloat.cast(concentrations).eq(0)]
+    if blank_samples.size > 0
+      blank_samples_mean = blank_samples.mean
+      blank_samples_sd = blank_samples.stddev
+      lod = [lod, 3 * blank_samples_sd].max
+      lob = blank_samples_mean + 1.645 * blank_samples_sd
+    else
+      lob = nil
+    end
 
-  self.lod = lod.try(:round, 3)
-  self.lob = lob.try(:round, 3)
-  self.save
+    self.lod = lod.try(:round, 3)
+    self.lob = lob.try(:round, 3)
+    self.save
   end
 
   private
