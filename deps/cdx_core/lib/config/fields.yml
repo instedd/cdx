@@ -98,6 +98,10 @@ entities:
     fields:
       name:
         type: string
+      lod:
+        type: float
+      lob:
+        type: float
       threshold:
         type: float
   batch: &BATCH

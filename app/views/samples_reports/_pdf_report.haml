@@ -5,7 +5,7 @@
 
 %div{:hidden => true}
   .samples-report{id:'samples-report'}
-    .report-content 
+    .report-content
       .report-header
         = image_tag "cdx-logo-bw.png"
         %span
@@ -16,26 +16,36 @@
         Summary
       %table
         %td{width: "200px"}
-          .subtitle 
+          .subtitle
             Samples
-          .text 
+          .text
             = @samples_report.samples_report_samples.length
             -if @samples_without_results_count > 0
               (#{@samples_without_results_count} without results)
-          .subtitle 
+          .subtitle
             Box Purpose
-          .text 
+          .text
             = @purpose
+          -if @purpose == "LOD"
+            %td{width: "200px"}
+              .subtitle
+                Limit of blank
+              .text
+                = @samples_report.lob
+              .subtitle
+                Limit of Detection
+              .text
+                = @samples_report.lod
         - if @purpose == "Challenge"
           %td{width: "200px"}
-            .subtitle 
+            .subtitle
               Threshold
-            .text 
+            .text
               = params["threshold"].to_f
             -if @purpose == "Challenge"
-              .subtitle 
+              .subtitle
                 Computed ROC AUC
-              .text 
+              .text
                 = auc(roc_curve(@samples_report))
               %td{width: "200px"}
                 .subtitle
@@ -63,12 +73,12 @@
       %br
       %br
       %div
-        = react_component('SamplesReportsBarChart', 
-                    data: @reports_data, 
-                    height: 300, 
+        = react_component('SamplesReportsBarChart',
+                    data: @reports_data,
+                    height: 300,
                     barVariable: "average",
                     errorBarsVariable: "errors",
-                    y_label: 'Measured Signal', 
+                    y_label: 'Measured Signal',
                     x_labels: @purpose == "Challenge" ? ["Virus", "Distractor"]:[])
 
 
@@ -80,19 +90,19 @@
             Report: #{@samples_report.name}
             %br
             Created at #{@samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
-        
+
         .title
           Limit of detection
         %br
         %br
         %br
         %div
-          = react_component('SamplesReportsLineChart', 
-                      data: @reports_data, 
-                      height: 400, 
-                      width: 600, 
+          = react_component('SamplesReportsLineChart',
+                      data: @reports_data,
+                      height: 400,
+                      width: 600,
                       dotsVariable: "measurements",
-                      y_label: 'Measured Signal', 
+                      y_label: 'Measured Signal',
                       x_labels: [])
       - if @purpose == "Challenge"
         .pdf-page-break
@@ -102,7 +112,7 @@
             Report: #{@samples_report.name}
             %br
             Created at #{@samples_report.created_at.strftime(I18n.t('date.input_format.pattern'))}
-        
+
         .title
           ROC Curve
         %br
@@ -113,7 +123,7 @@
           data: roc_curve(@samples_report))
 
 :javascript
-  
+
   var getUrlParameter = function getUrlParameter(sParam) {
       var sPageURL = window.location.search.substring(1),
           sURLVariables = sPageURL.split('&'),
@@ -140,7 +150,7 @@
         .then((r) => {
             return r;
     })
-    
+
     if (gon.purpose == "Challenge") {
       // For the bar chart
       var minthreshold = parseFloat(gon.min_threshold);
@@ -171,7 +181,7 @@
       document.getElementById("computed-tpr").innerHTML =  tpr.toFixed(2);
     }
     else {
-      d3.select("#threshold-line").style("display", "none") 
+      d3.select("#threshold-line").style("display", "none")
     }
 
     document.getElementById("true_negative").innerHTML =  ret.confusion_matrix.true_negative || 0;
@@ -193,11 +203,11 @@
   }
 
   addScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js');
-      
+
   window.onload =
     function() {
       var element = document.getElementById('samples-report');
-      
+
       var opt = {
         filename: gon.samples_report_name+'.pdf',
         pagebreak: { before: '.pdf-page-break' },
@@ -207,4 +217,3 @@
       };
       updateThreshold().then(() => html2pdf().set(opt).from(element).save().then(() => window.close()));
     }
-  

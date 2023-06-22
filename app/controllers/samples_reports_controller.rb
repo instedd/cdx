@@ -11,7 +11,7 @@ class SamplesReportsController < ApplicationController
 
     @samples_reports = SamplesReport.where(institution: @navigation_context.institution)
     @samples_reports = check_access(@samples_reports, READ_SAMPLES_REPORT).order('samples_reports.created_at DESC')
-  
+
     # Filter by search params
 
     @samples_reports = @samples_reports.partial_name(params[:name])
@@ -22,7 +22,7 @@ class SamplesReportsController < ApplicationController
     #paginate samples report
     @samples_reports = perform_pagination(@samples_reports)
   end
-  
+
   def new
     @samples_report = SamplesReport.new({
       institution: @navigation_context.institution,
@@ -30,7 +30,7 @@ class SamplesReportsController < ApplicationController
     })
 
     @boxes = []
-    
+
     prepare_for_institution_and_authorize(@samples_report, CREATE_INSTITUTION_SAMPLES_REPORT)
   end
 
@@ -42,9 +42,9 @@ class SamplesReportsController < ApplicationController
     @samples_report.institution = @institution
     @samples_report.site = @navigation_context.site
     @samples_report.name = params[:samples_report][:name]
-    
+
     samples_report_samples = []
-    if params[:samples_report][:box_ids] 
+    if params[:samples_report][:box_ids]
       params[:samples_report][:box_ids].each do |box_id|
         box = Box.find(box_id)
         box = check_access(box, READ_BOX)
@@ -58,6 +58,7 @@ class SamplesReportsController < ApplicationController
     @samples_report.samples_report_samples = samples_report_samples
 
     if @samples_report.save
+      @samples_report.calculate_lod_and_lob
       redirect_to samples_reports_path, notice: 'Report was successfully created.'
     else
       render action: 'new'
@@ -71,7 +72,7 @@ class SamplesReportsController < ApplicationController
     @reports_data = measured_signal_data(@samples_report)
     @samples_without_results_count = @samples_report.samples.without_results.count
     @purpose = @samples_report.samples[0].box.purpose
-    
+
     if params[:display] == "pdf"
       gon.samples_report_id = @samples_report.id
       gon.samples_report_name = @samples_report.name
@@ -89,25 +90,25 @@ class SamplesReportsController < ApplicationController
   def delete
     @samples_report = SamplesReport.find(params[:id])
     return unless authorize_resource(@samples_report, DELETE_SAMPLES_REPORT)
-  
+
     @samples_report.destroy
-    
+
     redirect_to samples_reports_path, notice: 'Report was successfully deleted.'
   end
-  
+
   def bulk_destroy
     samples_reports_ids = params[:samples_report_ids]
-  
+
     if samples_reports_ids.blank?
       redirect_to samples_reports_path, notice: 'Select at least one report to destroy.'
       return
     end
-  
+
     samples_reports = SamplesReport.where(id: samples_reports_ids)
     return unless authorize_resources(samples_reports, DELETE_SAMPLES_REPORT)
-  
+
     samples_reports.destroy_all
-  
+
     redirect_to samples_reports_path, notice: 'Reports were successfully deleted.'
   end
 
@@ -183,7 +184,7 @@ class SamplesReportsController < ApplicationController
 
   def confusion_matrix(samples, threshold)
     confusion_matrix = Hash.new{0}
-    
+
     samples.each do |s|
       next unless s.measured_signal
       if s.concentration == 0 || s.distractor
