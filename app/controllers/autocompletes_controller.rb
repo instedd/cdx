@@ -18,12 +18,12 @@ class AutocompletesController < ApplicationController
     matcher = Regexp.new(Regexp.escape(query), Regexp::IGNORECASE)
 
     check_access(@institution.batches, READ_BATCH).select(:id, :core_fields, :uuid, :custom_fields).find_each do |batch|
-      value = batch.try(field_name)
+      value = batch.send(field_name)
       values << value if value&.match?(matcher)
     end
 
     check_access(@institution.samples, READ_SAMPLE).select(:id, :core_fields, :custom_fields).find_each do |sample|
-      value = sample.try(field_name)
+      value = sample.send(field_name)
       values << value if value&.match?(matcher)
     end
 
