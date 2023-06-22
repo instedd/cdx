@@ -292,7 +292,7 @@
     
     // Open the download_nih_tables path in a new tab
     var context = getUrlParameter('context');
-    var url = '/samples_reports/download_nih_tables?context='+context+"&samples_report_id="+#{@samples_report.id};
+    var url = '/samples_reports/'+#{@samples_report.id}+'/nih_tables?context='+context+"";
     window.open(url, '_blank');
 
   }
