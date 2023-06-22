@@ -1,7 +1,7 @@
 var Modal = React.createClass({
   getInitialState: function() {
     return { show: false,
-            showCloseButton : this.props.showCloseButton === undefined ? true : this.props.showCloseButton};
+            showCloseButton : this.props.showCloseButton == null ? true : this.props.showCloseButton};
   },
 
   show: function() {
