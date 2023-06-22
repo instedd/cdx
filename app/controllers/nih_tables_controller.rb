@@ -1,5 +1,5 @@
 class NihTablesController < ApplicationController
-  def show
+  def create
     samples_report = SamplesReport.find(params[:id])
     return unless authorize_resource(samples_report, READ_SAMPLES_REPORT)
     
