@@ -277,8 +277,6 @@
 
   // For NIH download button
 
-  var nihDownloadButton = document.querySelectorAll("#print-as-csv");
-
   function showConfirmModal() {
     document.querySelector(`.nih-report-type-modal-container`).classList.remove("hidden");
   }
@@ -297,7 +295,5 @@
 
   }
 
-  nihDownloadButton.forEach(function(button) {
-    button.addEventListener("click", showConfirmModal);
-  });
+  document.getElementById("print-as-csv").addEventListener("click", showConfirmModal);
 
