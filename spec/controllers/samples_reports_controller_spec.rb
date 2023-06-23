@@ -9,14 +9,6 @@ RSpec.describe SamplesReportsController, type: :controller do
     @other_institution = Institution.make! user: @other_user
 
     @box = Box.make!(:overfilled, institution: @institution, purpose: "LOD")
-
-
-    concentrations = @box.samples.map(&:concentration)
-    signals = Numo::DFloat[*@box.samples.map(&:measured_signal)]
-
-    puts concentrations.inspect
-    puts signals.inspect
-
     @box2 = Box.make!(:filled, institution: @institution, purpose: "Challenge")
     @box_without_measurements = Box.make!(:filled_without_measurements, institution: @institution, purpose: "LOD")
 
