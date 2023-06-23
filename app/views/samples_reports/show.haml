@@ -58,6 +58,10 @@
                 .subtitle{id:'print-as-pdf'}
                   = icon_tag "as-pdf", class: "btn-icon icon-text-color"
                   Download PDF
+            .action
+              =button_tag id:'print-as-csv', class: 'subtitle btn-transparent' do
+                = icon_tag "table", class: "btn-icon icon-text-color"
+                Download NIH files
 
         - if @can_delete
           .report-summary-after
@@ -114,6 +118,18 @@
                 ROC Curve
               = react_component('SamplesReportsRocChart',
                 data: roc_curve(@samples_report))
+
+.nih-report-type-modal-container.hidden
+  = react_component("ConfirmationModal",
+                      deletion: false,
+                      cancelFunction: "hideConfirmModal",
+                      confirmFunction: "downloadNIHFiles",
+                      id: "nih-report-type-modal",
+                      colorClass: "black",
+                      confirmMessage: "Continue",
+                      title: "Notice",
+                      showCloseButton: false,
+                      message: "After downloading these files, you will need to fill specific columns. <br />Make sure you read the instructions to be aware of these considerations <br>contained in the file called Instructions.txt")
 
 :javascript
 
@@ -267,3 +283,26 @@
       document.getElementById("samples-report").classList.remove("hidden");
     });
   }
+
+  // For NIH download button
+
+  function showConfirmModal() {
+    document.querySelector(`.nih-report-type-modal-container`).classList.remove("hidden");
+  }
+
+  function hideConfirmModal() {
+    document.querySelector(`.nih-report-type-modal-container`).classList.add("hidden");
+  }
+
+  function downloadNIHFiles() {
+    hideConfirmModal();
+    
+    // Open the download_nih_tables path in a new tab
+    var context = getUrlParameter('context');
+    var url = '/samples_reports/'+#{@samples_report.id}+'/nih_tables?context='+context+"";
+    window.open(url, '_blank');
+
+  }
+
+  document.getElementById("print-as-csv").addEventListener("click", showConfirmModal);
+

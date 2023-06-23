@@ -1,3 +1,5 @@
+require 'zip'
+
 class SamplesReportsController < ApplicationController
   include SamplesReportsHelper
 

@@ -133,6 +133,7 @@ Rails.application.routes.draw do
     member do
       get 'show'
       delete 'delete'
+      get 'nih_tables', to: 'nih_tables#show'
     end
     collection do
       get 'update_threshold'

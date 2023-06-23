@@ -1,6 +1,7 @@
 var Modal = React.createClass({
   getInitialState: function() {
-    return { show: false };
+    return { show: false,
+            showCloseButton : this.props.showCloseButton == null ? true : this.props.showCloseButton};
   },
 
   show: function() {
@@ -34,12 +35,14 @@ var Modal = React.createClass({
   },
 
   render: function() {
+    var closeButton = this.state.showCloseButton ? 
+        <div className="close-modal" onClick={this.hide} title="Close">
+          <img src="<%= asset_url('ic-cross.png') %>" />
+        </div> : "";
     if (this.state.show)
       return (<div className="modal-wrapper" onClick={this.hideOnOuterClick} onKeyDown={this.handleKeyDown}>
         <div className="modal">
-          <div className="close-modal" onClick={this.hide} title="Close">
-            <img src="<%= asset_url('ic-cross.png') %>" />
-          </div>
+          {closeButton}
           {this.props.children}
         </div>
       </div>);

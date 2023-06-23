@@ -65,7 +65,7 @@ var ConfirmationModal = React.createClass({
       cancelButton = <button type="button" className="btn-link" onClick={this.onCancel}>{this.cancelMessage()}</button>
     }
     return (
-      <Modal ref="confirmationModal" show="true">
+      <Modal ref="confirmationModal" show="true" showCloseButton={this.props.showCloseButton}>
         <h1 className={this.colorClass()}>{this.modalTitle()}</h1>
         <div className={this.colorClass()+ " modal-content"} dangerouslySetInnerHTML={this.message()}>
         </div>
