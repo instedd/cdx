@@ -157,7 +157,11 @@ class BatchesController < ApplicationController
       :isolate_name,
       :inactivation_method,
       :volume,
-      :virus_lineage
+      :virus_lineage,
+      :reference_gene,
+      :target_organism_taxonomy_id,
+      :pango_lineage,
+      :who_label
     )
   end
 

@@ -22,7 +22,11 @@ class Batch < ApplicationRecord
                   :specimen_role,
                   :inactivation_method,
                   :volume,
-                  :virus_lineage
+                  :virus_lineage,
+                  :reference_gene,
+                  :target_organism_taxonomy_id,
+                  :pango_lineage,
+                  :who_label
 
   validates_presence_of :inactivation_method
   validates_presence_of :volume
