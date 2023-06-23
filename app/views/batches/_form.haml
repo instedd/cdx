@@ -36,7 +36,14 @@
         .row.input-unit
           = f.number_field :volume, min: 0, step: :any, :class => "input-small", readonly: !@can_update
           .span.unit (μl)
-
+      = f.form_field :reference_gene do
+        = autocomplete_field(f, "batch[reference_gene]", @navigation_context.institution)
+      = f.form_field :target_organism_taxonomy do
+        = autocomplete_field(f, "batch[target_organism_taxonomy_id]", @navigation_context.institution)
+      = f.form_field :pango_lineage do
+        = autocomplete_field(f, "batch[pango_lineage]", @navigation_context.institution)
+      = f.form_field :who_label do
+        = autocomplete_field(f, "batch[who_label]", @navigation_context.institution)
       - if @can_edit_sample_quantity
         = f.form_field :samples_quantity do
           = f.number_field :samples_quantity, min: 0, :class => "input-small"

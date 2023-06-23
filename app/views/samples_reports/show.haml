@@ -13,23 +13,32 @@
     .row
       .col.pe-4
         .samples-report
-          .report-summary-content 
+          .report-summary-content
             .title
               Summary
-            .subtitle 
+            .subtitle
               Samples
-            .text 
+            .text
               = @samples_report.samples_report_samples.length
               -if @samples_without_results_count > 0
                 (#{@samples_without_results_count} without results)
-            .subtitle 
+            .subtitle
               Box Purpose
-            .text 
+            .text
               = @purpose
+            -if @purpose == "LOD"
+              .subtitle
+                Limit of blank
+              .text
+                = @samples_report.lob
+              .subtitle
+                Limit of Detection
+              .text
+                = @samples_report.lod
             -if @purpose == "Challenge"
-              .subtitle 
+              .subtitle
                 Computed ROC AUC
-              .text 
+              .text
                 = auc(roc_curve(@samples_report))
               .subtitle
                 Threshold's TPR
@@ -37,11 +46,11 @@
               .subtitle
                 Threshold's FPR
               .text{id: "computed-fpr"}
-            .separation 
-              
+            .separation
+
             .action
               = link_to "", :onclick => "downloadCharts()", id: "download-svg" do
-                .subtitle 
+                .subtitle
                   = icon_tag "barchart", class: "btn-icon icon-text-color"
                   Download charts as svg
             .action
@@ -60,51 +69,51 @@
               .subtitle
                 = icon_tag "trash", class: "btn-icon icon-text-color"
                 Delete Report
-              
+
       .col
         .samples-report.hidden{id:'samples-report'}
-          .report-content 
+          .report-content
             - if @purpose == "Challenge"
               .title{id: "treshold-title"}
-              .slider 
-                .min-signal 
+              .slider
+                .min-signal
                   0.00
-                .progress 
+                .progress
                 %input{type:"range", id:"threshold", class: "slider", onchange:"updateThreshold()", min:0, max:@max_signal, step:@max_signal/100, value:0}
                 .max-signal
                   #{@max_signal.round(2)}
-              .separation 
+              .separation
             - if @purpose == "LOD" || @purpose == "Variants"
               %input{type:"hidden", id:"threshold", value: 0.0}
             .title
               Confusion Matrix
-            .separation 
+            .separation
               %div#confusion-matrix
                 = render 'confusion_matrix'
-            .separation 
+            .separation
             .title
               Measured signal
-            = react_component('SamplesReportsBarChart', 
-                        data: @reports_data, 
-                        height: 300, 
+            = react_component('SamplesReportsBarChart',
+                        data: @reports_data,
+                        height: 300,
                         barVariable: "average",
                         errorBarsVariable: "errors",
-                        y_label: 'Measured Signal', 
+                        y_label: 'Measured Signal',
                         x_labels: @purpose == "Challenge" ? ["Virus", "Distractor"]:[])
 
             - if @purpose == "LOD"
-              .separation 
+              .separation
               .title
                 Limit of detection
-              = react_component('SamplesReportsLineChart', 
-                          data: @reports_data, 
-                          height: 300, 
+              = react_component('SamplesReportsLineChart',
+                          data: @reports_data,
+                          height: 300,
                           dotsVariable: "measurements",
-                          y_label: 'Measured Signal', 
+                          y_label: 'Measured Signal',
                           x_labels: [])
 
             - if @purpose == "Challenge"
-              .separation 
+              .separation
               .title
                 ROC Curve
               = react_component('SamplesReportsRocChart',
@@ -184,9 +193,9 @@
 
   function downloadCharts(){
     downloadSvg("barchart", "measured_signal");
-    if ("#{@purpose}" == "Challenge") 
+    if ("#{@purpose}" == "Challenge")
       downloadSvg("rocchart", "roc_curve");
-    else 
+    else
       downloadSvg("linechart", "limit_of_detection");
   }
 
@@ -208,7 +217,7 @@
 
   async function updateThreshold(){
     var threshold = document.getElementById("threshold").value;
-    
+
     var context = getUrlParameter('context');
     var url = '/samples_reports/update_threshold?context='+context+"&samples_report_id="+#{@samples_report.id}+"&threshold="+threshold;
     var ret = await fetch(url)
@@ -225,7 +234,7 @@
       document.getElementById("print-pdf-link").href += "&threshold="+parseFloat(ret.threshold).toFixed(2);
       document.getElementById("print-pdf-link").href += "&minthreshold="+parseFloat(minthreshold).toFixed(2);
       document.getElementById("print-pdf-link").href += "&maxthreshold="+parseFloat(maxthreshold).toFixed(2);
-    
+
 
       // For the bar chart
       var threshold_percentage = (threshold - minthreshold) / (maxthreshold - minthreshold);
@@ -254,7 +263,7 @@
       document.getElementById("computed-tpr").innerHTML =  tpr.toFixed(2);
     }
     else {
-      d3.select("#threshold-line").style("display", "none") 
+      d3.select("#threshold-line").style("display", "none")
     }
 
     document.getElementById("true_negative").innerHTML =  ret.confusion_matrix.true_negative || 0;
