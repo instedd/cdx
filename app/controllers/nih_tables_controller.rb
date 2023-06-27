@@ -29,6 +29,7 @@ class NihTablesController < ApplicationController
     end
     zip_file
   end
+
   def add_general_samples_table(samples_report, zip_file)
     csv_file = Tempfile.new("#{samples_report.name}_samples.csv")
     csv_data = []
