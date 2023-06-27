@@ -38,6 +38,37 @@ RSpec.describe NihTablesController, type: :controller do
       expect(Zip::File.open_buffer(response.body).entries.map(&:name)).to include("Instructions.txt")
     end
 
+    it "should contain the samples & results table" do
+      get :show, params: { id: @samples_report.id }
+
+      expect(Zip::File.open_buffer(response.body).entries.map(&:name)).to include("#{@samples_report.name}_samples.csv")
+      expect(Zip::File.open_buffer(response.body).entries.map(&:name)).to include("#{@samples_report.name}_results.csv")
+    end
+
+    it "should contain the samples table with the correct data" do
+      get :show, params: { id: @samples_report.id }
+
+      samples_table = CSV.parse(Zip::File.open_buffer(response.body).entries.find{|e| e.name == "Test_samples.csv"}.get_input_stream.read, headers: true)
+      
+      #expect the samples table to contain the same number of rows as the samples report
+      expect(samples_table.count).to eq(@samples_report.samples_report_samples.count)
+
+      #expect the id columns to contain the proper samples
+      expect(samples_table["sample_id"]).to eq(@samples_report.samples_report_samples.map{|srs| srs.sample.id.to_s})
+    end
+
+    it "should contain the results table with the correct data" do
+      get :show, params: { id: @samples_report.id }
+
+      samples_table = CSV.parse(Zip::File.open_buffer(response.body).entries.find{|e| e.name == "Test_results.csv"}.get_input_stream.read, headers: true)
+      
+      #expect the samples table to contain the same number of rows as the samples report
+      expect(samples_table.count).to eq(@samples_report.samples_report_samples.count)
+
+      #expect the id columns to contain the proper samples
+      expect(samples_table["sample_id"]).to eq(@samples_report.samples_report_samples.map{|srs| srs.sample.id.to_s})
+    end
+
     it "should not allow access to user without read access" do
       sign_in @other_user
       get :show, params: { id: @samples_report.id, context: @other_institution.uuid }
