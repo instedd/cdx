@@ -1,0 +1,44 @@
+csv << [
+  'sample_id',
+  'vqa_box_id',
+  'sample_group',
+  'sample_media',
+  'sample_media_id',
+  'sample_media_source',
+  'sample_media_source_url',
+  'sample_concentration',
+  'sample_concentration_unit',
+  'sample_concentration_reference_gene',
+  'virus_sample_id',
+  'virus_batch_number',
+  'target_analyte_type',
+  'target_organism_name',
+  'target_organism_taxonomy_id',
+  'pango_lineage',
+  'who_label',
+  'virus_sample_inactivation_method'
+]
+
+samples_report.samples.each do |sample|
+  batch = Batch.find_by(batch_number: sample.batch_number)
+  csv << [
+    sample.id,
+    sample.box.uuid,
+    "#{sample.box.purpose}-panel",
+    nil,
+    nil,
+    nil,
+    nil,
+    sample.concentration,
+    'copies/ml',
+    batch.reference_gene,
+    sample.id,
+    sample.batch_number,
+    'inactivated virus',
+    'SARS-CoV-2',
+    batch.target_organism_taxonomy_id,
+    batch.pango_lineage,
+    batch.who_label,
+    sample.inactivation_method
+  ]
+end

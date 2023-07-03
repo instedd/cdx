@@ -1,0 +1,23 @@
+csv << [
+  'sample_id',
+  'vqa_box_id',
+  'sample_group',
+  'protocol_id',
+  'technology_platform',
+  'assay_readout',
+  'assay_readout_unit',
+  'assay_readout_description'
+]
+
+samples_report.samples.each do |sample|
+  csv << [
+    sample.id,
+    sample.box.uuid,
+    "#{sample.box.purpose}-panel",
+    nil,
+    nil,
+    sample.measured_signal,
+    nil,
+    nil
+  ]
+end
