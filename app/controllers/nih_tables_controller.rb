@@ -1,5 +1,3 @@
-require 'csv'
-
 class NihTablesController < ApplicationController
   def show
     samples_report = SamplesReport.find(params[:id])
@@ -18,119 +16,27 @@ class NihTablesController < ApplicationController
     zip_file = Tempfile.new("#{samples_report.name}_nih_tables.zip")
     Zip::File.open(zip_file.path, Zip::File::CREATE) do |zip|
       zip.add("Instructions.txt", Rails.root.join('public/templates/Instructions.txt'))
-      add_general_samples_table(samples_report, zip)
-      add_general_results_table(samples_report, zip)
+      add_nih_table(samples_report, 'samples', zip)
+      add_nih_table(samples_report, 'results', zip)
 
       if purpose == "LOD"
-        add_lod_table(samples_report, zip_file)
+        #add_nih_table(samples_report, 'lod', zip)
       elsif purpose == "Challenge"
-        add_challenge_table(samples_report, zip_file)
+        #add_nih_table(samples_report, 'challenge', zip)
       end
     end
     zip_file
   end
 
-  def add_general_samples_table(samples_report, zip_file)
-    csv_file = Tempfile.new("#{samples_report.name}_samples.csv")
-    csv_data = []
-  
-    csv_data << [
-      'sample_id',
-      'vqa_box_id',
-      'sample_group',
-      'sample_media',
-      'sample_media_id',
-      'sample_media_source',
-      'sample_media_source_url',
-      'sample_concentration',
-      'sample_concentration_unit',
-      'sample_concentration_reference_gene',
-      'virus_sample_id',
-      'virus_batch_number',
-      'target_analyte_type',
-      'target_organism_name',
-      'target_organism_taxonomy_id',
-      'pango_lineage',
-      'who_label',
-      'virus_sample_inactivation_method'
-    ]
-  
-    samples_report.samples.each do |sample|
-      batch = Batch.find_by(batch_number: sample.batch_number)
-      csv_data << [
-        sample.id,
-        sample.box.uuid,
-        "#{sample.box.purpose}-panel",
-        nil,
-        nil,
-        nil,
-        nil,
-        sample.concentration,
-        'copies/ml',
-        batch.reference_gene,
-        sample.id,
-        sample.batch_number,
-        'inactivated virus',
-        'SARS-CoV-2',
-        batch.target_organism_taxonomy_id,
-        batch.pango_lineage,
-        batch.who_label,
-        sample.inactivation_method
-      ]
-    end
-  
-    CSV.open(csv_file.path, 'w') do |csv|
-      csv_data.each do |row|
-        csv << row
-      end
-    end
-  
-    zip_file.add("#{samples_report.name}_samples.csv", csv_file.path)
-  end
-  
-  def add_general_results_table(samples_report, zip_file)
-    csv_file = Tempfile.new("#{samples_report.name}_results.csv")
-    csv_data = []
-  
-    csv_data << [
-      'sample_id',
-      'vqa_box_id',
-      'sample_group',
-      'protocol_id',
-      'technology_platform',
-      'assay_readout',
-      'assay_readout_unit',
-      'assay_readout_description'
-    ]
-  
-    samples_report.samples.each do |sample|
-      csv_data << [
-        sample.id,
-        sample.box.uuid,
-        "#{sample.box.purpose}-panel",
-        nil,
-        nil,
-        sample.measured_signal,
-        nil,
-        nil
-      ]
-    end
-  
-    CSV.open(csv_file.path, 'w') do |csv|
-      csv_data.each do |row|
-        csv << row
-      end
-    end
-  
-    zip_file.add("#{samples_report.name}_results.csv", csv_file.path)
-  end
+  def add_nih_table(samples_report, table_name, zip_file)
+    csv_file = Tempfile.new("#{samples_report.name}_#{table_name}.csv")
+    
+    csv_file.write(
+      render_to_string(:file => 'samples_reports/nih_'+table_name+'.csv.csvbuilder', :locals => { :samples_report => samples_report })
+    )
+    csv_file.close
 
-  def add_lod_table(samples_report, zip_file)
-    # TODO: Add the LOD table to the zip file
-  end
-  
-  def add_challenge_table(samples_report, zip_file)
-    # TODO: Add the Challenge table to the zip file
+    zip_file.add("#{samples_report.name}_#{table_name}.csv", csv_file.path)
   end
   
   def send_zip_file(zip_file, filename)
