@@ -19,7 +19,7 @@ csv << [
   'virus_sample_inactivation_method'
 ]
 
-samples_report.samples.each do |sample|
+@samples_report.samples.each do |sample|
   batch = Batch.find_by(batch_number: sample.batch_number)
   csv << [
     sample.id,

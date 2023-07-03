@@ -9,7 +9,7 @@ csv << [
   'assay_readout_description'
 ]
 
-samples_report.samples.each do |sample|
+@samples_report.samples.each do |sample|
   csv << [
     sample.id,
     sample.box.uuid,
