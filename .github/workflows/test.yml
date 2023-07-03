@@ -20,6 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - run: docker compose build web
       - uses: ./.github/actions/gems-cache
 
   unit:
@@ -73,6 +74,7 @@ jobs:
       - integration
     steps:
       - uses: actions/checkout@v3
+      - run: docker compose build web
       - uses: ./.github/actions/gems-cache
 
       - uses: actions/download-artifact@v3
@@ -81,6 +83,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: integration_tests_coverage
+
       - run: docker compose run --no-deps --rm web bundle exec rails coverage:report
 
       - uses: actions/upload-artifact@v3
