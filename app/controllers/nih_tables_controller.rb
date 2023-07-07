@@ -1,41 +1,37 @@
 class NihTablesController < ApplicationController
   def show
-    samples_report = SamplesReport.find(params[:id])
-    return unless authorize_resource(samples_report, READ_SAMPLES_REPORT)
+    @samples_report = SamplesReport.find(params[:id])
+    return unless authorize_resource(@samples_report, READ_SAMPLES_REPORT)
     
-    purpose = samples_report.samples[0].box.purpose
-    zip_file = create_zip_file(samples_report.name)
-  
-    if purpose == "LOD"
-    add_lod_table(zip_file)
-    elsif purpose == "Challenge"
-    add_challenge_table(zip_file)
-    end
-  
-    zip_file.close
-  
-    send_zip_file(zip_file, samples_report.name)
+    zip_data = create_zip_file
+    send_data zip_data.read, type: 'application/zip', filename: "#{@samples_report.name}_nih_tables.zip"
   end
   
   private
   
-  def create_zip_file(filename)
-    zip_file = Tempfile.new("#{filename}_nih_tables.zip")
-    Zip::File.open(zip_file.path, Zip::File::CREATE) do |zip|
-    zip.add("Instructions.txt", Rails.root.join('public/templates/Instructions.txt'))
+  def create_zip_file
+    purpose = @samples_report.samples[0].box.purpose
+
+    zip_stream = Zip::OutputStream.write_buffer do |stream|
+      # Read public/templates/Instructions.txt contents and write to zip
+      stream.put_next_entry('Instructions.txt')
+      stream.write(File.read(Rails.root.join('public/templates/Instructions.txt')))
+
+      add_nih_table('samples', stream)
+      add_nih_table('results', stream)
+
+      if purpose == "LOD"
+        #add_nih_table('lod', stream)
+      elsif purpose == "Challenge"
+        #add_nih_table('challenge', stream)
+      end
     end
-    zip_file
+    zip_stream.rewind
+    zip_stream
   end
-  
-  def add_lod_table(zip_file)
-    # TODO: Add the LOD table to the zip file
-  end
-  
-  def add_challenge_table(zip_file)
-    # TODO: Add the Challenge table to the zip file
-  end
-  
-  def send_zip_file(zip_file, filename)
-    send_file zip_file.path, type: 'application/zip', filename: "#{filename}_nih_tables.zip"
+
+  def add_nih_table(table_name, stream)
+    stream.put_next_entry("#{@samples_report.name}_#{table_name}.csv")
+    stream.write(render_to_string('samples_reports/nih_'+table_name, formats: :csv))
   end
 end
