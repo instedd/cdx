@@ -26,7 +26,6 @@ csv << [
 ]
 
 sample = @samples_report.samples[0]
-batch = Batch.find_by(batch_number: sample.batch_number)
 csv << [
   nil,
   nil,
@@ -34,9 +33,9 @@ csv << [
   "#{sample.box.purpose}-panel",
   'inactivated virus',
   'SARS-CoV-2',
-  batch.target_organism_taxonomy_id,
-  batch.pango_lineage,
-  batch.who_label,
+  @samples_report.target_batch.target_organism_taxonomy_id,
+  @samples_report.target_batch.pango_lineage,
+  @samples_report.target_batch.who_label,
   @samples_report.threshold,
   'copies/ml',
   params[:true_positives],

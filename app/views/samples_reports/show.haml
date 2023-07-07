@@ -299,21 +299,23 @@
     var context = getUrlParameter('context');
     
     // if purpose is challenge, then we need the live threshold calculations
-    if ("#{@purpose}" == "Challenge") {
+    if (#{@purpose.to_json} == "Challenge") {
       var threshold = document.getElementById("threshold").value;
-      var url = '/samples_reports/update_threshold?context='+context+"&samples_report_id="+#{@samples_report.id}+"&threshold="+threshold;
+      var url = '/samples_reports/update_threshold?context='+context+"&samples_report_id=#{@samples_report.id}&threshold="+threshold;
       await fetch(url)
           .then((response) => response.json())
           .then((ret) => {
-            var params = {};
-            params["true_positives"] = ret.confusion_matrix.true_positive || 0;
-            params["true_negatives"] = ret.confusion_matrix.true_negative || 0;
-            params["false_positives"] = ret.confusion_matrix.false_positive || 0;
-            params["tpr"] = (ret.confusion_matrix.true_positive || 0) / ((ret.confusion_matrix.true_positive || 0) + (ret.confusion_matrix.false_negative || 0));
-            params["fpr"] = (ret.confusion_matrix.false_positive || 0) / ((ret.confusion_matrix.false_positive || 0) + (ret.confusion_matrix.true_negative || 0));
-            params["auc"] = #{auc(roc_curve(@samples_report))};
-            params["roc_x_values"] = #{roc_curve(@samples_report).map{|x| x[0]}};
-            params["roc_y_values"] = #{roc_curve(@samples_report).map{|x| x[1]}};
+            var params = {
+              true_positives: ret.confusion_matrix.true_positive || 0,
+              true_negatives: ret.confusion_matrix.true_negative || 0,
+              false_positives: ret.confusion_matrix.false_positive || 0,
+              false_negatives: ret.confusion_matrix.false_negative || 0,
+              tpr: (ret.confusion_matrix.true_positive || 0) / ((ret.confusion_matrix.true_positive || 0) + (ret.confusion_matrix.false_negative || 0)),
+              fpr: (ret.confusion_matrix.false_positive || 0) / ((ret.confusion_matrix.false_positive || 0) + (ret.confusion_matrix.true_negative || 0)),
+              auc: #{auc(roc_curve(@samples_report))},
+              roc_x_values: #{roc_curve(@samples_report).map{|x| x[0]}},
+              roc_y_values: #{roc_curve(@samples_report).map{|x| x[1]}},
+            };
 
             // create url params with the params dictionary
             var urlParams = new URLSearchParams(Object.entries(params));
