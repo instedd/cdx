@@ -294,14 +294,41 @@
     document.querySelector(`.nih-report-type-modal-container`).classList.add("hidden");
   }
 
-  function downloadNIHFiles() {
+  async function downloadNIHFiles() {
     hideConfirmModal();
-    
-    // Open the download_nih_tables path in a new tab
     var context = getUrlParameter('context');
-    var url = '/samples_reports/'+#{@samples_report.id}+'/nih_tables?context='+context+"";
-    window.open(url, '_blank');
+    
+    // if purpose is challenge, then we need the live threshold calculations
+    if (#{@purpose.to_json} == "Challenge") {
+      var threshold = document.getElementById("threshold").value;
+      var url = '/samples_reports/update_threshold?context='+context+"&samples_report_id=#{@samples_report.id}&threshold="+threshold;
+      await fetch(url)
+          .then((response) => response.json())
+          .then((ret) => {
+            var params = {
+              true_positives: ret.confusion_matrix.true_positive || 0,
+              true_negatives: ret.confusion_matrix.true_negative || 0,
+              false_positives: ret.confusion_matrix.false_positive || 0,
+              false_negatives: ret.confusion_matrix.false_negative || 0,
+              tpr: (ret.confusion_matrix.true_positive || 0) / ((ret.confusion_matrix.true_positive || 0) + (ret.confusion_matrix.false_negative || 0)),
+              fpr: (ret.confusion_matrix.false_positive || 0) / ((ret.confusion_matrix.false_positive || 0) + (ret.confusion_matrix.true_negative || 0)),
+              auc: #{auc(roc_curve(@samples_report))},
+              roc_x_values: #{roc_curve(@samples_report).map{|x| x[0]}},
+              roc_y_values: #{roc_curve(@samples_report).map{|x| x[1]}},
+            };
 
+            // create url params with the params dictionary
+            var urlParams = new URLSearchParams(Object.entries(params));
+
+            // Open the download_nih_tables path in a new tab
+            var url = '/samples_reports/'+#{@samples_report.id}+'/nih_tables?context='+context+"&"+urlParams.toString();
+            window.open(url, '_blank');
+        })
+    }
+    else {
+      var url = '/samples_reports/'+#{@samples_report.id}+'/nih_tables?context='+context;
+      window.open(url, '_blank');
+    }
   }
 
   document.getElementById("print-as-csv").addEventListener("click", showConfirmModal);

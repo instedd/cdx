@@ -1,6 +1,7 @@
 class NihTablesController < ApplicationController
   def show
     @samples_report = SamplesReport.find(params[:id])
+    @target_batch = @samples_report.target_batch
     return unless authorize_resource(@samples_report, READ_SAMPLES_REPORT)
     
     zip_data = create_zip_file
@@ -21,9 +22,9 @@ class NihTablesController < ApplicationController
       add_nih_table('results', stream)
 
       if purpose == "LOD"
-        #add_nih_table('lod', stream)
+        add_nih_table('lod', stream)
       elsif purpose == "Challenge"
-        #add_nih_table('challenge', stream)
+        add_nih_table('challenge', stream)
       end
     end
     zip_stream.rewind
