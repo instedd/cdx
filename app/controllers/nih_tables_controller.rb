@@ -1,6 +1,7 @@
 class NihTablesController < ApplicationController
   def show
     @samples_report = SamplesReport.find(params[:id])
+    @target_batch = @samples_report.target_batch
     return unless authorize_resource(@samples_report, READ_SAMPLES_REPORT)
     
     zip_data = create_zip_file
