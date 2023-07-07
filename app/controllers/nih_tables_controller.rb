@@ -21,9 +21,9 @@ class NihTablesController < ApplicationController
       add_nih_table('results', stream)
 
       if purpose == "LOD"
-        #add_nih_table('lod', stream)
+        add_nih_table('lod', stream)
       elsif purpose == "Challenge"
-        #add_nih_table('challenge', stream)
+        add_nih_table('challenge', stream)
       end
     end
     zip_stream.rewind

@@ -1,0 +1,45 @@
+csv << [
+  'protocol_id',
+  'technology_platform',
+  'vqa_box_id',
+  'sample_group',
+  'target_analyte_type',
+  'target_organism_name',
+  'target_organism_taxonomy_id',
+  'pango_lineage',
+  'who_label',
+  'limit_of_blank',
+  'limit_of_blank_unit',
+  'limit_of_detection',
+  'limit_of_detection_reference_gene',
+  'limit_of_detection_unit',
+  'limit_of_detection_sn_ratio',
+  'limit_of_detection_ci_percent',
+  'limit_of_detection_detail',
+  'analytical_sensitivity',
+  'analytical_sensitivity_unit'
+]
+
+sample = @samples_report.samples[0]
+batch = Batch.find_by(batch_number: sample.batch_number)
+csv << [
+  nil,
+  nil,
+  sample.box.uuid,
+  "#{sample.box.purpose}-panel",
+  'inactivated virus',
+  'SARS-CoV-2',
+  batch.target_organism_taxonomy_id,
+  batch.pango_lineage,
+  batch.who_label,
+  @samples_report.lob,
+  nil,
+  @samples_report.lod,
+  batch.reference_gene,
+  nil,
+  nil,
+  "90",
+  'linear regression',
+  nil,
+  nil
+]
