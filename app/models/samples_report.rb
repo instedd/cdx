@@ -70,7 +70,7 @@ class SamplesReport < ApplicationRecord
 
   def target_batch
     # The target batch for this box is the batch of any sample which distractor is false or null
-    samples_report_samples.joins(:sample).where("samples.distractor IS NULL OR samples.distractor = false").first.sample.batch
+    samples_report_samples.joins(:sample).find_by("samples.distractor IS NULL OR samples.distractor = 'false'").sample.batch
   end
 
   private
