@@ -67,6 +67,10 @@ class Batch < ApplicationRecord
       isolate_name: isolate_name,
       inactivation_method: inactivation_method,
       virus_lineage: virus_lineage,
+      reference_gene: reference_gene,
+      target_organism_taxonomy_id: target_organism_taxonomy_id,
+      pango_lineage: pango_lineage,
+      who_label: who_label,
       **attributes
     )
   end
