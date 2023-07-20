@@ -2,7 +2,7 @@ var UploadCsvBox = React.createClass({
   getInitialState: function() {
     return {
       csrfToken: this.props.csrf_token,
-      url: "/csv_validation/" + this.props.context,
+      url: this.props.validate_url,
       fieldName: this.props.name, // Initial fieldName value
       uploadRows: [], // Array to store upload rows
       hideListItems: "hidden",
@@ -16,7 +16,7 @@ var UploadCsvBox = React.createClass({
     this.setState({ fileValue: event.target.value });
     const file = event.target.files[0];
     const formData = new FormData();
-    formData.append('csv_file', file);
+    formData.append('csv_box', file);
 
     fetch(this.state.url, {
       method: "POST",
@@ -33,25 +33,19 @@ var UploadCsvBox = React.createClass({
         }
       })
       .then(responseJson => {
-        const not_found_batches = responseJson.not_found_batches;
-        const samples_nbr = responseJson.samples_nbr;
-        const error_message = responseJson.error_message;
-
         // Create row from template with filename and upload info
-        const filename = file.name;
-        const uploadInfo =  {
-          uploadedSamplesCount: samples_nbr,
-          notFoundUuids: not_found_batches,
-          errorMessage: error_message
+        const uploadInfo = {
+          uploadedSamplesCount: responseJson.samples_count,
+          notFoundUuids: responseJson.not_found_batches,
+          errorMessage: responseJson.error_message,
         };
 
         // Add the new row to the state
         this.setState(prevState => ({
-          uploadRows: [...prevState.uploadRows, {filename, uploadInfo, showTooltip: false}]
+          uploadRows: [...prevState.uploadRows, {filename: file.name, uploadInfo, showTooltip: false}]
         }));
 
         this.setState({ hideListItems: "" });
-
       })
       .catch(error => {
         this.setState({ errorMessage: error });
@@ -97,7 +91,7 @@ var UploadCsvBox = React.createClass({
 
   const tooltipText = notFoundUuids.slice(0, 5).map((batch_number) => <div>{batch_number}</div>);
 
-  const rowContent = errorMessage == "" ?
+  const rowContent = errorMessage ?
     <div className="uploaded-samples-count">
       {uploadedSamplesCount} {samplesText}
       {batchesNotFound > 0 && (
@@ -110,17 +104,16 @@ var UploadCsvBox = React.createClass({
       {errorMessage}
     </div>;
 
-
   return (
     <div className="items-row" key={filename}>
       <div className="items-item gap-5">
         <div className="icon-circle-minus icon-gray remove_file" onClick={() => this.handleRemove(index)}></div>
         <div className="file-name">{filename}</div>
       </div>
-      <div className={`items-row-action gap-5 not_found_message ${batchesNotFound > 0 ? ' ttip ' : ' '} ${batchesNotFound > 0 || errorMessage != "" ? ' input-required ' : ' '}}`}
+      <div className={`items-row-action gap-5 not_found_message ${batchesNotFound > 0 ? ' ttip ' : ' '} ${batchesNotFound > 0 || errorMessage ? ' input-required ' : ' '}}`}
            onClick={() => this.handleClick(index)}>
-        {rowContent}  
-        <div className={`upload-icon bigger ${batchesNotFound > 0 || errorMessage != "" ? 'icon-alert icon-red' : 'icon-check'}`}></div>
+        {rowContent}
+        <div className={`upload-icon bigger ${batchesNotFound > 0 || errorMessage ? 'icon-alert icon-red' : 'icon-check'}`}></div>
         {batchesNotFound > 0 && (
           <div className={`ttext not-found-uuids ${showTooltip ? '' : 'hidden'}`}>
             {tooltipText}

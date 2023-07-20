@@ -1,5 +1,5 @@
 class BoxesController < ApplicationController
-  before_action :load_box, except: %i[index new create bulk_destroy]
+  before_action :load_box, except: %i[index new validate create bulk_destroy]
 
   def index
     @can_create = has_access?(@navigation_context.institution, CREATE_INSTITUTION_BOX)
@@ -49,6 +49,33 @@ class BoxesController < ApplicationController
     return unless authorize_resource(@navigation_context.institution, CREATE_INSTITUTION_BOX)
 
     @box_form = BoxForm.build(@navigation_context)
+  end
+
+  def validate
+    @samples_count = 0
+    batch_numbers = Set.new
+
+    # TODO: should be handled by BoxForm (& duplicates BoxForm#parse_csv)
+    CSV.open(params[:csv_box].path, headers: true) do |csv|
+      while csv.headers == true
+        csv.readline
+      end
+
+      unless csv.headers == ["Batch", "Concentration", "Distractor", "Instructions"]
+        @error_message = "Invalid columns"
+        return # rubocop:disable Lint/NonLocalExitFromIterator
+      end
+
+      csv.each do |row|
+        if batch_number = row["Batch"].presence&.strip
+          batch_numbers << batch_number
+          @samples_count += 1
+        end
+      end
+    end
+
+    @found_batches = @navigation_context.institution.batches.where(batch_number: batch_numbers.to_a).pluck(:batch_number)
+    @not_found_batches = (batch_numbers - @found_batches)
   end
 
   def create

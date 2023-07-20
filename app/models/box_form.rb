@@ -22,8 +22,9 @@ class BoxForm
     @option = params[:option]
     @media = params[:media].presence
     @batches_data = params[:batches].presence.to_h
-    @csv_box = params[:csv_box].presence
-    initialize_csv_box if @csv_box
+    if uploaded_file = params[:csv_box].presence
+      parse_csv(uploaded_file.path)
+    end
     @batch_uuids = @batches_data.transform_values { |v| v[:batch_uuid] }
     @sample_uuids = params[:sample_uuids].presence.to_h
   end
@@ -204,23 +205,23 @@ class BoxForm
     @samples.any? { |_, sample| sample.distractor }
   end
 
-  def initialize_csv_box
-    CSV.open(@csv_box.path) do |csv_stream|
-      i = 0
-      csv_stream.each do |row|
-        batch_number, concentration, distractor, instruction = row[0..3]
-        batch_uuid = Batch.find_by(batch_number: batch_number)&.uuid
-        next if batch_uuid.blank?
-        @batches_data[i] = {
-          batch_uuid: batch_uuid,
-          distractor: distractor.downcase == "yes",
-          instruction: instruction,
-          concentrations: {"0" => {
-            replicate: 1,
-            concentration: Integer(Float(concentration)),
-          }},
+  def parse_csv(path)
+    CSV.open(path, headers: true) do |csv|
+      csv.each do |row|
+        next unless batch_number = row["Batch"]&.strip.presence
+        next unless batch = Batch.find_by(batch_number: batch_number)
+
+        @batches_data[@batches_data.size] = {
+          batch_uuid: batch.uuid,
+          distractor: row["Distractor"]&.strip&.downcase == "yes",
+          instruction: row["Instructions"],
+          concentrations: {
+            "0" => {
+              replicate: 1,
+              concentration: Integer(Float(row["Concentration"]&.strip)),
+            },
+          },
         }
-        i += 1
       end
     end
   end

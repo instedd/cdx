@@ -271,15 +271,15 @@ Box.blueprint(:overfilled) do
   @batch_two = Batch.make!
 
   samples { [
-    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_one, concentration: 30, replicate: 1),
-    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_two, concentration: 200, replicate: 2),
-    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_one, concentration: 1000, replicate: 3),
-    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_two, concentration: 30, replicate: 4),
-    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_one, concentration: 200, replicate: 5),
-    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_two, concentration: 1000, replicate: 6),
-    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_one, concentration: 30, replicate: 7),
-    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_two, concentration: 200, replicate: 8),
-    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_one, concentration: 1000, replicate: 9),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_one, concentration: 30, replicate: 1, distractor: true),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_two, concentration: 200, replicate: 2, distractor: false),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_one, concentration: 1000, replicate: 3, distractor: true),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_two, concentration: 30, replicate: 4, distractor: false),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_one, concentration: 200, replicate: 5, distractor: true),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_two, concentration: 1000, replicate: 6, distractor: false),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_one, concentration: 30, replicate: 7, distractor: true),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_two, concentration: 200, replicate: 8, distractor: false),
+    Sample.make(:filled, box: object, institution: object.institution, site: object.site, batch: @batch_one, concentration: 1000, replicate: 9, distractor: true),
   ] }
 end
 

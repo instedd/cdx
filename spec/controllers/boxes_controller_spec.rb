@@ -260,6 +260,58 @@ RSpec.describe BoxesController, type: :controller do
     end
   end
 
+  describe "validate (CSV)" do
+    let!(:batch) do
+      Batch.make!(institution: institution, site: site, batch_number: "DISTRACTOR")
+    end
+
+    it "validates CSV headers" do
+      csv_file = fixture_file_upload(Rails.root.join("spec/fixtures/csvs/samples_results_1.csv"), "text/csv")
+
+      expect do
+        post :validate, params: { csv_box: csv_file }, format: "json"
+        expect(response).to have_http_status(:ok)
+      end.to change(institution.boxes, :count).by(0)
+
+      expect(JSON.parse(response.body)).to eq({
+        "found_batches" => [],
+        "not_found_batches" => [],
+        "samples_count" => 0,
+        "error_message" => "Invalid columns"
+      })
+    end
+
+    it "finds all batches" do
+      csv_file = fixture_file_upload(Rails.root.join("spec/fixtures/csvs/csv_box_1.csv"), "text/csv")
+
+      expect do
+        post :validate, params: { csv_box: csv_file }, format: "json"
+        expect(response).to have_http_status(:ok)
+      end.to change(institution.boxes, :count).by(0)
+
+      expect(JSON.parse(response.body)).to eq({
+        "found_batches" => ["DISTRACTOR"],
+        "not_found_batches" => [],
+        "samples_count" => 3,
+      })
+    end
+
+    it "fails to find some batches" do
+      csv_file = fixture_file_upload(Rails.root.join("spec/fixtures/csvs/csv_box_2.csv"), "text/csv")
+
+      expect do
+        post :validate, params: { csv_box: csv_file }, format: "json"
+        expect(response).to have_http_status(:ok)
+      end.to change(institution.boxes, :count).by(0)
+
+      expect(JSON.parse(response.body)).to eq({
+        "found_batches" => ["DISTRACTOR"],
+        "not_found_batches" => ["VIRUS"],
+        "samples_count" => 5,
+      })
+    end
+  end
+
   describe "create" do
     let :batch do
       Batch.make!(institution: institution, site: site)
