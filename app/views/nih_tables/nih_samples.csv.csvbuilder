@@ -20,9 +20,8 @@ csv << [
 ]
 
 @samples_report.samples.each do |sample|
-  batch = Batch.find_by(batch_number: sample.batch_number)
   csv << [
-    sample.id,
+    sample.uuid,
     sample.box.uuid,
     "#{sample.box.purpose}-panel",
     nil,
@@ -31,14 +30,14 @@ csv << [
     nil,
     sample.concentration,
     'copies/ml',
-    batch.reference_gene,
-    sample.id,
+    sample.reference_gene,
+    sample.uuid,
     sample.batch_number,
     'inactivated virus',
     'SARS-CoV-2',
-    batch.target_organism_taxonomy_id,
-    batch.pango_lineage,
-    batch.who_label,
+    sample.target_organism_taxonomy_id,
+    sample.pango_lineage,
+    sample.who_label,
     sample.inactivation_method
   ]
 end

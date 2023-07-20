@@ -7,6 +7,7 @@ class SamplesReport < ApplicationRecord
 
   has_many :samples_report_samples, dependent: :destroy
   has_many :samples, through: :samples_report_samples
+  has_many :boxes, through: :samples
 
   def self.entity_scope
     "samples_report"
@@ -30,19 +31,24 @@ class SamplesReport < ApplicationRecord
   }
 
   scope :partial_box_uuid, ->(box_uuid) {
-    joins("LEFT JOIN samples_report_samples ON samples_report_samples.samples_report_id = samples_reports.id
-      LEFT JOIN samples ON samples_report_samples.sample_id = samples.id
-      LEFT JOIN boxes ON boxes.id = samples.box_id")
-      .where("boxes.uuid LIKE ?", "%#{sanitize_sql_like(box_uuid)}%")
-      .group(:samples_report_id) unless box_uuid.blank?
+    unless box_uuid.blank?
+      where(id: SamplesReportSample
+        .select(:samples_report_id)
+        .joins(:sample => :box)
+        .where("boxes.uuid LIKE ?", "%#{sanitize_sql_like(box_uuid)}%"))
+    end
   }
 
   scope :partial_batch_number, ->(batch_number) {
-    joins("LEFT JOIN samples_report_samples ON samples_report_samples.samples_report_id = samples_reports.id
-      LEFT JOIN samples ON samples_report_samples.sample_id = samples.id
-      LEFT JOIN batches ON batches.id = samples.batch_id")
-      .where("batches.batch_number LIKE ?", "%#{sanitize_sql_like(batch_number)}%")
-      .group(:samples_report_id) unless batch_number.blank?
+    # after box transfer, the sample <-> batch relationship will be severed,
+    # hence the coalesce to match the old batch number (valid after transfer)
+    # then the original batch number (valid before transfer)
+    unless batch_number.blank?
+      where(id: SamplesReportSample
+        .select(:samples_report_id)
+        .left_joins(:sample => :batch)
+        .where("COALESCE(samples.old_batch_number, batches.batch_number) LIKE ?", "%#{sanitize_sql_like(batch_number)}%"))
+    end
   }
 
   def calculate_lod_and_lob
@@ -68,9 +74,9 @@ class SamplesReport < ApplicationRecord
     self.save
   end
 
-  def target_batch
-    # The target batch for this box is the batch of any sample which distractor is false or null
-    samples_report_samples.joins(:sample).find_by("samples.distractor IS NULL OR samples.distractor = 'false'").sample.batch
+  # Returns any sample that isn't a distractor.
+  def target_sample
+    samples.where.not(distractor: true).take!
   end
 
   private
