@@ -1,12 +1,18 @@
 var CdxSelectAutocomplete = React.createClass({
-  componentWillMount: function () {
-    this.asyncOptions = _.debounce(this.asyncOptions.bind(this), 100, { maxWait: 250 });
+  getDefaultProps: function() {
+    return {
+      className: "input-large"
+    };
   },
 
   getInitialState: function () {
     return {
       options: null,
     };
+  },
+
+  componentWillMount: function () {
+    this.asyncOptions = _.debounce(this.asyncOptions.bind(this), 100, { maxWait: 250 });
   },
 
   // Since <Select> uses a different INPUT we must copy the value when the
