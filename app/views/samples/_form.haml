@@ -8,20 +8,22 @@
             = "VIEW QC INFO"
 
       = f.form_field :uuid do
-        %span.copy-content
-          = f.object.uuid
-        %button.btn-copy.ttip
-          = icon_tag "copy", class: "btn-icon"
+        .value
+          %span.copy-content
+            = f.object.uuid
+          %button.btn-copy.ttip
+            = icon_tag "copy", class: "btn-icon"
       - if f.object.batch_number
         = f.form_field :batch_id, value: @sample_form.batch_number
 
       - if box = @sample_form.box
         = f.fields_for :box, box do |g|
           = g.form_field :uuid, label: { text: "Box ID" } do
-            %span.copy-content
-              = g.object.uuid
-            %button.btn-copy.ttip
-              = icon_tag "copy", class: "btn-icon"
+            .value
+              %span.copy-content
+                = g.object.uuid
+              %button.btn-copy.ttip
+                = icon_tag "copy", class: "btn-icon"
           = g.form_field :purpose, value: box.purpose, label: { text: "Box Purpose" }
 
     .col.pe-5
