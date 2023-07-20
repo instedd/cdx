@@ -209,7 +209,7 @@ class BoxForm
     CSV.open(path, headers: true) do |csv|
       csv.each do |row|
         next unless batch_number = row["Batch"]&.strip.presence
-        next unless batch = Batch.find_by(batch_number: batch_number)
+        next unless batch = @box.institution.batches.find_by(batch_number: batch_number)
 
         @batches_data[@batches_data.size] = {
           batch_uuid: batch.uuid,
