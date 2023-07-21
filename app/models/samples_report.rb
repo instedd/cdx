@@ -52,25 +52,25 @@ class SamplesReport < ApplicationRecord
   }
 
   def calculate_lod_and_lob
+    samples = self.samples.select { |sample| sample.measured_signal.present? }
     concentrations = samples.map(&:concentration)
-    signals = Numo::DFloat[*samples.select { |sample| sample.measured_signal.present? }.map(&:measured_signal)]
-    concentrations_matrix = Numo::DFloat[*concentrations.map { |c| [c] }]
-    lr = Rumale::LinearModel::LinearRegression.new(fit_bias: true)
-    lr.fit(concentrations_matrix, signals)
 
-    lod = lr.bias_term
+    concentrations_matrix = Numo::DFloat[*concentrations.map { |c| [c] }]
+    signals = Numo::DFloat[*samples.map(&:measured_signal)]
+    linear_regression = Rumale::LinearModel::LinearRegression.new(fit_bias: true)
+    linear_regression.fit(concentrations_matrix, signals)
+    lod = linear_regression.bias_term
     blank_samples = signals[Numo::DFloat.cast(concentrations).eq(0)]
-    if blank_samples.size > 0
-      blank_samples_mean = blank_samples.mean
-      blank_samples_sd = blank_samples.stddev
-      lod = [lod, 3 * blank_samples_sd].max
-      lob = blank_samples_mean + 1.645 * blank_samples_sd
-    else
-      lob = nil
+
+    unless blank_samples.empty?
+      stddev = blank_samples.stddev
+      lod = [lod, 3 * stddev].max
+      lob = blank_samples.mean + 1.645 * stddev
     end
 
-    self.lod = lod.try(:round, 3)
-    self.lob = lob.try(:round, 3)
+    self.lod = lod&.round(3)
+    self.lob = lob&.round(3)
+
     self.save
   end
 
