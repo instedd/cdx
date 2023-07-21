@@ -646,30 +646,65 @@ RSpec.describe SamplesController, type: :controller do
   end
 
   context "upload_results" do
-    let!(:sample1) { Sample.make!(institution: institution, sample_identifiers: [SampleIdentifier.make!(uuid: '01234567-8ce1-a0c8-ac1b-58bed3633e88')], date_produced: Time.zone.local(2018, 1, 1)) }
+    it "renders form" do
+      get :upload_results
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
+  context "bulk_process_csv" do
+    let(:sample) { Sample.make! :filled, institution: institution }
 
     it "should write measurement results for samples" do
-      file_path = File.join(Rails.root, 'spec', 'fixtures', 'csvs', 'samples_results_1.csv')
-      file = fixture_file_upload(file_path, 'text/csv')
-      post :bulk_process_csv, params: { "csv_files": [file] }
-      sample1.reload
-
-      expect(sample1.measured_signal).to eq(10.0)
+      uploaded_file("#{sample.uuid},10", "text/csv") do |file|
+        post :bulk_process_csv, params: { "csv_files": [file] }
+        expect(response).to redirect_to(samples_path)
+      end
+      expect(sample.reload.measured_signal).to eq(10.0)
     end
 
     it "shouldn't overwrite measurement results for samples with measurements" do
-      file_path = File.join(Rails.root, 'spec', 'fixtures', 'csvs', 'samples_results_1.csv')
-      file = fixture_file_upload(file_path, 'text/csv')
-      post :bulk_process_csv, params: { "csv_files": [file] }
-      sample1.reload
+      uploaded_file("#{sample.uuid},10", "text/csv") do |file|
+        post :bulk_process_csv, params: { "csv_files": [file] }
+        expect(response).to redirect_to(samples_path)
+      end
 
-      file_path = File.join(Rails.root, 'spec', 'fixtures', 'csvs', 'samples_results_2.csv')
-      file = fixture_file_upload(file_path, 'text/csv')
-      post :bulk_process_csv, params: { "csv_files": [file] }
-      sample1.reload
+      uploaded_file("#{sample.uuid},20", "text/csv") do |file|
+        post :bulk_process_csv, params: { "csv_files": [file] }
+        expect(response).to redirect_to(samples_path)
+      end
 
-      expect(sample1.measured_signal).to eq(10.0)
+      expect(sample.reload.measured_signal).to eq(10.0)
     end
 
+    describe "box" do
+      let(:box) do
+        Box.make! :filled_without_measurements, institution: institution, blinded: true
+      end
+
+      it "unblinds box with complete results" do
+        contents = <<~CSV
+          #{box.samples[0].uuid},10
+          #{box.samples[1].uuid},20
+        CSV
+        uploaded_file(contents, "text/csv") do |file|
+          post :bulk_process_csv, params: { "csv_files": [file] }
+          expect(response).to redirect_to(samples_path)
+          expect(box.reload.blinded).to be(false)
+        end
+        expect(box.samples[0].reload.measured_signal).to eq(10.0)
+        expect(box.samples[1].reload.measured_signal).to eq(20.0)
+      end
+
+      it "won't unblind box with partial results" do
+        uploaded_file("#{box.samples[1].uuid},20", "text/csv") do |file|
+          post :bulk_process_csv, params: { "csv_files": [file] }
+          expect(response).to redirect_to(samples_path)
+          expect(box.reload.blinded).to be(true)
+        end
+        expect(box.samples[0].reload.measured_signal).to be_nil
+        expect(box.samples[1].reload.measured_signal).to eq(20.0)
+      end
+    end
   end
 end
