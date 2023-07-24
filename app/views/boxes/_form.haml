@@ -42,7 +42,7 @@
 
             .row
               .col
-                = react_component "UploadCsvBox", { name: "box[csv_box]", context: @navigation_context.uuid, csrf_token: form_authenticity_token}
+                = react_component "UploadCsvBox", { name: "box[csv_box]", validate_url: validate_boxes_url(context: @navigation_context.institution.uuid + "-*"), csrf_token: form_authenticity_token}
             .row
               =link_to '/templates/upload_box.csv', class: 'btn-link', target: "_blank" do
                 .icon-download.icon-gray
@@ -73,8 +73,6 @@
                       title: "Warning",
                       showCloseButton: false,
                       message: "If you change the sample source, the box contents will be emptied. ")
-
-= render 'upload_csv_box'
 
 :javascript
   var sourcesRadio = document.querySelectorAll(".radiotoggle input");

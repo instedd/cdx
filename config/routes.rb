@@ -166,15 +166,14 @@ Rails.application.routes.draw do
     member do
       post :unblind
       post :blind
-      get 'print'
-      get 'inventory', constraints: { format: 'csv' }
+      get :print
+      get :inventory, constraints: { format: 'csv' }
     end
     collection do
-      post 'bulk_action', constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
+      post :validate
+      post :bulk_action, constraints: lambda { |request| request.params[:bulk_action] == 'destroy' }, action: :bulk_destroy
     end
   end
-
-  post '/csv_validation/:context', to: 'csv_validations#create', as: 'csv_validation'
 
   resources :qc_infos
   resources :test_results , only: [:index, :show]

@@ -201,20 +201,30 @@ class SamplesController < ApplicationController
     redirect_to samples_path, notice: "Samples were successfully deleted."
   end
 
+  def upload_results
+  end
+
   def bulk_process_csv
     uuid_regex = /\b[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}\b/i
+    samples = check_access(@navigation_context.institution.samples, UPDATE_SAMPLE)
+    box_ids = Set.new
 
     params[:csv_files].each do |csv_file|
       CSV.open(csv_file.path) do |csv_stream|
         csv_stream.each do |(sample_id, measured_signal)|
           next unless sample_id&.match(uuid_regex) && measured_signal.present?
 
-          if sample = Sample.find_by_uuid(sample_id.strip)
+          if sample = samples.find_by_uuid(sample_id.strip)
+            box_ids << sample.box_id
             sample.measured_signal ||= Float(measured_signal.strip)
             sample.save!
           end
         end
       end
+    end
+
+    Box.where(blinded: true, id: box_ids.to_a).each do |box|
+      box.unblind! if box.samples.all?(&:measured_signal)
     end
 
     redirect_to samples_path, notice: "Sample's results uploaded successfully."

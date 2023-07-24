@@ -72,6 +72,7 @@ RSpec.configure do |config|
 
   config.include Devise::TestHelpers, :type => :controller
   config.include DefaultParamsHelper, :type => :controller
+  config.include UploadedFileHelper, :type => :controller
   config.extend SpecFixtures
   config.include ManifestSpecHelper
   config.include CdxFieldsHelper

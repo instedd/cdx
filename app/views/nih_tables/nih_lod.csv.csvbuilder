@@ -20,21 +20,20 @@ csv << [
   'analytical_sensitivity_unit'
 ]
 
-sample = @samples_report.samples[0]
 csv << [
   nil,
   nil,
-  sample.box.uuid,
-  "#{sample.box.purpose}-panel",
+  @target_box.uuid,
+  "#{@target_box.purpose}-panel",
   'inactivated virus',
   'SARS-CoV-2',
-  @target_batch.target_organism_taxonomy_id,
-  @target_batch.pango_lineage,
-  @target_batch.who_label,
+  @target_sample.target_organism_taxonomy_id,
+  @target_sample.pango_lineage,
+  @target_sample.who_label,
   @samples_report.lob,
   nil,
   @samples_report.lod,
-  @target_batch.reference_gene,
+  @target_sample.reference_gene,
   nil,
   nil,
   "90",

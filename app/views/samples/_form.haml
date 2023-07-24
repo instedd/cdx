@@ -8,20 +8,22 @@
             = "VIEW QC INFO"
 
       = f.form_field :uuid do
-        %span.copy-content
-          = f.object.uuid
-        %button.btn-copy.ttip
-          = icon_tag "copy", class: "btn-icon"
+        .value
+          %span.copy-content
+            = f.object.uuid
+          %button.btn-copy.ttip
+            = icon_tag "copy", class: "btn-icon"
       - if f.object.batch_number
         = f.form_field :batch_id, value: @sample_form.batch_number
 
       - if box = @sample_form.box
         = f.fields_for :box, box do |g|
           = g.form_field :uuid, label: { text: "Box ID" } do
-            %span.copy-content
-              = g.object.uuid
-            %button.btn-copy.ttip
-              = icon_tag "copy", class: "btn-icon"
+            .value
+              %span.copy-content
+                = g.object.uuid
+              %button.btn-copy.ttip
+                = icon_tag "copy", class: "btn-icon"
           = g.form_field :purpose, value: box.purpose, label: { text: "Box Purpose" }
 
     .col.pe-5
@@ -62,14 +64,19 @@
         .row.input-unit
           = f.number_field :volume, min: 0, step: :any, :class => "input-small", readonly: !@can_update
           .span.unit (μl)
+
       = f.form_field :reference_gene do
-        = autocomplete_field(f, "sample[reference_gene]", @navigation_context.institution)
-      = f.form_field :target_organism_taxonomy do
-        = autocomplete_field(f, "sample[target_organism_taxonomy_id]", @navigation_context.institution)
+        = autocomplete_field(f, "sample[reference_gene]", :reference_gene, @navigation_context.institution, class: "input-x-large")
+
+      = f.form_field :target_organism_taxonomy_id do
+        = autocomplete_field(f, "sample[target_organism_taxonomy_id]", :target_organism_taxonomy_id, @navigation_context.institution, class: "input-x-large")
+
       = f.form_field :pango_lineage do
-        = autocomplete_field(f, "sample[pango_lineage]", @navigation_context.institution)
+        = autocomplete_field(f, "sample[pango_lineage]", :pango_lineage, @navigation_context.institution, class: "input-x-large")
+
       = f.form_field :who_label do
-        = autocomplete_field(f, "sample[who_label]", @navigation_context.institution)
+        = autocomplete_field(f, "sample[who_label]", :who_label, @navigation_context.institution, class: "input-x-large")
+
       = f.form_field :concentration do
         - @sample_form.blinded_attribute(:concentration) do
           .row.input-unit

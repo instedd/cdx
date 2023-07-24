@@ -14,14 +14,13 @@ class SamplesReportsController < ApplicationController
     @samples_reports = SamplesReport.where(institution: @navigation_context.institution)
     @samples_reports = check_access(@samples_reports, READ_SAMPLES_REPORT).order('samples_reports.created_at DESC')
 
-    # Filter by search params
-
+    # filter by search params
     @samples_reports = @samples_reports.partial_name(params[:name])
     @samples_reports = @samples_reports.partial_sample_uuid(params[:sample_uuid])
     @samples_reports = @samples_reports.partial_box_uuid(params[:box_uuid])
     @samples_reports = @samples_reports.partial_batch_number(params[:batch_number])
 
-    #paginate samples report
+    # paginate samples report
     @samples_reports = perform_pagination(@samples_reports)
   end
 
