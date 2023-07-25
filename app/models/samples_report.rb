@@ -76,7 +76,8 @@ class SamplesReport < ApplicationRecord
 
   # Returns any sample that isn't a distractor.
   def target_sample
-    samples.where.not(distractor: true).take!
+    target_sample = samples.where("distractor IS NULL or distractor = ?", false).take
+    target_sample ||= samples.take
   end
 
   private
