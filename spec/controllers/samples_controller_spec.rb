@@ -193,6 +193,10 @@ RSpec.describe SamplesController, type: :controller do
         assert_select "input[name='sample[replicate]']", count: 0
         assert_select "input[name='sample[virus_lineage]']", count: 0
         assert_select "input[name='sample[isolate_name]']", count: 0
+        assert_select "input[name='sample[reference_gene]']", count: 0
+        assert_select "input[name='sample[target_organism_taxonomy_id]']", count: 0
+        assert_select "input[name='sample[pango_lineage]']", count: 0
+        assert_select "input[name='sample[who_label]']", count: 0
       end
     end
   end

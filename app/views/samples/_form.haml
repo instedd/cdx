@@ -66,16 +66,20 @@
           .span.unit (μl)
 
       = f.form_field :reference_gene do
-        = autocomplete_field(f, "sample[reference_gene]", :reference_gene, @navigation_context.institution, class: "input-x-large")
+        - @sample_form.blinded_attribute(:reference_gene) do
+          = autocomplete_field(f, "sample[reference_gene]", :reference_gene, @navigation_context.institution, class: "input-x-large")
 
       = f.form_field :target_organism_taxonomy_id do
-        = autocomplete_field(f, "sample[target_organism_taxonomy_id]", :target_organism_taxonomy_id, @navigation_context.institution, class: "input-x-large")
+        - @sample_form.blinded_attribute(:target_organism_taxonomy_id) do
+          = autocomplete_field(f, "sample[target_organism_taxonomy_id]", :target_organism_taxonomy_id, @navigation_context.institution, class: "input-x-large")
 
       = f.form_field :pango_lineage do
-        = autocomplete_field(f, "sample[pango_lineage]", :pango_lineage, @navigation_context.institution, class: "input-x-large")
+        - @sample_form.blinded_attribute(:pango_lineage) do
+          = autocomplete_field(f, "sample[pango_lineage]", :pango_lineage, @navigation_context.institution, class: "input-x-large")
 
       = f.form_field :who_label do
-        = autocomplete_field(f, "sample[who_label]", :who_label, @navigation_context.institution, class: "input-x-large")
+        - @sample_form.blinded_attribute(:who_label) do
+          = autocomplete_field(f, "sample[who_label]", :who_label, @navigation_context.institution, class: "input-x-large")
 
       = f.form_field :concentration do
         - @sample_form.blinded_attribute(:concentration) do
