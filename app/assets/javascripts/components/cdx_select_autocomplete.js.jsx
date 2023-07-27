@@ -38,6 +38,7 @@ var CdxSelectAutocomplete = React.createClass({
       value={this.props.value || ""}
       onChange={this.onChange}
       onInputChange={this.props.combobox && this.copyValue}
+      onBlur= {this.onBlur}
     />);
   },
 
@@ -50,11 +51,17 @@ var CdxSelectAutocomplete = React.createClass({
     var url = this.props.url;
     url += (url.includes("?") ? "&query=" : "?query=") + encodeURIComponent(query);
 
-    $.ajax({
+    this.cancelAjax();
+    
+    this.xhr = $.ajax({
       type: this.props.method || "GET",
       url: url,
 
       success: function (options) {
+        if (!this.selectRef.state.isFocused) {
+          this.selectRef.setState({ isLoading: false });
+          return;
+        }
         if (prepareOptions) {
           options = prepareOptions.call(null, options);
         }
@@ -68,9 +75,16 @@ var CdxSelectAutocomplete = React.createClass({
       }.bind(this),
 
       error: function (_, error) {
-        callback(error);
+        if (error !== "abort") {
+          callback(error);
+        }
       },
     })
+  },
+
+  onBlur: function () {
+    this.selectRef.setState({ isLoading: false });
+    this.cancelAjax()
   },
 
   onChange: function (value, options) {
@@ -81,5 +95,9 @@ var CdxSelectAutocomplete = React.createClass({
 
   setSelectRef: function (ref) {
     this.selectRef = ref;
+  },
+
+  cancelAjax: function () {
+    if (this.xhr) this.xhr.abort();
   }
 });
