@@ -136,6 +136,7 @@ Rails.application.routes.draw do
       get 'nih_tables', to: 'nih_tables#show'
     end
     collection do
+      post :print
       get 'update_threshold'
       get "find_box"
       get 'autocomplete'

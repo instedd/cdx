@@ -33,6 +33,7 @@ gem 'jbuilder', '~> 2.5'
 gem 'view_components', git: 'https://github.com/manastech/rails-view_components.git', branch: 'master'
 gem 'prawn'
 gem 'prawn-svg'
+gem 'prawn-table'
 
 # Authentication
 # gem 'bcrypt-ruby', '~> 3.1.2'

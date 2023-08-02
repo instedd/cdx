@@ -54,10 +54,9 @@
                   = icon_tag "barchart", class: "btn-icon icon-text-color"
                   Download charts as svg
             .action
-              =link_to samples_report_path(:samples_report_id => @samples_report.id, :display => :pdf), id: "print-pdf-link", target: "_blank" do
-                .subtitle{id:'print-as-pdf'}
-                  = icon_tag "as-pdf", class: "btn-icon icon-text-color"
-                  Download PDF
+              =button_tag id:'print-pdf', class: 'subtitle btn-transparent' do
+                = icon_tag "as-pdf", class: "btn-icon icon-text-color"
+                Download PDF
             .action
               =button_tag id:'print-as-csv', class: 'subtitle btn-transparent' do
                 = icon_tag "table", class: "btn-icon icon-text-color"
@@ -98,7 +97,7 @@
                         height: 300,
                         barVariable: "average",
                         errorBarsVariable: "errors",
-                        y_label: 'Measured Signal',
+                        y_label: 'MEASURED SIGNAL',
                         x_labels: @purpose == "Challenge" ? ["Virus", "Distractor"]:[])
 
             - if @purpose == "LOD"
@@ -109,7 +108,7 @@
                           data: @reports_data,
                           height: 300,
                           dotsVariable: "measurements",
-                          y_label: 'Measured Signal',
+                          y_label: 'MEASURED SIGNAL',
                           x_labels: [])
 
             - if @purpose == "Challenge"
@@ -231,10 +230,6 @@
       var maxthreshold = document.getElementById("threshold").max;
 
       document.getElementById("treshold-title").innerHTML = "Threshold: " + parseFloat(ret.threshold).toFixed(2);
-      document.getElementById("print-pdf-link").href += "&threshold="+parseFloat(ret.threshold).toFixed(2);
-      document.getElementById("print-pdf-link").href += "&minthreshold="+parseFloat(minthreshold).toFixed(2);
-      document.getElementById("print-pdf-link").href += "&maxthreshold="+parseFloat(maxthreshold).toFixed(2);
-
 
       // For the bar chart
       var threshold_percentage = (threshold - minthreshold) / (maxthreshold - minthreshold);
@@ -331,5 +326,75 @@
     }
   }
 
+  function getSvg(chartId, chartName){
+    var svgData = document.getElementById(chartId);
+    applyInline(svgData);
+    svgData = svgData.outerHTML;
+    return svgData;
+  }
+
+  async function printPDF() {
+    var context = getUrlParameter('context');
+    
+    var measured_signal_svg = encodeURIComponent(getSvg("barchart", "measured_signal"));
+    var specific_svg;
+    if ("#{@purpose}" == "Challenge")
+      specific_svg = encodeURIComponent(getSvg("rocchart", "roc_curve"));
+    else
+      specific_svg = encodeURIComponent(getSvg("linechart", "limit_of_detection"));
+
+    // if purpose is challenge, then we need the live threshold calculations
+    if (#{@purpose.to_json} == "Challenge") {
+      var threshold = document.getElementById("threshold").value;
+      var url = '/samples_reports/update_threshold?context='+context+"&samples_report_id=#{@samples_report.id}&threshold="+threshold;
+      await fetch(url)
+          .then((response) => response.json())
+          .then((ret) => {
+            var params = {
+              id: #{@samples_report.id},
+              threshold: threshold,
+              auc: #{auc(roc_curve(@samples_report))},
+              threshold_tpr: (ret.confusion_matrix.true_positive || 0) / ((ret.confusion_matrix.true_positive || 0) + (ret.confusion_matrix.false_negative || 0)),
+              threshold_fpr: (ret.confusion_matrix.false_positive || 0) / ((ret.confusion_matrix.false_positive || 0) + (ret.confusion_matrix.true_negative || 0)),
+              measured_signal_svg: measured_signal_svg,
+              specific_svg: specific_svg
+            };
+            var print_url = '/samples_reports/print'; 
+            postObjectToUri(print_url, params, context);
+        })
+    }
+    else {
+      var params = {
+        id: #{@samples_report.id},
+        measured_signal_svg: measured_signal_svg,
+        specific_svg: specific_svg
+      };
+      var print_url = '/samples_reports/print'; 
+      postObjectToUri(print_url, params, context);
+    }
+  }
+
+  async function postObjectToUri(uri, obj, context) {
+    var json, form, input, inputContext;
+
+    json = JSON.stringify(obj);
+    form = document.createElement("form");
+    form.method = "post";
+    form.action = uri;
+    form.target="_blank";
+    input = document.createElement("input");
+    input.setAttribute("name", "json");
+    input.setAttribute("value", json);
+    inputContext = document.createElement("input");
+    inputContext.setAttribute("name", "context");
+    inputContext.setAttribute("value", context);
+    form.appendChild(input);
+    form.appendChild(inputContext);
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+  }
+
   document.getElementById("print-as-csv").addEventListener("click", showConfirmModal);
+  document.getElementById("print-pdf").addEventListener("click", printPDF);
 
