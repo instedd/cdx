@@ -64,7 +64,7 @@ class NihReport < BasePdf
     
     data = [
       ["<b>Purpose</b>", @purpose],
-      ["<b>Samples</b>", "#{@samples_report.samples_report_samples.length} samples" + (@samples_report.samples.without_results.count > 0 ? "\n(#{@samples_report.samples.without_results.count} without results)" : "")],
+      ["<b>Samples</b>", "#{@samples_report.samples_report_samples.length} samples" + (@samples_report.samples.without_results.count > 0 ? "\n(#{@samples_report.samples.without_results.count} without results)" : "")]
     ]
 
     if @purpose == "LOD"
@@ -118,38 +118,38 @@ class NihReport < BasePdf
         "<font size='18'>#{@confusion_matrix[:true_negative] + @confusion_matrix[:false_negative]}</font>\nPredicted Negative",
         "<font size='18'>#{@confusion_matrix[:false_positive] + @confusion_matrix[:true_positive]}</font>\nPredicted Positive",
         "<font size='18'>#{@confusion_matrix[:true_negative] + @confusion_matrix[:false_positive] + @confusion_matrix[:false_negative] + @confusion_matrix[:true_positive]}</font>\nTotal"
-      ],
+      ]
     ]
 
     inside_colors = [
       "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF",
       "FFFFFF", "F0F0F0", "F0F0F0", "FFFFFF",
       "FFFFFF", "F0F0F0", "F0F0F0", "FFFFFF",
-      "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF",
+      "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF"
     ]
     text_colors = [
       "666666", "666666", "666666", "666666",
       "666666", "000000", "000000", "666666",
       "666666", "000000", "000000", "666666",
-      "666666", "666666", "666666", "666666",
+      "666666", "666666", "666666", "666666"
     ]
     text_rotate = [
       0, 0, 0, 0,
       90, 0, 0, 0,
       90, 0, 0, 0,
-      90, 0, 0, 0,
+      90, 0, 0, 0
     ]
     cell_widths = [
       70, 200, 200, 100,
       70, 200, 200, 100,
       70, 200, 200, 100,
-      70, 200, 200, 100,
+      70, 200, 200, 100
     ]
     cell_heights = [
       40, 40, 40, 40,
       70, 70, 70, 70,
       70, 70, 70, 70,
-      50, 50, 50, 50,
+      50, 50, 50, 50
     ]
 
     text "Confusion Matrix", size: 15, style: :bold, indent_paragraphs: 60
@@ -183,7 +183,7 @@ class NihReport < BasePdf
   end
 
   def render_svg_plot(svg)
-    svg URI.unescape(svg), vposition: :center
+    svg CGI.unescape(svg), vposition: :center
   end
 
 end
