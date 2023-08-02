@@ -229,4 +229,9 @@
   &:hover {
     border: 1px solid #999;
   }
+
+  &.v-aligned-box-detail{
+    position: absolute;
+    left: 300px;
+  }
 }

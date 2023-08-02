@@ -57,7 +57,11 @@
         - @samples.each do |sample|
           .col.pe-7.list-items.box-sample-row
             .items-row
-              .items-item= sample.uuid
+              .items-item
+                .copy-content
+                  = sample.uuid
+                %button.btn-copy.ttip.v-aligned-box-detail
+                  = icon_tag "copy", class: "btn-icon"
               - unless sample.blinded_attribute?(:batch_number)
                 .sample-row-action= sample.batch_number
 
