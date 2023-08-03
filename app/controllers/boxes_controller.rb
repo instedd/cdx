@@ -57,25 +57,30 @@ class BoxesController < ApplicationController
 
     # TODO: should be handled by BoxForm (& duplicates BoxForm#parse_csv)
     CSV.open(params[:csv_box].path, headers: true) do |csv|
-      while csv.headers == true
-        csv.readline
-      end
-
-      unless csv.headers == ["Batch", "Concentration", "Distractor", "Instructions"]
-        @error_message = "Invalid columns"
-        return # rubocop:disable Lint/NonLocalExitFromIterator
-      end
-
+      unique_rows = Set.new
       csv.each do |row|
+
+        unless csv.headers == ["Batch", "Concentration", "Distractor", "Instructions", "Replicates"]
+          @error_message = "Invalid columns"
+          return # rubocop:disable Lint/NonLocalExitFromIterator
+        end
+
+        if unique_rows.include?([row["Batch"], row["Concentration"], row["Distractor"], row["Instructions"]])
+          @error_message = "Batch, Concentration, Distractor, Instructions must be unique"
+          return # rubocop:disable Lint/NonLocalExitFromIterator
+        end
+        unique_rows << [row["Batch"], row["Concentration"], row["Distractor"], row["Instructions"]]
+
         if batch_number = row["Batch"].presence&.strip
           batch_numbers << batch_number
-          @samples_count += 1
+          @samples_count += row["Replicates"].to_i
         end
       end
     end
 
     @found_batches = @navigation_context.institution.batches.where(batch_number: batch_numbers.to_a).pluck(:batch_number)
     @not_found_batches = (batch_numbers - @found_batches)
+
   end
 
   def create

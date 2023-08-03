@@ -93,16 +93,16 @@ var UploadCsvBox = React.createClass({
 
   const rowContent = errorMessage ?
     <div className="uploaded-samples-count">
-      {uploadedSamplesCount} {samplesText}
-      {batchesNotFound > 0 && (
-        <span className="dashed-underline">
-          {" ("}{batchesNotFound} {batchesText} not found{")"}
-        </span>
-      )}
-    </div> :
-    <div className="uploaded-samples-count">
       {errorMessage}
-    </div>;
+    </div>:
+    <div className="uploaded-samples-count">
+     {uploadedSamplesCount} {samplesText}
+     {batchesNotFound > 0 && (
+       <span className="dashed-underline">
+         {" ("}{batchesNotFound} {batchesText} not found{")"}
+       </span>
+     )}
+   </div>;
 
   return (
     <div className="items-row" key={filename}>
