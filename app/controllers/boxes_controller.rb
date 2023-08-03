@@ -80,7 +80,6 @@ class BoxesController < ApplicationController
 
     @found_batches = @navigation_context.institution.batches.where(batch_number: batch_numbers.to_a).pluck(:batch_number)
     @not_found_batches = (batch_numbers - @found_batches)
-
   end
 
   def create

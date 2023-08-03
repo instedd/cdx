@@ -266,7 +266,7 @@ RSpec.describe BoxesController, type: :controller do
     end
 
     it "validates CSV headers" do
-      csv_file = fixture_file_upload(Rails.root.join("spec/fixtures/csvs/samples_results_1.csv"), "text/csv")
+      csv_file = fixture_file_upload(Rails.root.join("spec/fixtures/csvs/csv_box_no_headers.csv"), "text/csv")
 
       expect do
         post :validate, params: { csv_box: csv_file }, format: "json"
@@ -292,7 +292,7 @@ RSpec.describe BoxesController, type: :controller do
       expect(JSON.parse(response.body)).to eq({
         "found_batches" => ["DISTRACTOR"],
         "not_found_batches" => [],
-        "samples_count" => 3,
+        "samples_count" => 4,
       })
     end
 
@@ -307,7 +307,7 @@ RSpec.describe BoxesController, type: :controller do
       expect(JSON.parse(response.body)).to eq({
         "found_batches" => ["DISTRACTOR"],
         "not_found_batches" => ["VIRUS"],
-        "samples_count" => 5,
+        "samples_count" => 6,
       })
     end
   end
