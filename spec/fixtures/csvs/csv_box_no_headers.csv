@@ -1,4 +1,3 @@
-Batch,Concentration,Distractor,Instructions,Replicates
 VIRUS,10,no,Add 10ml,2
 DISTRACTOR,10,yes,Add 10ml,2
 DISTRACTOR,20,yes,Add 10ml,2

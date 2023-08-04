@@ -217,7 +217,7 @@ class BoxForm
           instruction: row["Instructions"],
           concentrations: {
             "0" => {
-              replicate: 1,
+              replicate: row["Replicates"].to_i,
               concentration: Integer(Float(row["Concentration"]&.strip)),
             },
           },
