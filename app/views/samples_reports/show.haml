@@ -345,19 +345,12 @@
   }
 
   function printPDF() {
-    var context = getUrlParameter('context');
-    
-    var params = {
-      id: #{@samples_report.id},
-      measured_signal_svg: encodeURIComponent(getSvg("barchart", "measured_signal"))
-    };
-
-    document.getElementById("print-pdf-measured-signal-svg").value = encodeURIComponent(getSvg("barchart", "measured_signal"));
-    
+    document.getElementById("print-pdf-samples-report-id").value = #{@samples_report.id};
+    document.getElementById("print-pdf-measured-signal-svg").value = getSvg("barchart", "measured_signal");
     if ("#{@purpose}" == "Challenge")
-      document.getElementById("print-pdf-specific-svg").value = encodeURIComponent(getSvg("rocchart", "roc_curve"));
+      document.getElementById("print-pdf-specific-svg").value = getSvg("rocchart", "roc_curve");
     else
-      document.getElementById("print-pdf-specific-svg").value = encodeURIComponent(getSvg("linechart", "roc_curve"));
+      document.getElementById("print-pdf-specific-svg").value = getSvg("linechart", "limit_of_detection");
 
     if (#{@purpose.to_json} == "Challenge") {
       document.getElementById("print-pdf-threshold").value = document.getElementById("threshold").value;

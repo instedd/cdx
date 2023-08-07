@@ -132,7 +132,7 @@ class NihReport < BasePdf
   end
 
   def render_svg_plot(svg)
-    svg CGI.unescape(svg), vposition: :center
+    svg svg, vposition: :center
   end
 
   private
