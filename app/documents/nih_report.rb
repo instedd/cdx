@@ -99,52 +99,31 @@ class NihReport < BasePdf
 
   def render_confussion_matrix
     move_down 10
-    data = [
-      ["", "PREDICTED\nNEGATIVE", "PREDICTED\n POSITIVE", "TOTAL"],
-      [
-        "ACTUAL\nNEGATIVE", 
-        "<font size='18'>#{@confusion_matrix[:true_negative]}</font>\nTrue Negative",
-        "<font size='18'>#{@confusion_matrix[:false_positive]}</font>\nFalse Positive",
-        "<font size='18'>#{@confusion_matrix[:true_negative] + @confusion_matrix[:false_positive]}</font>\nActual Negative"
-      ],
-      [
-        "ACTUAL\nPOSITIVE",
-        "<font size='18'>#{@confusion_matrix[:false_negative]}</font>\nFalse Negative",
-        "<font size='18'>#{@confusion_matrix[:true_positive]}</font>\nTrue Positive",
-        "<font size='18'>#{@confusion_matrix[:false_negative] + @confusion_matrix[:true_positive]}</font>\nActual Positive"
-      ],
-      [
-        "TOTAL",
-        "<font size='18'>#{@confusion_matrix[:true_negative] + @confusion_matrix[:false_negative]}</font>\nPredicted Negative",
-        "<font size='18'>#{@confusion_matrix[:false_positive] + @confusion_matrix[:true_positive]}</font>\nPredicted Positive",
-        "<font size='18'>#{@confusion_matrix[:true_negative] + @confusion_matrix[:false_positive] + @confusion_matrix[:false_negative] + @confusion_matrix[:true_positive]}</font>\nTotal"
-      ]
-    ]
 
     cells = [
       [
-        RotatedCell.new(@document, [0, 0], content: data[0][0]), 
-        TitleCell.new(@document, [0, 0], content: data[0][1]), 
-        TitleCell.new(@document, [0, 0], content: data[0][2]), 
-        TitleCell.new(@document, [0, 0], content: data[0][3])
+        RotatedCell.new(@document, content: ""), 
+        TitleCell.new(@document, content: "PREDICTED\nNEGATIVE"), 
+        TitleCell.new(@document, content: "PREDICTED\n POSITIVE"), 
+        TitleCell.new(@document, content: "TOTAL")
       ],
       [
-        RotatedCell.new(@document, [0, 0], content: data[1][0]), 
-        GreyCell.new(@document, [0, 0], content: data[1][1]), 
-        GreyCell.new(@document, [0, 0], content: data[1][2]), 
-        TotalCell.new(@document, [0, 0], content: data[1][3])
+        RotatedCell.new(@document, content: "ACTUAL\nNEGATIVE"), 
+        GreyCell.new(@document, value: @confusion_matrix[:true_negative], title: "True Negative"),
+        GreyCell.new(@document, value: @confusion_matrix[:false_positive], title: "False Positive"), 
+        TotalCell.new(@document, value: @confusion_matrix[:true_negative] + @confusion_matrix[:false_positive], title: "Actual Negative")
       ],
       [
-        RotatedCell.new(@document, [0, 0], content: data[2][0]), 
-        GreyCell.new(@document, [0, 0], content: data[2][1]), 
-        GreyCell.new(@document, [0, 0], content: data[2][2]), 
-        TotalCell.new(@document, [0, 0], content: data[2][3])
+        RotatedCell.new(@document, content: "ACTUAL\nPOSITIVE"), 
+        GreyCell.new(@document, value: @confusion_matrix[:false_negative], title: "False Negative"),
+        GreyCell.new(@document, value: @confusion_matrix[:true_positive], title: "True Positive"),
+        TotalCell.new(@document, value: @confusion_matrix[:false_negative] + @confusion_matrix[:true_positive], title: "Actual Positive")
       ],
       [
-        RotatedCell.new(@document, [0, 0], content: data[3][0]), 
-        TotalCell.new(@document, [0, 0], content: data[3][1]), 
-        TotalCell.new(@document, [0, 0], content: data[3][2]), 
-        TotalCell.new(@document, [0, 0], content: data[3][3])
+        RotatedCell.new(@document, content: "TOTAL"),
+        TotalCell.new(@document, value: @confusion_matrix[:true_negative] + @confusion_matrix[:false_negative], title: "Predicted Negative"),
+        TotalCell.new(@document, value: @confusion_matrix[:false_positive] + @confusion_matrix[:true_positive], title: "Predicted Positive"),
+        TotalCell.new(@document, value: @confusion_matrix[:true_negative] + @confusion_matrix[:false_positive] + @confusion_matrix[:false_negative] + @confusion_matrix[:true_positive], title: "Total")
       ]
     ]
 
@@ -159,9 +138,8 @@ class NihReport < BasePdf
   private
 
   class CustomCell < Prawn::Table::Cell
-    def new(pdf, point, options={})
-      super
-      @options = options
+    def initialize(pdf, options={})
+      super(pdf, [0, 0], options)
     end
 
     def draw_content
@@ -170,6 +148,10 @@ class NihReport < BasePdf
   end
 
   class GreyCell < CustomCell
+    def initialize(pdf, options={})
+      super(pdf, {content: "<font size='18'>#{options[:value]}</font>\n#{options[:title]}"})
+    end
+
     def draw_content
       @pdf.fill_color "eeeeee"
       @pdf.rounded_rectangle [0, natural_content_height], natural_content_width, natural_content_height, 5
@@ -224,6 +206,10 @@ class NihReport < BasePdf
   end
 
   class TotalCell < CustomCell
+    def initialize(pdf, options={})
+      super(pdf, {content: "<font size='18'>#{options[:value]}</font>\n#{options[:title]}"})
+    end
+
     def draw_content
       @pdf.stroke_color "666666"
       @pdf.fill_color "FFFFFF"

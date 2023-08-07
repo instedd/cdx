@@ -38,7 +38,7 @@
             -if @purpose == "Challenge"
               .subtitle
                 Computed ROC AUC
-              .text
+              .text{id: "computed-auc"}
                 = auc(roc_curve(@samples_report))
               .subtitle
                 Threshold's TPR
@@ -131,8 +131,15 @@
                       message: "After downloading these files, you will need to fill specific columns. <br />Make sure you read the instructions to be aware of these considerations <br>contained in the file called Instructions.txt")
 
 = form_tag print_samples_reports_path, method: "post", id: "print-pdf-form", target: "_blank" do
-  %input{type: "hidden", name: "json", id: "print-pdf-json"}
-  %input{type: "hidden", name: "context", id: "print-pdf-context"}
+  %input{type: "hidden", name: "context", id: "print-pdf-context", value: params[:context]}
+  %input{type: "hidden", name: "samples_report_id", id: "print-pdf-samples-report-id", value: @samples_report.id}
+  %input{type: "hidden", name: "measured_signal_svg", id: "print-pdf-measured-signal-svg"}
+  %input{type: "hidden", name: "specific_svg", id: "print-pdf-specific-svg"}
+  - if @purpose == "Challenge"
+    %input{type: "hidden", name: "threshold", id: "print-pdf-threshold"}
+    %input{type: "hidden", name: "auc", id: "print-pdf-auc"}
+    %input{type: "hidden", name: "threshold_tpr", id: "print-pdf-tpr"}
+    %input{type: "hidden", name: "threshold_fpr", id: "print-pdf-fpr"}
   
 :javascript
 
@@ -340,49 +347,25 @@
   async function printPDF() {
     var context = getUrlParameter('context');
     
-    var measured_signal_svg = encodeURIComponent(getSvg("barchart", "measured_signal"));
-    var specific_svg;
+    var params = {
+      id: #{@samples_report.id},
+      measured_signal_svg: encodeURIComponent(getSvg("barchart", "measured_signal"))
+    };
+
+    document.getElementById("print-pdf-measured-signal-svg").value = encodeURIComponent(getSvg("barchart", "measured_signal"));
+    
     if ("#{@purpose}" == "Challenge")
-      specific_svg = encodeURIComponent(getSvg("rocchart", "roc_curve"));
+      document.getElementById("print-pdf-specific-svg").value = encodeURIComponent(getSvg("rocchart", "roc_curve"));
     else
-      specific_svg = encodeURIComponent(getSvg("linechart", "limit_of_detection"));
+      document.getElementById("print-pdf-specific-svg").value = encodeURIComponent(getSvg("linechart", "roc_curve"));
 
-    // if purpose is challenge, then we need the live threshold calculations
     if (#{@purpose.to_json} == "Challenge") {
-      var threshold = document.getElementById("threshold").value;
-      var url = '/samples_reports/update_threshold?context='+context+"&samples_report_id=#{@samples_report.id}&threshold="+threshold;
-      await fetch(url)
-          .then((response) => response.json())
-          .then((ret) => {
-            var params = {
-              id: #{@samples_report.id},
-              threshold: threshold,
-              auc: #{auc(roc_curve(@samples_report))},
-              threshold_tpr: (ret.confusion_matrix.true_positive || 0) / ((ret.confusion_matrix.true_positive || 0) + (ret.confusion_matrix.false_negative || 0)),
-              threshold_fpr: (ret.confusion_matrix.false_positive || 0) / ((ret.confusion_matrix.false_positive || 0) + (ret.confusion_matrix.true_negative || 0)),
-              measured_signal_svg: measured_signal_svg,
-              specific_svg: specific_svg
-            };
-            var print_url = '/samples_reports/print'; 
-            postObjectToUri(print_url, params, context);
-        })
+      document.getElementById("print-pdf-threshold").value = document.getElementById("threshold").value;
+      document.getElementById("print-pdf-tpr").value = document.getElementById("computed-tpr").innerHTML;
+      document.getElementById("print-pdf-fpr").value = document.getElementById("computed-fpr").innerHTML;
+      document.getElementById("print-pdf-auc").value = document.getElementById("computed-auc").innerHTML;
     }
-    else {
-      var params = {
-        id: #{@samples_report.id},
-        measured_signal_svg: measured_signal_svg,
-        specific_svg: specific_svg
-      };
-      var print_url = '/samples_reports/print'; 
-      postObjectToUri(print_url, params, context);
-    }
-  }
 
-  async function postObjectToUri(uri, obj, context) {
-    json = JSON.stringify(obj);
-    form = document.createElement("form");
-    document.getElementById("print-pdf-json").setAttribute("value", json);
-    document.getElementById("print-pdf-context").setAttribute("value", context);
     document.getElementById('print-pdf-form').submit();
   }
 

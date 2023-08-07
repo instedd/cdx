@@ -68,8 +68,7 @@ class SamplesReportsController < ApplicationController
 
   def print
     # convert json param to hash
-    json_params = JSON.parse(params[:json])
-    samples_report = SamplesReport.find(json_params["id"])
+    samples_report = SamplesReport.find(params["samples_report_id"])
 
     return unless authorize_resource(samples_report, READ_SAMPLES_REPORT)
 
@@ -81,18 +80,18 @@ class SamplesReportsController < ApplicationController
     }
 
     if purpose == "Challenge"
-      options[:threshold] = json_params["threshold"].to_f
-      options[:auc] = json_params["auc"].to_f
-      options[:threshold_tpr] = json_params["threshold_tpr"].to_f
-      options[:threshold_fpr] = json_params["threshold_fpr"].to_f
+      options[:threshold] = params["threshold"].to_f
+      options[:auc] = params["auc"].to_f
+      options[:threshold_tpr] = params["threshold_tpr"].to_f
+      options[:threshold_fpr] = params["threshold_fpr"].to_f
     else
       options[:threshold] = 0.0
     end
 
     options[:confusion_matrix] = confusion_matrix(samples_report.samples, options[:threshold])
 
-    options[:measured_signal_svg] = json_params["measured_signal_svg"]
-    options[:specific_svg] = json_params["specific_svg"]
+    options[:measured_signal_svg] = params["measured_signal_svg"]
+    options[:specific_svg] = params["specific_svg"]
 
     send_data NihReport.new(options).render,
       filename: "#{samples_report.name}.pdf",
