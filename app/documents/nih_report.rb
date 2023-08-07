@@ -121,69 +121,124 @@ class NihReport < BasePdf
       ]
     ]
 
-    inside_colors = [
-      "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF",
-      "FFFFFF", "F0F0F0", "F0F0F0", "FFFFFF",
-      "FFFFFF", "F0F0F0", "F0F0F0", "FFFFFF",
-      "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF"
-    ]
-    text_colors = [
-      "666666", "666666", "666666", "666666",
-      "666666", "000000", "000000", "666666",
-      "666666", "000000", "000000", "666666",
-      "666666", "666666", "666666", "666666"
-    ]
-    text_rotate = [
-      0, 0, 0, 0,
-      90, 0, 0, 0,
-      90, 0, 0, 0,
-      90, 0, 0, 0
-    ]
-    cell_widths = [
-      70, 200, 200, 100,
-      70, 200, 200, 100,
-      70, 200, 200, 100,
-      70, 200, 200, 100
-    ]
-    cell_heights = [
-      40, 40, 40, 40,
-      70, 70, 70, 70,
-      70, 70, 70, 70,
-      50, 50, 50, 50
+    cells = [
+      [
+        RotatedCell.new(@document, [0, 0], content: data[0][0]), 
+        TitleCell.new(@document, [0, 0], content: data[0][1]), 
+        TitleCell.new(@document, [0, 0], content: data[0][2]), 
+        TitleCell.new(@document, [0, 0], content: data[0][3])
+      ],
+      [
+        RotatedCell.new(@document, [0, 0], content: data[1][0]), 
+        GreyCell.new(@document, [0, 0], content: data[1][1]), 
+        GreyCell.new(@document, [0, 0], content: data[1][2]), 
+        TotalCell.new(@document, [0, 0], content: data[1][3])
+      ],
+      [
+        RotatedCell.new(@document, [0, 0], content: data[2][0]), 
+        GreyCell.new(@document, [0, 0], content: data[2][1]), 
+        GreyCell.new(@document, [0, 0], content: data[2][2]), 
+        TotalCell.new(@document, [0, 0], content: data[2][3])
+      ],
+      [
+        RotatedCell.new(@document, [0, 0], content: data[3][0]), 
+        TotalCell.new(@document, [0, 0], content: data[3][1]), 
+        TotalCell.new(@document, [0, 0], content: data[3][2]), 
+        TotalCell.new(@document, [0, 0], content: data[3][3])
+      ]
     ]
 
     text "Confusion Matrix", size: 15, style: :bold, indent_paragraphs: 60
-    move_down 30
-
-    i=0
-    table data, position: :center do
-      cells.style do |cell|
-        cell.border_width = 10
-        cell.border_color = "FFFFFF"
-        cell.background_color = inside_colors[i]
-        cell.padding_left = 5
-        cell.padding_right = 5
-        cell.padding_top = 2
-        cell.padding_bottom = 2
-        cell.size = 10
-        cell.align = :center
-        cell.valign = :center
-        cell.text_color = text_colors[i]
-        cell.rotate = text_rotate[i]
-        cell.rotate_around = :center
-        cell.height = cell_heights[i]
-        cell.width = cell_widths[i]
-        cell.inline_format = true 
-        i+=1
-      end
-    end
-    @current_cursor = cursor
-
-    rounded_rectangle [0, @current_cursor + 50], 50, @current_cursor - cursor + 10, 10
+    table(cells, :position => :center, :cell_style => {:border_color => "FFFFFF"})
   end
 
   def render_svg_plot(svg)
     svg CGI.unescape(svg), vposition: :center
+  end
+
+  private
+
+  class CustomCell < Prawn::Table::Cell
+    def new(pdf, point, options={})
+      super
+      @options = options
+    end
+
+    def draw_content
+      @pdf.text @content, align: :center, valign: :center, size: 10, inline_format: true
+    end
+  end
+
+  class GreyCell < CustomCell
+    def draw_content
+      @pdf.fill_color "eeeeee"
+      @pdf.rounded_rectangle [0, natural_content_height], natural_content_width, natural_content_height, 5
+      @pdf.fill
+      @pdf.fill_color "000000"
+      super
+      @pdf.fill_color "000000"
+    end
+
+    def natural_content_width
+      150
+    end
+
+    def natural_content_height
+      70
+    end
+  end
+
+  class RotatedCell < CustomCell
+    def draw_content
+      @pdf.fill_color "666666"
+      @pdf.rotate 90, origin: [natural_content_width, natural_content_height] do
+        @pdf.move_up 130
+        @pdf.text @content, align: :center, valign: :center, size: 10, inline_format: true
+      end
+    end
+
+    def natural_content_width
+      70
+    end
+
+    def natural_content_height
+      70
+    end
+  end
+
+  class TitleCell < CustomCell
+    def draw_content
+      @pdf.fill_color "666666"
+      @pdf.move_down 20
+      super
+      @pdf.fill_color "000000"
+    end
+
+    def natural_content_width
+      150
+    end
+
+    def natural_content_height
+      40
+    end
+  end
+
+  class TotalCell < CustomCell
+    def draw_content
+      @pdf.stroke_color "666666"
+      @pdf.fill_color "FFFFFF"
+      @pdf.fill_and_stroke_rounded_rectangle [0, natural_content_height], natural_content_width, natural_content_height, 5
+      @pdf.fill_color "666666"
+      super
+    end
+    
+    def natural_content_width
+      150
+    end
+
+    def natural_content_height
+      70
+    end
   end
 
 end

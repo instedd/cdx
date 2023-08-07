@@ -130,6 +130,10 @@
                       showCloseButton: false,
                       message: "After downloading these files, you will need to fill specific columns. <br />Make sure you read the instructions to be aware of these considerations <br>contained in the file called Instructions.txt")
 
+= form_tag print_samples_reports_path, method: "post", id: "print-pdf-form", target: "_blank" do
+  %input{type: "hidden", name: "json", id: "print-pdf-json"}
+  %input{type: "hidden", name: "context", id: "print-pdf-context"}
+  
 :javascript
 
   function applyInline(element, recursive = true) {
@@ -375,24 +379,11 @@
   }
 
   async function postObjectToUri(uri, obj, context) {
-    var json, form, input, inputContext;
-
     json = JSON.stringify(obj);
     form = document.createElement("form");
-    form.method = "post";
-    form.action = uri;
-    form.target="_blank";
-    input = document.createElement("input");
-    input.setAttribute("name", "json");
-    input.setAttribute("value", json);
-    inputContext = document.createElement("input");
-    inputContext.setAttribute("name", "context");
-    inputContext.setAttribute("value", context);
-    form.appendChild(input);
-    form.appendChild(inputContext);
-    document.body.appendChild(form);
-    form.submit();
-    document.body.removeChild(form);
+    document.getElementById("print-pdf-json").setAttribute("value", json);
+    document.getElementById("print-pdf-context").setAttribute("value", context);
+    document.getElementById('print-pdf-form').submit();
   }
 
   document.getElementById("print-as-csv").addEventListener("click", showConfirmModal);

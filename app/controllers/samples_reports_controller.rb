@@ -3,8 +3,6 @@ require 'zip'
 class SamplesReportsController < ApplicationController
   include SamplesReportsHelper
 
-  skip_before_action :verify_authenticity_token
-
   helper_method :boxes_data
   helper_method :available_institutions
   helper_method :confusion_matrix
