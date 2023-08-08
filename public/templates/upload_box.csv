@@ -1,5 +1,5 @@
 Batch,Concentration,Distractor,Instructions,Replicates
-borrar,100,no,Add 175 ml of media,2
-borrar,1000,no,Add 175 ml of media,2
-Blank,2,yes,Add 250 ml of media,4
-Blank,200,yes,Add 100 ml of media,4
+batch1,100,no,Add 175 ml of media,2
+batch1,1000,no,Add 175 ml of media,2
+batch2,2,yes,Add 250 ml of media,4
+batch2,200,yes,Add 100 ml of media,4
