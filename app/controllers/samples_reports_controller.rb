@@ -66,6 +66,38 @@ class SamplesReportsController < ApplicationController
     end
   end
 
+  def print
+    # convert json param to hash
+    samples_report = SamplesReport.find(params["samples_report_id"])
+
+    return unless authorize_resource(samples_report, READ_SAMPLES_REPORT)
+
+    purpose = samples_report.samples[0].box.purpose
+
+    options = {
+      :samples_report => samples_report,
+      :purpose => purpose
+    }
+
+    if purpose == "Challenge"
+      options[:threshold] = params["threshold"].to_f
+      options[:auc] = params["auc"].to_f
+      options[:threshold_tpr] = params["threshold_tpr"].to_f
+      options[:threshold_fpr] = params["threshold_fpr"].to_f
+    else
+      options[:threshold] = 0.0
+    end
+
+    options[:confusion_matrix] = confusion_matrix(samples_report.samples, options[:threshold])
+
+    options[:measured_signal_svg] = params["measured_signal_svg"]
+    options[:specific_svg] = params["specific_svg"]
+
+    send_data NihReport.new(options).render,
+      filename: "#{samples_report.name}.pdf",
+      type: "application/pdf",
+      disposition: "inline"
+  end
 
   def show
     @samples_report = SamplesReport.find(params[:id])
@@ -73,19 +105,8 @@ class SamplesReportsController < ApplicationController
     @reports_data = measured_signal_data(@samples_report)
     @samples_without_results_count = @samples_report.samples.without_results.count
     @purpose = @samples_report.samples[0].box.purpose
-
-    if params[:display] == "pdf"
-      gon.samples_report_id = @samples_report.id
-      gon.samples_report_name = @samples_report.name
-      gon.purpose = @purpose
-      gon.threshold = params[:threshold]
-      gon.min_threshold = params[:minthreshold]
-      gon.max_threshold = params[:maxthreshold]
-      render "_pdf_report", layout: false
-    else
-      @max_signal = @reports_data.reduce(0) { |a, e| e[:max] > a ? e[:max] : a }
-      @can_delete = has_access?(@samples_report, DELETE_SAMPLES_REPORT)
-    end
+    @max_signal = @reports_data.reduce(0) { |a, e| e[:max] > a ? e[:max] : a }
+    @can_delete = has_access?(@samples_report, DELETE_SAMPLES_REPORT)
   end
 
   def delete

@@ -38,7 +38,7 @@
             -if @purpose == "Challenge"
               .subtitle
                 Computed ROC AUC
-              .text
+              .text{id: "computed-auc"}
                 = auc(roc_curve(@samples_report))
               .subtitle
                 Threshold's TPR
@@ -54,10 +54,9 @@
                   = icon_tag "barchart", class: "btn-icon icon-text-color"
                   Download charts as svg
             .action
-              =link_to samples_report_path(:samples_report_id => @samples_report.id, :display => :pdf), id: "print-pdf-link", target: "_blank" do
-                .subtitle{id:'print-as-pdf'}
-                  = icon_tag "as-pdf", class: "btn-icon icon-text-color"
-                  Download PDF
+              =button_tag id:'print-pdf', class: 'subtitle btn-transparent' do
+                = icon_tag "as-pdf", class: "btn-icon icon-text-color"
+                Download PDF
             .action
               =button_tag id:'print-as-csv', class: 'subtitle btn-transparent' do
                 = icon_tag "table", class: "btn-icon icon-text-color"
@@ -98,7 +97,7 @@
                         height: 300,
                         barVariable: "average",
                         errorBarsVariable: "errors",
-                        y_label: 'Measured Signal',
+                        y_label: 'MEASURED SIGNAL',
                         x_labels: @purpose == "Challenge" ? ["Virus", "Distractor"]:[])
 
             - if @purpose == "LOD"
@@ -109,7 +108,7 @@
                           data: @reports_data,
                           height: 300,
                           dotsVariable: "measurements",
-                          y_label: 'Measured Signal',
+                          y_label: 'MEASURED SIGNAL',
                           x_labels: [])
 
             - if @purpose == "Challenge"
@@ -131,6 +130,17 @@
                       showCloseButton: false,
                       message: "After downloading these files, you will need to fill specific columns. <br />Make sure you read the instructions to be aware of these considerations <br>contained in the file called Instructions.txt")
 
+= form_tag print_samples_reports_path, method: "post", id: "print-pdf-form", target: "_blank" do
+  %input{type: "hidden", name: "context", id: "print-pdf-context", value: params[:context]}
+  %input{type: "hidden", name: "samples_report_id", id: "print-pdf-samples-report-id", value: @samples_report.id}
+  %input{type: "hidden", name: "measured_signal_svg", id: "print-pdf-measured-signal-svg"}
+  %input{type: "hidden", name: "specific_svg", id: "print-pdf-specific-svg"}
+  - if @purpose == "Challenge"
+    %input{type: "hidden", name: "threshold", id: "print-pdf-threshold"}
+    %input{type: "hidden", name: "auc", id: "print-pdf-auc"}
+    %input{type: "hidden", name: "threshold_tpr", id: "print-pdf-tpr"}
+    %input{type: "hidden", name: "threshold_fpr", id: "print-pdf-fpr"}
+  
 :javascript
 
   function applyInline(element, recursive = true) {
@@ -231,10 +241,6 @@
       var maxthreshold = document.getElementById("threshold").max;
 
       document.getElementById("treshold-title").innerHTML = "Threshold: " + parseFloat(ret.threshold).toFixed(2);
-      document.getElementById("print-pdf-link").href += "&threshold="+parseFloat(ret.threshold).toFixed(2);
-      document.getElementById("print-pdf-link").href += "&minthreshold="+parseFloat(minthreshold).toFixed(2);
-      document.getElementById("print-pdf-link").href += "&maxthreshold="+parseFloat(maxthreshold).toFixed(2);
-
 
       // For the bar chart
       var threshold_percentage = (threshold - minthreshold) / (maxthreshold - minthreshold);
@@ -331,5 +337,31 @@
     }
   }
 
+  function getSvg(chartId, chartName){
+    var svgData = document.getElementById(chartId);
+    applyInline(svgData);
+    svgData = svgData.outerHTML;
+    return svgData;
+  }
+
+  function printPDF() {
+    document.getElementById("print-pdf-samples-report-id").value = #{@samples_report.id};
+    document.getElementById("print-pdf-measured-signal-svg").value = getSvg("barchart", "measured_signal");
+    if ("#{@purpose}" == "Challenge")
+      document.getElementById("print-pdf-specific-svg").value = getSvg("rocchart", "roc_curve");
+    else
+      document.getElementById("print-pdf-specific-svg").value = getSvg("linechart", "limit_of_detection");
+
+    if (#{@purpose.to_json} == "Challenge") {
+      document.getElementById("print-pdf-threshold").value = document.getElementById("threshold").value;
+      document.getElementById("print-pdf-tpr").value = document.getElementById("computed-tpr").innerHTML;
+      document.getElementById("print-pdf-fpr").value = document.getElementById("computed-fpr").innerHTML;
+      document.getElementById("print-pdf-auc").value = document.getElementById("computed-auc").innerHTML;
+    }
+
+    document.getElementById('print-pdf-form').submit();
+  }
+
   document.getElementById("print-as-csv").addEventListener("click", showConfirmModal);
+  document.getElementById("print-pdf").addEventListener("click", printPDF);
 

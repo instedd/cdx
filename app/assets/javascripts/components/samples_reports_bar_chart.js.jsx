@@ -122,7 +122,7 @@ var SamplesReportsBarChart = React.createClass({
                             x={x(d.label)+x.rangeBand()/2-1}
                             y={y(d[barVariable]) - error}
                             width={2}
-                            height={error*2} />
+                            height={error*2+1} />
                       <rect 
                             x={x(d.label)}
                             y={y(d[barVariable]) - error - 1}
