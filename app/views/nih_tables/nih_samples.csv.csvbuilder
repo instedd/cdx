@@ -29,7 +29,7 @@ csv << [
     nil,
     nil,
     sample.concentration,
-    'copies/ml',
+    'copies/mL',
     sample.reference_gene,
     sample.uuid,
     sample.batch_number,
