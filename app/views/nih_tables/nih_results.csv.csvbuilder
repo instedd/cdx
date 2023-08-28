@@ -11,7 +11,7 @@ csv << [
 
 @samples_report.samples.each do |sample|
   csv << [
-    sample.id,
+    sample.uuid,
     sample.box.uuid,
     "#{sample.box.purpose}-panel",
     nil,

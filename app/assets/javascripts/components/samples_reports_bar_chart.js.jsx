@@ -85,7 +85,7 @@ var SamplesReportsBarChart = React.createClass({
                 ref={function(ref) { if (ref) { d3.select(ref.getDOMNode()).call(xAxis); rotateLabels(ref); }}}>
               </g>
               <text transform={"translate(" + (chartWidth) + ", "+(chartHeight+this.props.margin.bottom-10)+")"}
-                        y="6" dy=".1em" style={{textAnchor: 'end'}}>CONCENTRATION (copies/ml)</text>
+                        y="6" dy=".1em" style={{textAnchor: 'end'}}>CONCENTRATION (copies/mL)</text>
   
 
               {/* Y Axis */}

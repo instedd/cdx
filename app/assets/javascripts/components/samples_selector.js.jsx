@@ -51,7 +51,7 @@ var SamplesSelector = React.createClass({
             </div>
             <div className="items-item">{sample.uuid}&nbsp;<span>{sample.batch_number}</span></div>
           </div>
-          <div className="items-concentration">{sample.concentration} copies/ml</div>
+          <div className="items-concentration">{sample.concentration} copies/mL</div>
         </div>
       </div>);
     } else {

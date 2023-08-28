@@ -273,7 +273,7 @@ var BoxBatchForm = React.createClass({
         </div>
         <div className="items-concentration">
           <input type="text" name={this.fieldFor("concentrations", item.key , "concentration")} value={item.concentration} onChange={set("concentration")}/>
-          copies/ml
+          copies/mL
         </div>
       </div>
     );

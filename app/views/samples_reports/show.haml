@@ -316,11 +316,12 @@
               true_negatives: ret.confusion_matrix.true_negative || 0,
               false_positives: ret.confusion_matrix.false_positive || 0,
               false_negatives: ret.confusion_matrix.false_negative || 0,
-              tpr: (ret.confusion_matrix.true_positive || 0) / ((ret.confusion_matrix.true_positive || 0) + (ret.confusion_matrix.false_negative || 0)),
-              fpr: (ret.confusion_matrix.false_positive || 0) / ((ret.confusion_matrix.false_positive || 0) + (ret.confusion_matrix.true_negative || 0)),
-              auc: #{auc(roc_curve(@samples_report))},
-              roc_x_values: #{roc_curve(@samples_report).map{|x| x[0]}},
-              roc_y_values: #{roc_curve(@samples_report).map{|x| x[1]}},
+              sensitivity: ((ret.confusion_matrix.true_positive || 0) / ((ret.confusion_matrix.true_positive || 0) + (ret.confusion_matrix.false_negative || 0))).toFixed(3),
+              specificity: 1-((ret.confusion_matrix.false_positive || 0) / ((ret.confusion_matrix.false_positive || 0) + (ret.confusion_matrix.true_negative || 0))).toFixed(3),
+              auc: #{auc(roc_curve(@samples_report)).round(3)},
+              roc_x_values: #{roc_curve(@samples_report).map{|x| x[0].round(3)}},
+              roc_y_values: #{roc_curve(@samples_report).map{|x| x[1].round(3)}},
+              threshold: parseFloat(threshold).toFixed(3),
             };
 
             // create url params with the params dictionary
