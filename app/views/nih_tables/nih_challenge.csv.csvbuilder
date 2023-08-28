@@ -48,6 +48,6 @@ csv << [
   nil,
   nil,
   params[:auc],
-  params[:roc_x_values].gsub(",","|"),
-  params[:roc_y_values].gsub(",","|")
+  params[:roc_x_values].to_s.gsub(",","|"),
+  params[:roc_y_values].to_s.gsub(",","|")
 ]

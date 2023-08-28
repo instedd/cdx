@@ -61,7 +61,7 @@ RSpec.describe NihTablesController, type: :controller do
       samples_table = CSV.parse(Zip::File.open_buffer(response.body).entries.find{|e| e.name == "Test_results.csv"}.get_input_stream.read, headers: true)
       
       expect(samples_table.count).to eq(@samples_report.samples_report_samples.count)
-      expect(samples_table["sample_id"]).to eq(@samples_report.samples_report_samples.map{|srs| srs.sample.id.to_s})
+      expect(samples_table["sample_id"]).to eq(@samples_report.samples_report_samples.map{|srs| srs.sample.uuid.to_s})
     end
 
     it "should contain the LOD table for if the box purpose is LOD" do
