@@ -30,14 +30,14 @@ csv << [
     nil,
     sample.concentration,
     'copies/mL',
-    sample.reference_gene,
+    sample.original_batch.reference_gene,
     sample.uuid,
     sample.batch_number,
     'inactivated virus',
     'SARS-CoV-2',
-    sample.target_organism_taxonomy_id,
-    sample.pango_lineage,
-    sample.who_label,
+    sample.original_batch.target_organism_taxonomy_id,
+    sample.original_batch.pango_lineage,
+    sample.original_batch.who_label,
     sample.inactivation_method
   ]
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20230731140544) do
+ActiveRecord::Schema.define(version: 20231030102203) do
 
   create_table "alert_condition_results", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci" do |t|
     t.string  "result"
@@ -128,23 +128,38 @@ ActiveRecord::Schema.define(version: 20230731140544) do
     t.index ["assay_attachment_id"], name: "index_assay_files_on_assay_attachment_id", using: :btree
   end
 
+  create_table "autocomplete_values", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci" do |t|
+    t.string   "field_name"
+    t.string   "value"
+    t.integer  "institution_id", null: false
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+    t.index ["field_name", "value", "institution_id"], name: "autocomplete_index", unique: true, using: :btree
+    t.index ["institution_id"], name: "index_autocomplete_values_on_institution_id", using: :btree
+  end
+
   create_table "batches", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci" do |t|
     t.string   "uuid"
-    t.text     "core_fields",    limit: 16777215
-    t.text     "custom_fields",  limit: 16777215
-    t.binary   "sensitive_data", limit: 65535
+    t.text     "core_fields",                 limit: 16777215
+    t.text     "custom_fields",               limit: 16777215
+    t.binary   "sensitive_data",              limit: 65535
+    t.string   "isolate_name"
     t.datetime "deleted_at"
     t.integer  "institution_id"
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
-    t.string   "isolate_name"
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
     t.string   "batch_number"
     t.integer  "site_id"
     t.string   "site_prefix"
     t.datetime "date_produced"
+    t.string   "reference_gene"
+    t.integer  "target_organism_taxonomy_id"
+    t.string   "pango_lineage"
+    t.string   "who_label"
     t.index ["date_produced"], name: "index_batches_on_date_produced", using: :btree
     t.index ["deleted_at"], name: "index_batches_on_deleted_at", using: :btree
     t.index ["institution_id"], name: "index_batches_on_institution_id", using: :btree
+    t.index ["isolate_name"], name: "index_batches_on_isolate_name", using: :btree
     t.index ["site_id"], name: "index_batches_on_site_id", using: :btree
   end
 
@@ -158,18 +173,18 @@ ActiveRecord::Schema.define(version: 20230731140544) do
   end
 
   create_table "boxes", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci" do |t|
-    t.string   "uuid",           limit: 36,                    null: false
+    t.string   "uuid",           limit: 36,                       null: false
     t.integer  "institution_id"
     t.integer  "site_id"
     t.string   "site_prefix"
-    t.text     "core_fields",    limit: 65535
-    t.text     "custom_fields",  limit: 65535
+    t.text     "core_fields",    limit: 16777215
+    t.text     "custom_fields",  limit: 16777215
     t.binary   "sensitive_data", limit: 65535
     t.string   "purpose"
     t.datetime "deleted_at"
-    t.datetime "created_at",                                   null: false
-    t.datetime "updated_at",                                   null: false
-    t.boolean  "blinded",                      default: false, null: false
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
+    t.boolean  "blinded",                         default: false, null: false
     t.index ["created_at"], name: "index_boxes_on_created_at", using: :btree
     t.index ["deleted_at"], name: "index_boxes_on_deleted_at", using: :btree
     t.index ["institution_id"], name: "index_boxes_on_institution_id", using: :btree
@@ -537,26 +552,27 @@ ActiveRecord::Schema.define(version: 20230731140544) do
   end
 
   create_table "samples", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci" do |t|
-    t.binary   "sensitive_data",   limit: 65535
+    t.binary   "sensitive_data",    limit: 65535
     t.integer  "institution_id"
-    t.text     "custom_fields",    limit: 16777215
-    t.text     "core_fields",      limit: 16777215
+    t.text     "custom_fields",     limit: 16777215
+    t.text     "core_fields",       limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "patient_id"
     t.integer  "encounter_id"
-    t.boolean  "is_phantom",                        default: true
+    t.boolean  "is_phantom",                         default: true
     t.datetime "deleted_at"
     t.integer  "batch_id"
     t.string   "isolate_name"
     t.integer  "site_id"
     t.string   "site_prefix"
     t.string   "specimen_role"
-    t.integer  "qc_info_id"
     t.string   "old_batch_number"
+    t.integer  "qc_info_id"
     t.integer  "box_id"
     t.boolean  "distractor"
     t.string   "instruction"
+    t.integer  "original_batch_id"
     t.index ["batch_id"], name: "index_samples_on_batch_id", using: :btree
     t.index ["box_id"], name: "index_samples_on_box_id", using: :btree
     t.index ["deleted_at"], name: "index_samples_on_deleted_at", using: :btree
@@ -741,10 +757,7 @@ ActiveRecord::Schema.define(version: 20230731140544) do
     t.index ["unlock_token"], name: "index_users_on_unlock_token", unique: true, using: :btree
   end
 
-  add_foreign_key "alerts", "institutions"
-  add_foreign_key "assay_attachments", "assay_files"
-  add_foreign_key "assay_attachments", "loinc_codes"
-  add_foreign_key "assay_attachments", "samples"
+  add_foreign_key "autocomplete_values", "institutions"
   add_foreign_key "batches", "sites"
   add_foreign_key "box_transfers", "boxes"
   add_foreign_key "box_transfers", "transfer_packages"

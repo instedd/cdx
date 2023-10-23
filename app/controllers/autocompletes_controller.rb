@@ -1,6 +1,31 @@
 class AutocompletesController < ApplicationController
   def index
-    permitted_attributes = %w[reference_gene target_organism_taxonomy_id pango_lineage who_label]
+    permitted_attributes = [
+      'virus_shortname',
+      'reference_gene',
+      'target_organism_name',
+      'target_organism_taxonomy_id',
+      'pango_lineage',
+      'who_label',
+      'gisaid_id',
+      'gisaid_clade',
+      'nucleotide_db_id',
+      'virus_sample_source',
+      'virus_sample_source_url',
+      'virus_source',
+      'virus_location',
+      'virus_sample_type',
+      'virus_sample_formulation',
+      'virus_sample_concentration',
+      'virus_sample_concentration_unit',
+      'virus_sample_genome_equivalents',
+      'virus_sample_genome_equivalents_unit',
+      'virus_sample_genome_equivalents_reference_gene',
+      'virus_preinactivation_tcid50',
+      'virus_preinactivation_tcid50_unit',
+      'virus_sample_grow_cell_line'
+    ]
+
     @institution = Institution.find(params[:institution_id])
 
     unless params[:field_name].in?(permitted_attributes)
@@ -19,11 +44,6 @@ class AutocompletesController < ApplicationController
 
     check_access(@institution.batches, READ_BATCH).select(:id, :core_fields, :uuid, :custom_fields).find_each do |batch|
       value = batch.send(field_name)
-      values << value if value&.match?(matcher)
-    end
-
-    check_access(@institution.samples, READ_SAMPLE).select(:id, :core_fields, :custom_fields).find_each do |sample|
-      value = sample.send(field_name)
       values << value if value&.match?(matcher)
     end
 

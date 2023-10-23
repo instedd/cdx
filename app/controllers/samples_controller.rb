@@ -106,6 +106,7 @@ class SamplesController < ApplicationController
     sample = Sample.new(sample_params.merge({
       institution: institution,
       site: @navigation_context.site,
+      original_batch_id: sample_params[:batch_id] || nil,
       sample_identifiers: [SampleIdentifier.new({ uuid: uuid })],
     }))
     @sample_form = SamplePresenter.new(SampleForm.for(sample), request.format)
@@ -247,10 +248,6 @@ class SamplesController < ApplicationController
       :distractor,
       :instruction,
       :measured_signal,
-      :reference_gene,
-      :target_organism_taxonomy_id,
-      :pango_lineage,
-      :who_label,
       assay_attachments_attributes: [:id, :loinc_code_id, :result, :assay_file_id, :_destroy],
       notes_attributes: [:id, :description, :updated_at, :user_id, :_destroy],
     )

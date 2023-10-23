@@ -89,7 +89,7 @@ class Box < ApplicationRecord
 
   # Returns the full list of sample attributes that can be blinded.
   def self.blind_attribute_names
-    %i[batch_number concentration replicate virus_lineage isolate_name reference_gene target_organism_taxonomy_id pango_lineage who_label]
+    %i[batch_number concentration replicate virus_lineage isolate_name]
   end
 
   # Returns true if a sample attribute should be blinded for the current box.
@@ -107,5 +107,13 @@ class Box < ApplicationRecord
 
   def blind!
     update_columns(blinded: true)
+  end
+
+  def original_batches
+    Batch.where(id: samples.map(&:original_batch_id).uniq)
+  end
+
+  def batches
+    batches + original_batches
   end
 end

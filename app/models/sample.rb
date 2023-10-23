@@ -50,6 +50,7 @@ class Sample < ApplicationRecord
   attribute_field :isolate_name, copy: true
   attribute_field :specimen_role, copy: true
   attribute_field :old_batch_number, copy: true
+  attribute_field :original_batch_id, copy: true
   attribute_field :date_produced,
                   :lab_technician,
                   :inactivation_method,
@@ -58,11 +59,7 @@ class Sample < ApplicationRecord
                   :concentration,
                   :replicate,
                   :media,
-                  :measured_signal,
-                  :reference_gene,
-                  :target_organism_taxonomy_id,
-                  :pango_lineage,
-                  :who_label
+                  :measured_signal
 
   def self.find_by_entity_id(entity_id, opts)
     query = joins(:sample_identifiers).where(sample_identifiers: {entity_id: entity_id.to_s}, institution_id: opts.fetch(:institution_id))
@@ -186,5 +183,9 @@ class Sample < ApplicationRecord
 
   def self.sort_column?(attr_name)
     sort_columns.include?(attr_name)
+  end
+
+  def original_batch
+    Batch.find_by_id(original_batch_id)
   end
 end
