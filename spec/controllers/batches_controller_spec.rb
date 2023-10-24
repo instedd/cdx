@@ -665,6 +665,7 @@ RSpec.describe BatchesController, type: :controller do
       expect(sample.inactivation_method).to eq(batch.inactivation_method)
       expect(sample.volume).to eq(batch.volume)
       expect(sample.virus_lineage).to eq(batch.virus_lineage)
+      expect(sample.original_batch_id).to eq(batch.id)
     end
 
     it "should be allowed if can update batch" do
