@@ -94,8 +94,6 @@ entities:
       lab_technician:
       old_batch_number:
         searchable: true
-      original_batch_id:
-        type: integer
   samples_report: &SAMPLES_REPORT
     fields:
       name:

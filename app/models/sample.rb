@@ -50,7 +50,6 @@ class Sample < ApplicationRecord
   attribute_field :isolate_name, copy: true
   attribute_field :specimen_role, copy: true
   attribute_field :old_batch_number, copy: true
-  attribute_field :original_batch_id, copy: true
   attribute_field :date_produced,
                   :lab_technician,
                   :inactivation_method,
