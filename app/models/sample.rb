@@ -15,6 +15,7 @@ class Sample < ApplicationRecord
   belongs_to :batch
   belongs_to :box
   belongs_to :qc_info
+  belongs_to :original_batch, class_name: "Batch", optional: true
 
   has_many :sample_identifiers, inverse_of: :sample, dependent: :destroy
   has_many :test_results, through: :sample_identifiers

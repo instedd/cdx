@@ -108,12 +108,4 @@ class Box < ApplicationRecord
   def blind!
     update_columns(blinded: true)
   end
-
-  def original_batches
-    Batch.where(id: samples.map(&:original_batch_id).uniq)
-  end
-
-  def batches
-    batches + original_batches
-  end
 end

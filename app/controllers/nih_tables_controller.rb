@@ -5,7 +5,7 @@ class NihTablesController < ApplicationController
 
     @target_box = @samples_report.boxes.take
     @target_sample = @samples_report.target_sample
-    @target_batches = @samples_report.samples.map(&:original_batch).uniq
+    @target_batches = @samples_report.original_batches.distinct
     zip_data = create_zip_file(@target_box.purpose)
     send_data zip_data.read, type: 'application/zip', filename: "#{@samples_report.name}_nih_tables.zip"
   end

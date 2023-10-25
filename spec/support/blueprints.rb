@@ -167,8 +167,7 @@ end
 Sample.blueprint do
   institution { object.encounter.try(:institution) || object.patient.try(:institution) || Institution.make! }
   patient { object.encounter.try(:patient) }
-  batch { Batch.make! }
-  original_batch_id { object.batch.id }
+  original_batch_id { object.batch_id }
 end
 
 # FIXME: These properties should probably be part of the main blueprint, but that breaks a number of different existing specs.
@@ -179,13 +178,12 @@ Sample.blueprint(:filled) do
   specimen_role { "p" }
   date_produced { Faker::Time.backward }
   measured_signal { 10.0 }
-  batch { Batch.make! }
-  original_batch_id { object.batch.id }
+  original_batch_id { object.batch_id }
 end
 
 Sample.blueprint(:batch) do
   batch { Batch.make! }
-  original_batch_id { object.batch.id }
+  original_batch_id { object.batch_id }
 end
 
 QcInfo.blueprint do

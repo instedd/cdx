@@ -8,6 +8,7 @@ class SamplesReport < ApplicationRecord
   has_many :samples_report_samples, dependent: :destroy
   has_many :samples, through: :samples_report_samples
   has_many :boxes, through: :samples
+  has_many :original_batches, through: :samples
 
   def self.entity_scope
     "samples_report"

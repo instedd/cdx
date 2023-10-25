@@ -128,16 +128,6 @@ ActiveRecord::Schema.define(version: 20231030102203) do
     t.index ["assay_attachment_id"], name: "index_assay_files_on_assay_attachment_id", using: :btree
   end
 
-  create_table "autocomplete_values", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci" do |t|
-    t.string   "field_name"
-    t.string   "value"
-    t.integer  "institution_id", null: false
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
-    t.index ["field_name", "value", "institution_id"], name: "autocomplete_index", unique: true, using: :btree
-    t.index ["institution_id"], name: "index_autocomplete_values_on_institution_id", using: :btree
-  end
-
   create_table "batches", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci" do |t|
     t.string   "uuid"
     t.text     "core_fields",                 limit: 16777215
@@ -757,7 +747,6 @@ ActiveRecord::Schema.define(version: 20231030102203) do
     t.index ["unlock_token"], name: "index_users_on_unlock_token", unique: true, using: :btree
   end
 
-  add_foreign_key "autocomplete_values", "institutions"
   add_foreign_key "batches", "sites"
   add_foreign_key "box_transfers", "boxes"
   add_foreign_key "box_transfers", "transfer_packages"
