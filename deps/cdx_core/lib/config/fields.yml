@@ -94,14 +94,6 @@ entities:
       lab_technician:
       old_batch_number:
         searchable: true
-      reference_gene:
-        type: string
-      target_organism_taxonomy_id:
-        type: string
-      pango_lineage:
-        type: string
-      who_label:
-        type: string
   samples_report: &SAMPLES_REPORT
     fields:
       name:
@@ -146,9 +138,13 @@ entities:
       volume:
         type: float
         searchable: true
+      virus_shortname:
+        type: string
       virus_lineage:
         type: string
       reference_gene:
+        type: string
+      target_organism_name:
         type: string
       target_organism_taxonomy_id:
         type: string
@@ -157,6 +153,41 @@ entities:
       who_label:
         type:
           String
+      gisaid_clade:
+        type: string
+      gisaid_id:
+        type: string
+      nucleotide_db_id:
+        type: string
+      virus_sample_source:
+        type: string
+      virus_sample_source_url:
+        type: string
+      virus_source:
+        type: string
+      virus_location:
+        type: string
+      virus_sample_type:
+        type: string
+      virus_sample_formulation:
+        type: string
+      virus_sample_concentration:
+        type: string
+      virus_sample_concentration_unit:
+        type: string
+      virus_sample_genome_equivalents:
+        type: string
+      virus_sample_genome_equivalents_unit:
+        type: string
+      virus_sample_genome_equivalents_reference_gene:
+        type: string
+      virus_preinactivation_tcid50:
+        type: string
+      virus_preinactivation_tcid50_unit:
+        type: string
+      virus_sample_grow_cell_line:
+        type: string
+
   box: &BOX
     allows_custom: true
     fields:

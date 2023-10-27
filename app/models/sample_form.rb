@@ -22,11 +22,7 @@ class SampleForm
       :measured_signal,
       :distractor,
       :instruction,
-      :qc_info,
-      :reference_gene,
-      :target_organism_taxonomy_id,
-      :pango_lineage,
-      :who_label ]
+      :qc_info]
   end
 
   def self.model_name

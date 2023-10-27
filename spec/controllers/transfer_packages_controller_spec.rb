@@ -331,6 +331,31 @@ RSpec.describe TransferPackagesController, type: :controller do
       expect(box2.blinded).to eq(false)
     end
 
+    it "removes original sample batch upon transfer keeping original_batch id" do
+      batch = Batch.make!(:qc_sample)
+      sample = Sample.make!(:filled, institution: institution, batch: batch)
+      box = Box.make!(institution: institution, samples: [sample])
+      
+      expect do
+        post :create, params: {
+                        transfer_package: {
+                          receiver_institution_id: other_institution.id,
+                          recipient: "Mr. X",
+                          includes_qc_info: true,
+                          box_transfers_attributes: {
+                            "0" => {
+                              box_id: box.id,
+                            },
+                          },
+                        },
+                      }
+      end.to change { TransferPackage.count }.by(1)
+
+      sample.reload
+      expect(sample.batch_id).to be_nil
+      expect(sample.original_batch_id).to eq(batch.id)
+    end
+
     it "ignores blank sample_uuid" do
       sample = Sample.make!(:filled, institution: institution)
       box = Box.make!(institution: institution, samples: [sample])

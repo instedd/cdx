@@ -24,9 +24,28 @@ class Batch < ApplicationRecord
                   :volume,
                   :virus_lineage,
                   :reference_gene,
+                  :virus_shortname,
                   :target_organism_taxonomy_id,
+                  :target_organism_name,
                   :pango_lineage,
-                  :who_label
+                  :who_label,
+                  :gisaid_id,
+                  :gisaid_clade,
+                  :nucleotide_db_id,
+                  :virus_sample_source,
+                  :virus_sample_source_url,
+                  :virus_source,
+                  :virus_location,
+                  :virus_sample_type,
+                  :virus_sample_formulation,
+                  :virus_sample_concentration,
+                  :virus_sample_concentration_unit,
+                  :virus_sample_genome_equivalents,
+                  :virus_sample_genome_equivalents_unit,
+                  :virus_sample_genome_equivalents_reference_gene,
+                  :virus_preinactivation_tcid50,
+                  :virus_preinactivation_tcid50_unit,
+                  :virus_sample_grow_cell_line
 
   validates_presence_of :inactivation_method
   validates_presence_of :volume
@@ -67,10 +86,7 @@ class Batch < ApplicationRecord
       isolate_name: isolate_name,
       inactivation_method: inactivation_method,
       virus_lineage: virus_lineage,
-      reference_gene: reference_gene,
-      target_organism_taxonomy_id: target_organism_taxonomy_id,
-      pango_lineage: pango_lineage,
-      who_label: who_label,
+      original_batch_id: id,
       **attributes
     )
   end
