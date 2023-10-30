@@ -3,7 +3,7 @@ class AddOriginalBatchIdToSamples < ActiveRecord::Migration
     add_column :samples, :original_batch_id, :integer
 
     Sample.preload(:batch).find_each do |sample|
-      batch = sample.batch ? sample.batch : Batch.find_by(batch_number: sample.old_batch_number)
+      batch = sample.batch || Batch.find_by(batch_number: sample.old_batch_number)
       if batch
         sample.original_batch_id = batch.id
         sample.save
