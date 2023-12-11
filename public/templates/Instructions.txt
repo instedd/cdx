@@ -1,4 +1,4 @@
-This compressed file contains three tables containing data elements for the RADx-rad Data Hub. The tables 
+This compressed file contains four tables containing data elements for the RADx-rad Data Hub. The tables 
 contain pre-filled data based on the information available to the CDx LIMS system. The tables are provided 
 to the user to fill in the missing information. Please note that you need to maintain the same format as 
 the one provided in the tables (CSV file format, with identical columns and rows).
@@ -8,6 +8,7 @@ The three provided tables are as follows:
 1. <report_name>_samples.csv
 2. <report_name>_samples_results.csv
 3. <report_name>_<purpose>.csv
+3. <report_name>_batches.csv
 
 The first table contains one row per sample with general information about each sample. 
 
@@ -15,13 +16,15 @@ The second table contains one row per sample result, providing information about
 each sample by the user, including the readout, measurement units, used technology, etc. 
 
 The third table contains one row per panel and provides information about the aggregated results obtained 
-after the tests were performed. The <purpose> can be either "LOD" or "Challenge" depending on the type of
-test performed. 
+after the tests were performed. The <purpose> can be either "LOD", "Challenge" or "Variants" depending on the 
+type of panel used. 
 
-Once the developer completes the missing data, these files are ready to be submitted to the RADx-rad 
-Data Core (https://www.radxrad.org/) for quality assurance. For more information, please contact 
-Dr. Peter Rose (pwrose.ucsd@gmail.com). The Data Core administrator will review the data for completeness 
-and consistency and will reach out to the developer if any issues arise.
+The fourth table contains one row per batch included in the panel and provides information about these 
+batches: features describing the virus features as its lineage, reference gene taken into account to measure 
+concentration, etc.
 
-After the data passes the quality check, the Data Core administrator uploads the data files, common data 
-element dictionaries, and metadata files to the NIH COVID RADx-rad Data Hub (https://radx-hub.nih.gov/).
+Please reach out to Dr. Peter Rose at pwrose.ucsd@gmail.com once you have obtained the necessary files. 
+Dr. Rose will assist you in incorporating technology metadata, generating the dictionary file, and thoroughly 
+assessing your files for completeness and consistency. Upon successful completion of this review, submit the 
+files to the RADx-rad Data Core. For questions related to the data submission process, please contact 
+Pritham Ram at pritham.ram@yale.edu.
