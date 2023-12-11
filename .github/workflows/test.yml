@@ -59,6 +59,13 @@ jobs:
       - name: Run specs (cucumber)
         run: docker compose run --rm -e RAILS_ENV=test -e COVERAGE=true -e SELENIUM_URL web bundle exec cucumber
 
+      - if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: Screenshots
+          path: tmp/capybara/
+          retention-days: 60
+
       - run: cp coverage/.resultset.json resultset.integration_tests.json
 
       - uses: actions/upload-artifact@v3
