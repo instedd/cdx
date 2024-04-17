@@ -33,7 +33,8 @@
   .row
     .col
       = f.form_field :date_produced do
-        = f.date_field :date_produced, readonly: !@can_update
+        - @sample_form.blinded_attribute(:date_produced) do
+          = f.date_field :date_produced, readonly: !@can_update
 
       = f.form_field :lab_technician do
         = f.text_field :lab_technician, :class => 'input-x-large', readonly: !@can_update
