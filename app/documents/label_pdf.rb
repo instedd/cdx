@@ -41,7 +41,7 @@ class LabelPdf < BasePdf
     text_lines [
       "I.N. #{sample.isolate_name}".truncate(22),
       "I.M. #{sample.inactivation_method}".truncate(22),
-      "P.D. #{sample.date_produced == "Blinded" ? "Blinded" : sample.date_produced.strftime("%m/%d/%Y")}",
+      "P.D. #{sample.blinded_attribute?(:date_produced) ? sample.date_produced : sample.date_produced.strftime("%m/%d/%Y")}",
     ], leading: -0.5
   end
 
