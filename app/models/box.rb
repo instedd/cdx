@@ -89,7 +89,7 @@ class Box < ApplicationRecord
 
   # Returns the full list of sample attributes that can be blinded.
   def self.blind_attribute_names
-    %i[batch_number concentration replicate virus_lineage isolate_name]
+    %i[batch_number concentration replicate virus_lineage isolate_name date_produced]
   end
 
   # Returns true if a sample attribute should be blinded for the current box.

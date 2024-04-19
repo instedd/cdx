@@ -143,7 +143,7 @@ class BoxesController < ApplicationController
 
   def load_box_samples
     samples = @box.samples.preload(:batch, :sample_identifiers)
-    samples = if @box.blinded? && !params[:unblind]
+    samples = if @box.blinded? && !params[:unblind] && @box.transferred?
       samples.scrambled
     else
       samples.order(:id)
