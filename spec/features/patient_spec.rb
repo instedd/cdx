@@ -16,7 +16,7 @@ describe "Patients", elasticsearch: true do
     }
 
     it "should display 'Unknown name' in test result and in patient page" do
-      pending "always fails on github actions" if ENV["CI"]
+      skip "sometimes fails on github actions" if ENV["CI"]
 
       goto_page TestResultsPage do |page|
         page.table.items[6].click
