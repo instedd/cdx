@@ -20,7 +20,7 @@ csv << [
     sample.virus_lineage,
     sample.replicate,
     sample.concentration,
-    sample.blinded_attribute(:date_produced) { sample.date_produced.to_date },
+    params[:unblind] ? sample.date_produced.to_date : sample.blinded_attribute(:date_produced) { sample.date_produced.to_date },
     sample.inactivation_method,
     sample.media,
   ]
